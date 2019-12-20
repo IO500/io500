@@ -1,3 +1,7 @@
+core
+vgcore.*
+io500
+
 # Prerequisites
 *.d
 

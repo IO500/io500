@@ -5,12 +5,24 @@
 
 #include <io500-util.h>
 
+
+typedef enum {
+  IO500_NO_SCORE,
+  IO500_SCORE_MD,
+  IO500_SCORE_BW,
+  IO500_SCORE_LAST
+} io500_phase_score_group;
+
+
 typedef struct{
   char const * name;
   ini_option_t * options;
   void (*validate)(void);
   double (*run)(void); // returns the score
   bool verify_stonewall;
+
+  double score; // the measured score
+  io500_phase_score_group group;
 } u_phase_t;
 
 #define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5)

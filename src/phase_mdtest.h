@@ -28,6 +28,13 @@ typedef struct{
 
 extern opt_mdtest_easy mdtest_easy_o;
 
+typedef struct{
+  opt_mdtest_generic g;
+  mdtest_generic_res res;
+} opt_mdtest_hard;
+
+extern opt_mdtest_hard mdtest_hard_o;
+
 void mdtest_add_generic_params(u_argv_t * argv, opt_mdtest_generic * dflt, opt_mdtest_generic * generic);
 
 void mdtest_easy_add_params(u_argv_t * argv);

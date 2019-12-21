@@ -55,5 +55,6 @@ u_phase_t p_ior_hard_write = {
   option,
   validate,
   run,
-  .verify_stonewall = 1
+  .verify_stonewall = 1,
+  .group = IO500_SCORE_BW,
 };

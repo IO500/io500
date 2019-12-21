@@ -46,5 +46,6 @@ u_phase_t p_mdtest_easy_delete = {
   option,
   validate,
   run,
-  0
+  0,
+  .group = IO500_SCORE_MD
 };

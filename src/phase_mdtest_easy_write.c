@@ -26,6 +26,8 @@ static double run(void){
   u_argv_t * argv = u_argv_create();
   mdtest_easy_add_params(argv);
   u_argv_push(argv, "-C");
+  u_argv_push(argv, "-W");
+  u_argv_push_printf(argv, "%d", opt.stonewall);
 
   opt_mdtest_easy d = mdtest_easy_o;
   mdtest_add_generic_params(argv, & d.g, & o.g);
@@ -47,5 +49,6 @@ u_phase_t p_mdtest_easy_write = {
   option,
   validate,
   run,
-  .verify_stonewall = 1
+  .verify_stonewall = 1,
+  .group = IO500_SCORE_MD
 };

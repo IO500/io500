@@ -56,5 +56,6 @@ u_phase_t p_ior_easy_read = {
   option,
   validate,
   run,
-  0
+  0,
+  .group = IO500_SCORE_BW,
 };

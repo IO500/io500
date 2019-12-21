@@ -15,7 +15,7 @@ static void validate(void){
 static double run(void){
   char timestamp_file[2048];
   sprintf(timestamp_file, "%s/timestampfile", opt.datadir);
-  DEBUG_INFO("Writing timestamp file %s\n", timestamp_file);
+  INFO_PAIR("timestamp-file", "%s\n", timestamp_file);
 
   FILE * f = fopen(timestamp_file, "w");
   if(! f){

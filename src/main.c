@@ -4,9 +4,15 @@
 #include <mpi.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 #include <io500-util.h>
 #include <io500-phase.h>
+
+static char const * io500_phase_str[IO500_SCORE_LAST] = {
+  "NO SCORE",
+  "MD",
+  "BW"};
 
 static u_phase_t * phases[IO500_PHASES] = {
   & p_opt,
@@ -17,7 +23,7 @@ static u_phase_t * phases[IO500_PHASES] = {
 
   & p_mdtest_easy,
   & p_mdtest_easy_write,
-  & p_timestamp, 
+  & p_timestamp,
 
   & p_ior_hard,
   & p_ior_hard_write,
@@ -93,14 +99,14 @@ static void init_result_dir(void){
   tm_info = localtime(&timer);
   strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
 
-  char resdir[2048];
-  sprintf(resdir, "./results/%s", buffer);
+  printf("; Creating results dir: results\n");
   ret = mkdir("results", S_IRWXU);
-  printf("; Creating results dir: %s\n", resdir);
   if(ret != 0 && errno != EEXIST){
     FATAL("Couldn't create directory results (Error: %s)\n", strerror(errno));
   }
 
+  char resdir[2048];
+  sprintf(resdir, "./results/%s", buffer);
   ret = mkdir(resdir, S_IRWXU);
   if(ret != 0){
     FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
@@ -182,9 +188,10 @@ int main(int argc, char ** argv){
 
     double start = GetTimeStamp();
     double score = phases[i]->run();
-    if(opt.rank == 0){
+    if(opt.rank == 0 && phases[i]->group > IO500_NO_SCORE){
       PRINT_PAIR("score", "%f\n", score);
     }
+    phases[i]->score = score;
 
     double runtime = GetTimeStamp() - start;
     // This is an additional sanity check
@@ -208,6 +215,33 @@ int main(int argc, char ** argv){
     printf("; END ");
     u_print_timestamp();
     printf("\n");
+
+    // compute the overall score
+    printf("\n[SCORE]\n");
+    double overall_score = 0;
+
+    for(int g=1; g < IO500_SCORE_LAST; g++){
+      char score_string[2048];
+      char *p = score_string;
+      double score = 0;
+      int numbers = 0;
+      p += sprintf(p, " %s = (", io500_phase_str[g]);
+      for(int i=0; i < IO500_PHASES; i++){
+        if(phases[i]->group == g){
+          double t = phases[i]->score;
+          score += t*t;
+          if(numbers > 0)
+            p += sprintf(p, " + ");
+          numbers++;
+          p += sprintf(p, "(%.3f*%.3f)", t, t);
+        }
+      }
+      DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
+      score = pow(score, 1.0/numbers);
+      PRINT_PAIR(io500_phase_str[g], "%.3f\n", score);
+      overall_score += score * score;
+    }
+    PRINT_PAIR("SCORE", "%.3f\n", sqrt(overall_score));
   }
   MPI_Finalize();
   return 0;

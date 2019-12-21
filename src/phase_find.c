@@ -28,7 +28,9 @@ static double run(void){
   int ret = 0;
 
   PRINT_PAIR("exe", "%s\n", of.command);
-  PRINT_PAIR("nproc", "%d\n", of.nproc);
+  if(of.nproc != INI_UNSET_UINT){
+    PRINT_PAIR("nproc", "%d\n", of.nproc);
+  }
 
   if(opt.dry_run){
     return 0;
@@ -148,7 +150,7 @@ static void validate(void){
     of.command = u_flatten_argv(argv);
 
     MPI_Comm com = MPI_COMM_WORLD;
-    if(of.nproc != 0){
+    if(of.nproc != INI_UNSET_UINT){
       int color = opt.rank < of.nproc;
       int ret = MPI_Comm_split(MPI_COMM_WORLD, color, opt.rank, & com);
       MPI_Comm_size(com, & ret);
@@ -162,7 +164,7 @@ static void validate(void){
 
     u_argv_free(argv);
 
-    if(of.nproc != 0){
+    if(of.nproc != INI_UNSET_UINT){
       MPI_Comm_free(& com);
     }
   }
@@ -173,5 +175,6 @@ u_phase_t p_find = {
   option,
   validate,
   run,
-  0
+  0,
+  .group = IO500_SCORE_MD
 };

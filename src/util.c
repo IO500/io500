@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <assert.h>
 
 
 #include <io500-util.h>

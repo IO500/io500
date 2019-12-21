@@ -7,14 +7,15 @@
 
 typedef struct{
   char const * name;
-  ini_option_t * (*get_ini_section)(void);
+  ini_option_t * options;
   void (*validate)(void);
   double (*run)(void); // returns the score
 } u_phase_t;
 
-#define IO500_PHASES (2 + 2*3 + 4 + 5)
+#define IO500_PHASES (2 + 2*3 + 1 + 4 + 5)
 
 extern u_phase_t p_opt;
+extern u_phase_t p_debug;
 
 extern u_phase_t p_find;
 

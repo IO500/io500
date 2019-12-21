@@ -15,17 +15,13 @@ static ini_option_t option[] = {
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & mdtest_hard_o.odirect},
   {NULL} };
 
-static ini_option_t * get_ini_section(void){
-  return option;
-}
-
 static void validate(void){
 
 }
 
 u_phase_t p_mdtest_hard = {
   "mdtest_hard",
-  get_ini_section,
+  option,
   validate,
   NULL
 };

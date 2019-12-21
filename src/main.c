@@ -9,6 +9,8 @@
 
 static u_phase_t * phases[IO500_PHASES] = {
   & p_opt,
+  & p_debug,
+
   & p_ior_easy,
   & p_ior_easy_write,
 
@@ -34,12 +36,12 @@ static u_phase_t * phases[IO500_PHASES] = {
   & p_mdtest_hard_delete,
 };
 
-static ini_section_t ** get_ini_sections(void){
+static ini_section_t ** options(void){
   ini_section_t ** ini_section = u_malloc(sizeof(ini_section_t*) * (IO500_PHASES + 2));
   for(int i=0; i < IO500_PHASES; i++){
     ini_section[i] = u_malloc(sizeof(ini_section_t));
     ini_section[i]->name = phases[i]->name;
-    ini_section[i]->option = phases[i]->get_ini_section();
+    ini_section[i]->option = phases[i]->options;
   }
   return ini_section;
 }
@@ -79,10 +81,11 @@ static void parse_ini_file(char * file, ini_section_t** cfg){
 }
 
 int main(int argc, char ** argv){
-  ini_section_t ** cfg = get_ini_sections();
+  ini_section_t ** cfg = options();
 
   MPI_Init(& argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
+  MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
 
   if (argc < 2){
     help:
@@ -114,29 +117,41 @@ int main(int argc, char ** argv){
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
+    printf("; START ");
     u_print_timestamp();
-    printf(" START\n");
+    printf("\n");
   }
 
   for(int i=0; i < IO500_PHASES; i++){
     phases[i]->validate();
   }
 
+  printf("\n");
+
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.verbosity > 0 && opt.rank == 0){
+      printf("[%s]\nstart=", phases[i]->name);
       u_print_timestamp();
-      printf(" START %s\n", phases[i]->name);
+      printf("\n");
     }
 
-    phases[i]->run();
+    double score = phases[i]->run();
+    printf("score=%f\n", score);
+
+    if(opt.verbosity > 0 && opt.rank == 0){
+      printf("end=");
+      u_print_timestamp();
+      printf("\n\n");
+    }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
+    printf("; END ");
     u_print_timestamp();
-    printf(" END\n");
+    printf("\n");
   }
   MPI_Finalize();
   return 0;

@@ -17,9 +17,6 @@ static ini_option_t option[] = {
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & o.odirect},
   {NULL} };
 
-static ini_option_t * get_ini_section(void){
-  return option;
-}
 
 static void validate(void){
 
@@ -27,7 +24,7 @@ static void validate(void){
 
 u_phase_t p_ior_hard_read = {
   "ior-hard-read",
-  get_ini_section,
+  option,
   validate,
   run
 };

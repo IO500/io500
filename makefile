@@ -12,8 +12,8 @@ vpath %.h $(SEARCHPATH)
 
 DEPS += io500-util.h io500-debug.h io500-opt.h
 OBJS += util.o
-OBJS += ini-parse.o
-OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_opt.o
+OBJS += ini-parse.o phase_dbg.o phase_opt.o
+OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o
 
 
 TESTS += ini-test

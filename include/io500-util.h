@@ -5,13 +5,15 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <io500-debug.h>
 
 typedef enum{
   INI_STRING,
   INI_INT,
-  INI_UINT
+  INI_UINT,
+  INI_BOOL
 } ini_var_type_e;
 
 typedef struct {
@@ -21,7 +23,8 @@ typedef struct {
   bool mandatory;
   ini_var_type_e type; // for checking during the parsing
 
-  char * current_val; // the current value (default) or value after parsing, NULL if no value set
+  char * default_val; // the default value, NULL if no value set
+  void * var;         // the pointer to the variable to fill of the given type
 } ini_option_t;
 
 typedef struct {
@@ -33,12 +36,19 @@ typedef struct {
  Parse the ini file in data according to the expected specification
  @Return 0 if parsing is successfull
  */
-int u_parse_ini(char const * data, ini_section_t * specification);
+int u_parse_ini(char const * data, ini_section_t ** specification);
 
 /**
  Compute a hash based on the current values
  */
-uint32_t u_ini_gen_hash(ini_section_t * sections);
+uint32_t u_ini_gen_hash(ini_section_t ** sections);
 
-void u_ini_print_hash(FILE * file, ini_section_t * sections);
+void u_ini_print_hash(FILE * file, ini_section_t ** sections);
+void u_ini_print_values(ini_section_t ** sections);
+
+double u_time_diff(clock_t start);
+void u_print_timestamp(void);
+
+void * u_malloc(int size);
+
 #endif

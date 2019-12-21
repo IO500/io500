@@ -148,7 +148,7 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
           ERROR("Parsing error in section %s line %d, option %s expects integer, received \"%s\"\n", section->name, line, var, val);
           return 1;
         }
-      }else if(option->type == INI_UINT){
+      }else if(option->type == INI_UINT || option->type == INI_UINT64){
         reti = regexec(& r_uint, val, 0, NULL, 0);
         if(reti != 0){
           ERROR("Parsing error in section %s line %d, option %s expects integer >= 0, received \"%s\"\n", section->name, line, var, val);
@@ -201,6 +201,9 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
         }case(INI_UINT):{
           *(unsigned*) o->var = atoi(o->default_val);
           break;
+        }case(INI_UINT64):{
+          *(uint64_t*) o->var = (uint64_t) atoll(o->default_val);
+          break;
         }case(INI_BOOL):{
           *(int*) o->var = o->default_val[0] == 'T';
           break;
@@ -216,6 +219,9 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
           break;
         }case(INI_UINT):{
           *(unsigned*) o->var = INI_UNSET_UINT;
+          break;
+        }case(INI_UINT64):{
+          *(uint64_t*) o->var = INI_UNSET_UINT64;
           break;
         }case(INI_BOOL):{
           *(int*) o->var = INI_UNSET_BOOL;

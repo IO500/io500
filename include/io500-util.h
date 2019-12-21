@@ -12,12 +12,14 @@
 #define INI_UNSET_STRING NULL
 #define INI_UNSET_INT (-2147483648)
 #define INI_UNSET_UINT (unsigned)(-1)
+#define INI_UNSET_UINT64 (uint64_t)(-1)
 #define INI_UNSET_BOOL 2
 
 typedef enum{
   INI_STRING,
   INI_INT,
   INI_UINT,
+  INI_UINT64,
   INI_BOOL
 } ini_var_type_e;
 

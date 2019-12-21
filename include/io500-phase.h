@@ -13,10 +13,12 @@ typedef struct{
   bool verify_stonewall;
 } u_phase_t;
 
-#define IO500_PHASES (2 + 2*3 + 1 + 4 + 5)
+#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5)
 
 extern u_phase_t p_opt;
 extern u_phase_t p_debug;
+
+extern u_phase_t p_timestamp;
 
 extern u_phase_t p_find;
 

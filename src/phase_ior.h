@@ -1,10 +1,11 @@
-#ifndef IO500_PHASE_IOR_EASY_H
-#define IO500_PHASE_IOR_EASY_H
+#ifndef IO500_PHASE_IOR_H
+#define IO500_PHASE_IOR_H
 
 #include <ior.h>
 #include <io500-util.h>
 
 typedef struct{
+  int no_run;
   char * api;
   int odirect;
 
@@ -17,6 +18,7 @@ typedef struct{
 opt_ior_easy ior_easy_o;
 
 typedef struct{
+  int no_run;
   char * api;
   bool odirect;
   char * hintsFileName;

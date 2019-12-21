@@ -42,7 +42,7 @@ static double run(void){
   o.command = u_flatten_argv(argv);
 
   PRINT_PAIR("exe", "%s\n", o.command);
-  if(opt.dry_run){
+  if(opt.dry_run || d.no_run == 1){
     u_argv_free(argv);
     return 0;
   }
@@ -55,5 +55,5 @@ u_phase_t p_ior_hard_write = {
   option,
   validate,
   run,
-  0
+  .verify_stonewall = 1
 };

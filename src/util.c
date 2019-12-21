@@ -12,6 +12,9 @@
 #include <io500-opt.h>
 
 void u_create_datadir(char const * dir){
+  if(opt.rank != 0){
+    return;
+  }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
   char outdir[2048];

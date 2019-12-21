@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 typedef struct{
-  bool drop_caches;
+  int drop_caches;
   int stonewall;
 
   char * datadir;
@@ -16,6 +16,8 @@ typedef struct{
 
   int rank;
   int mpi_size;
+
+  int non_posix_datadir;
 } io500_opt_t;
 
 io500_opt_t opt;

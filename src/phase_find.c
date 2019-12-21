@@ -47,7 +47,9 @@ static double run(void){
 
   if(! of.ext_find){
     // pfind supports stonewalling timer -s, but ignore for now
-    of.pfind_res = pfind_find(of.pfind_o);
+    pfind_find_results_t * res = pfind_find(of.pfind_o);
+    of.pfind_res = pfind_aggregrate_results(res);
+    free(res);
     of.found_files = of.pfind_res->found_files;
     of.runtime = of.pfind_res->runtime;
 

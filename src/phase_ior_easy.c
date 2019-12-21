@@ -27,7 +27,9 @@ static void validate(void){
       FATAL("The hintsFileName must be a readable file %s\n", ior_easy_o.hintsFileName);
     }
   }
-  u_create_datadir("ior_easy");
+  if(opt.rank == 0){
+    u_create_datadir("ior_easy");
+  }
 }
 
 void ior_easy_add_params(u_argv_t * argv){
@@ -39,7 +41,7 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
-  u_argv_push(argv, "27");
+  u_argv_push(argv, "271");
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");
   u_argv_push(argv, "-o");

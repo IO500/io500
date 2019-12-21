@@ -5,6 +5,10 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   u_res_file_close(out);
   u_argv_free(argv);
 
+  if(opt.rank != 0){
+    return 0;
+  }
+
   IOR_point_t * p = & res->write;
   *res_out = p;
 
@@ -12,7 +16,7 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
     WARNING("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
     opt.is_valid_run = 0;
   }
-  if(p->time < opt.stonewall ){
+  if( p->time < opt.stonewall ){
     WARNING("Write phase needed %fs instead of stonewall %ds. Stonewall was hit at %.1fs\n", p->time, opt.stonewall, p->stonewall_time);
     opt.is_valid_run = 0;
   }

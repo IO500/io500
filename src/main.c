@@ -91,27 +91,35 @@ static void parse_ini_file(char * file, ini_section_t** cfg){
 
 static void init_result_dir(void){
   int ret;
-  struct tm* tm_info;
-  time_t timer;
-
-  time(&timer);
   char buffer[30];
-  tm_info = localtime(&timer);
-  strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
 
-  printf("; Creating results dir: results\n");
-  ret = mkdir("results", S_IRWXU);
-  if(ret != 0 && errno != EEXIST){
-    FATAL("Couldn't create directory results (Error: %s)\n", strerror(errno));
+  if(opt.rank == 0){
+    struct tm* tm_info;
+    time_t timer;
+    time(&timer);
+    tm_info = localtime(&timer);
+    strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
+
+    printf("; Creating results dir: results\n");
+    ret = mkdir("results", S_IRWXU);
+    if(ret != 0 && errno != EEXIST){
+      FATAL("Couldn't create directory results (Error: %s)\n", strerror(errno));
+    }
   }
+  MPI_Bcast(buffer, 30, MPI_CHAR, 0, MPI_COMM_WORLD);
 
   char resdir[2048];
   sprintf(resdir, "./results/%s", buffer);
-  ret = mkdir(resdir, S_IRWXU);
-  if(ret != 0){
-    FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
+  if(opt.rank == 0){
+    ret = mkdir(resdir, S_IRWXU);
+    if(ret != 0){
+      FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
+    }
   }
   opt.resdir = strdup(resdir);
+
+  sprintf(resdir, "%s/%s", opt.datadir, buffer);
+  opt.datadir = strdup(resdir);
 }
 
 int main(int argc, char ** argv){
@@ -123,6 +131,9 @@ int main(int argc, char ** argv){
 
   if (argc < 2){
     help:
+    if(opt.rank != 0){
+      exit(0);
+    }
     r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run]\n\n", argv[0]);
     r0printf("Supported and current values of the ini file:\n");
     u_ini_print_values(cfg);
@@ -149,18 +160,7 @@ int main(int argc, char ** argv){
     goto help;
   }
 
-  if(opt.rank == 0){
-    init_result_dir();
-    // optionally distribute information about the results directory, in case needed
-    int len = strlen(opt.resdir) + 1;
-    MPI_Bcast(& len, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(opt.resdir, len, MPI_CHAR, 0, MPI_COMM_WORLD);
-  }else{
-    int len;
-    MPI_Bcast(& len, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    opt.resdir = u_malloc(len);
-    MPI_Bcast(opt.resdir, len, MPI_CHAR, 0, MPI_COMM_WORLD);
-  }
+  init_result_dir();
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){

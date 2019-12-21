@@ -33,16 +33,17 @@ static u_phase_t * phases[IO500_PHASES] = {
 
   & p_mdtest_easy_delete,
   & p_mdtest_hard_read,
-  & p_mdtest_hard_delete,
+  & p_mdtest_hard_delete
 };
 
 static ini_section_t ** options(void){
-  ini_section_t ** ini_section = u_malloc(sizeof(ini_section_t*) * (IO500_PHASES + 2));
+  ini_section_t ** ini_section = u_malloc(sizeof(ini_section_t*) * (IO500_PHASES + 1));
   for(int i=0; i < IO500_PHASES; i++){
     ini_section[i] = u_malloc(sizeof(ini_section_t));
     ini_section[i]->name = phases[i]->name;
     ini_section[i]->option = phases[i]->options;
   }
+  ini_section[IO500_PHASES] = NULL;
   return ini_section;
 }
 

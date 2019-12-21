@@ -7,7 +7,7 @@ static ini_option_t option[] = {
 
 
 static void validate(void){
-  if(opt.stonewall != 300){
+  if(opt.stonewall != 300 && opt.rank == 0){
     WARNING("stonewall-time != 300, this is an invalid run\n");
     opt.is_valid_run = 0;
   }

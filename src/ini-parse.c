@@ -184,7 +184,7 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
   int error = 0;
   for( ini_section_t ** ps = sections ; *ps != NULL; ps++){
     ini_section_t * s = *ps;
-
+    
     for( ini_option_t * o = s->option ; o->name != NULL; o++){
       if( o->mandatory && o->default_val == NULL ){
           ERROR("[%s]: The mandatory option \"%s\" is not set\n", s->name, o->name);

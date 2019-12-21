@@ -26,5 +26,6 @@ u_phase_t p_ior_hard_read = {
   "ior-hard-read",
   option,
   validate,
-  run
+  run,
+  0
 };

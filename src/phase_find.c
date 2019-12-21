@@ -1,5 +1,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
+#include <mpi.h>
 
 #include <io500-phase.h>
 
@@ -23,6 +24,10 @@ static double run(void){
   double performance = 0;
 
   if(of.ext_find){
+    if(opt.rank != 0){
+      MPI_Barrier(MPI_COMM_WORLD);
+      return 0;
+    }
     p+= sprintf(p, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
     printf("exe=%s\n", command);
     if(! opt.dry_run){
@@ -50,6 +55,7 @@ static double run(void){
         WARNING("Exit code != 0 from find command: \"%s\"\n", command);
       }
     }
+    MPI_Barrier(MPI_COMM_WORLD);
     return performance;
   }
   if(of.nproc != 0){
@@ -82,5 +88,6 @@ u_phase_t p_find = {
   "find",
   option,
   validate,
-  run
+  run,
+  0
 };

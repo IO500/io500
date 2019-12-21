@@ -125,23 +125,38 @@ int main(int argc, char ** argv){
   for(int i=0; i < IO500_PHASES; i++){
     phases[i]->validate();
   }
-
-  printf("\n");
+  if(opt.rank == 0){
+    printf("\n");
+  }
 
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.verbosity > 0 && opt.rank == 0){
-      printf("[%s]\nstart=", phases[i]->name);
+      printf("[%s]\nt_start=", phases[i]->name);
       u_print_timestamp();
       printf("\n");
     }
 
+    clock_t start = clock();
+
     double score = phases[i]->run();
-    printf("score=%f\n", score);
+    if(opt.rank == 0){
+      printf("score=%f\n", score);
+    }
+
+    double runtime = u_time_diff(start);
+
+    if( phases[i]->verify_stonewall && opt.rank == 0){
+      if(runtime < opt.stonewall){
+        opt.is_valid_run = 0;
+        ERROR("Runtime of phase is below stonewall time. This shouldn't happen!\n");
+      }
+    }
 
     if(opt.verbosity > 0 && opt.rank == 0){
-      printf("end=");
+      printf("t_delta=%.4f\n", runtime);
+      printf("t_end=");
       u_print_timestamp();
       printf("\n\n");
     }

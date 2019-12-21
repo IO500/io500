@@ -10,6 +10,7 @@ typedef struct{
   ini_option_t * options;
   void (*validate)(void);
   double (*run)(void); // returns the score
+  bool verify_stonewall;
 } u_phase_t;
 
 #define IO500_PHASES (2 + 2*3 + 1 + 4 + 5)

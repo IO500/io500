@@ -24,5 +24,6 @@ u_phase_t p_mdtest_easy_write = {
   "mdtest_easy_write",
   option,
   validate,
-  NULL
+  NULL,
+  .verify_stonewall = 1
 };

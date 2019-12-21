@@ -25,5 +25,6 @@ u_phase_t p_ior_hard_write = {
   "ior-hard-write",
   option,
   validate,
-  run
+  run,
+  .verify_stonewall = 1
 };

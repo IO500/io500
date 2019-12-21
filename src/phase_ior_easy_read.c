@@ -8,6 +8,7 @@
 typedef struct{
   char * api;
   int odirect;
+  char * hintsFileName;
 
   char * command;
   IOR_point_t * res;
@@ -16,8 +17,9 @@ typedef struct{
 static opt_ior_easy_read o;
 
 static ini_option_t option[] = {
-  {"API", "The API to be used", 0, INI_STRING, "POSIX", & o.api},
+  {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & o.odirect},
+  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
 
@@ -33,12 +35,13 @@ static double run(void){
   ior_easy_add_params(argv);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-R");
+  u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
   u_argv_push_default_if_set(argv, "-a", d.api, o.api);
   u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);
 
-  r0printf("exe=%s\n", o.command);
+  PRINT_PAIR("exe", "%s\n", o.command);
   if(opt.dry_run){
     u_argv_free(argv);
     return 0;

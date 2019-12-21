@@ -9,7 +9,10 @@
 
 #define DEBUG_ALL(...) do{ if(opt.verbosity > 5 && opt.rank == 0){ printf("; [D] "__VA_ARGS__);}  }while(0);
 #define DEBUG_INFO(...) do{ if(opt.verbosity > 4 && opt.rank == 0){ printf("; [I] "__VA_ARGS__);}  }while(0);
-#define INFO_PAIR(...) do{ if(opt.verbosity > 1 && opt.rank == 0){ printf(__VA_ARGS__);}  }while(0);
+
+#define PRINT_PAIR(key, format, ...) do{ if(opt.rank == 0){ printf("%-10s = "format, key, __VA_ARGS__); }  }while(0);
+#define PRINT_PAIR_HEADER(key) do{ if(opt.rank == 0){ printf("%-10s = ", key); }  }while(0);
+#define INFO_PAIR(key, format, ...) do{ if(opt.verbosity > 1){ PRINT_PAIR(key, format, __VA_ARGS__);}  }while(0);
 
 #define ERROR(...) do{ printf("; ERROR "__VA_ARGS__); }while(0);
 #define WARNING(...) do{ printf("; WARNING "__VA_ARGS__); }while(0);

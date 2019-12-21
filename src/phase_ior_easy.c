@@ -69,11 +69,11 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
     WARNING("Write phase needed %fs instead of stonewall %ds. Stonewall was hit at %.1fs\n", p->time, opt.stonewall, p->stonewall_time);
     opt.is_valid_run = 0;
   }
-  INFO_PAIR("accessed-pairs=%zu\n", p->pairs_accessed);
+  INFO_PAIR("accessed-pairs", "%zu\n", p->pairs_accessed);
 
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
-  INFO_PAIR("throughput=%.2f\n", tp);
-  INFO_PAIR("throughput-stonewall=%.2f\n", p->stonewall_avg_data_accessed / p->time / GIBIBYTE * opt.mpi_size);
+  INFO_PAIR("throughput","%.2f\n", tp);
+  INFO_PAIR("throughput-stonewall","%.2f\n", p->stonewall_avg_data_accessed / p->time / GIBIBYTE * opt.mpi_size);
 
   return tp;
 }
@@ -92,7 +92,7 @@ double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
     opt.is_valid_run = 0;
   }
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
-  INFO_PAIR("throughput=%.2f\n", tp);
+  INFO_PAIR("throughput","%.2f\n", tp);
 
   return tp;
 }

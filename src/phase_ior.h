@@ -16,7 +16,18 @@ typedef struct{
 
 opt_ior_easy ior_easy_o;
 
+typedef struct{
+  char * api;
+  bool odirect;
+  char * hintsFileName;
+
+  int segments;
+} opt_ior_hard;
+
+opt_ior_hard ior_hard_o;
+
 void ior_easy_add_params(u_argv_t * argv);
+void ior_hard_add_params(u_argv_t * argv);
 
 // Generic helpers
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);

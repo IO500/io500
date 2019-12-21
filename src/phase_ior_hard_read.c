@@ -1,26 +1,55 @@
 #include <sys/stat.h>
 #include <unistd.h>
+#include <mpi.h>
 
 #include <io500-phase.h>
+#include <phase_ior.h>
 
 typedef struct{
-  bool odirect;
+  char * api;
+  int odirect;
+  char * hintsFileName;
+
+  char * command;
+  IOR_point_t * res;
 } opt_ior_hard_read;
 
 static opt_ior_hard_read o;
 
-static double run(void){
-  return 0;
-}
-
 static ini_option_t option[] = {
+  {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & o.odirect},
+  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
 
 static void validate(void){
 
 }
+
+
+static double run(void){
+  opt_ior_hard d = ior_hard_o;
+
+  u_argv_t * argv = u_argv_create();
+  ior_hard_add_params(argv);
+  u_argv_push(argv, "-r");
+  u_argv_push(argv, "-R");
+  u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
+  u_argv_push_default_if_set(argv, "-a", d.api, o.api);
+  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
+
+  o.command = u_flatten_argv(argv);
+
+  PRINT_PAIR("exe", "%s\n", o.command);
+  if(opt.dry_run){
+    u_argv_free(argv);
+    return 0;
+  }
+  FILE * out = u_res_file_prep(p_ior_hard_read.name);
+  return ior_process_read(argv, out, & o.res);
+}
+
 
 u_phase_t p_ior_hard_read = {
   "ior-hard-read",

@@ -173,7 +173,8 @@ int main(int argc, char ** argv){
     if(! phases[i]->run) continue;
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.verbosity > 0 && opt.rank == 0){
-      printf("[%s]\nt_start=", phases[i]->name);
+      printf("[%s]\n", phases[i]->name);
+      PRINT_PAIR_HEADER("t_start");
       u_print_timestamp();
       printf("\n");
     }
@@ -181,21 +182,21 @@ int main(int argc, char ** argv){
     double start = GetTimeStamp();
     double score = phases[i]->run();
     if(opt.rank == 0){
-      printf("score=%f\n", score);
+      PRINT_PAIR("score", "%f\n", score);
     }
 
     double runtime = GetTimeStamp() - start;
     // This is an additional sanity check
     if( phases[i]->verify_stonewall && opt.rank == 0){
-      if(runtime < opt.stonewall){
+      if(runtime < opt.stonewall && ! opt.dry_run){
         opt.is_valid_run = 0;
         ERROR("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
       }
     }
 
     if(opt.verbosity > 0 && opt.rank == 0){
-      printf("t_delta=%.4f\n", runtime);
-      printf("t_end=");
+      PRINT_PAIR("t_delta", "%.4f\n", runtime);
+      PRINT_PAIR_HEADER("t_end");
       u_print_timestamp();
       printf("\n\n");
     }

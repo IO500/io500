@@ -27,8 +27,8 @@ static opt_find of;
 static double run(void){
   int ret = 0;
 
-  r0printf("exe=%s\n", of.command);
-  r0printf("nproc=%d\n", of.nproc);
+  PRINT_PAIR("exe", "%s\n", of.command);
+  PRINT_PAIR("nproc", "%d\n", of.nproc);
 
   if(opt.dry_run){
     return 0;
@@ -49,8 +49,8 @@ static double run(void){
     of.found_files = of.pfind_res->found_files;
     of.runtime = of.pfind_res->runtime;
 
-    r0printf("found=%"PRIu64"\n", of.found_files);
-    r0printf("total-files=%"PRIu64"\n", of.pfind_res->total_files);
+    PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
+    PRINT_PAIR("total-files", "%"PRIu64"\n", of.pfind_res->total_files);
     return of.found_files / of.runtime / 1000;
   }
   // only one process runs the external find
@@ -81,7 +81,7 @@ static double run(void){
   if(*line != '\0'){
     line[strlen(line) - 1] = 0;
   }
-  printf("last-output=\"%s\"\n", line);
+  PRINT_PAIR("last-output", "\"%s\"\n", line);
   if(strstr(line, "MATCHED ") == line){
     // the script is supposed to output the number of files in this line
     char * ptr   = line + 8;
@@ -91,7 +91,7 @@ static double run(void){
       FATAL("Invalid output from the external script, expected: MATCHED <NUM>/<NUM>\n");
     }
     hits = atoll(left);
-    printf("total-files=%lld\n", atoll(right));
+    PRINT_PAIR("total-files", "%lld\n", atoll(right));
   }
 
   performance = hits / runtime / 1000;

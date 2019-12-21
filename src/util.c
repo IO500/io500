@@ -118,6 +118,7 @@ FILE * u_res_file_prep(char const * name){
   if(opt.rank == 0){
     char fname[2048];
     sprintf(fname, "%s/%s.txt", opt.resdir, name);
+    INFO_PAIR("result-file", "%s\n", fname);
     out = fopen(fname, "w");
     if( out == NULL ){
       FATAL("Couldn't create results file: %s (Error: %s)\n", fname, strerror(errno));

@@ -9,6 +9,11 @@
 
 #include <io500-debug.h>
 
+#define INI_UNSET_STRING NULL
+#define INI_UNSET_INT (-2147483648)
+#define INI_UNSET_UINT (unsigned)(-1)
+#define INI_UNSET_BOOL 2
+
 typedef enum{
   INI_STRING,
   INI_INT,
@@ -46,9 +51,35 @@ uint32_t u_ini_gen_hash(ini_section_t ** sections);
 void u_ini_print_hash(FILE * file, ini_section_t ** sections);
 void u_ini_print_values(ini_section_t ** sections);
 
-double u_time_diff(clock_t start);
+// imported from IOR
+double GetTimeStamp(void);
+
 void u_print_timestamp(void);
 
 void * u_malloc(int size);
+
+void u_create_datadir(char const * dir);
+
+FILE * u_res_file_prep(char const * name);
+void u_res_file_close(FILE * out);
+
+/**
+ * Functions to handle the argument vectors for invoking other APIs
+ */
+typedef struct{
+ int size;
+ char ** vector;
+} u_argv_t;
+
+u_argv_t * u_argv_create(void);
+void u_argv_free(u_argv_t * argv);
+void u_argv_push(u_argv_t * argv, char const * str);
+
+void u_argv_push_default_if_set(u_argv_t * argv, char * const arg, char const * dflt, char const * var);
+void u_argv_push_default_if_set_bool(u_argv_t * argv, char * const arg, int dflt, int var);
+
+void u_argv_push_printf(u_argv_t * argv, char const * format, ...)
+  __attribute__ ((format (printf, 2, 3)));
+char * u_flatten_argv(u_argv_t * argv);
 
 #endif

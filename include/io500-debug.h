@@ -9,6 +9,7 @@
 
 #define DEBUG_ALL(...) do{ if(opt.verbosity > 5 && opt.rank == 0){ printf("; [D] "__VA_ARGS__);}  }while(0);
 #define DEBUG_INFO(...) do{ if(opt.verbosity > 4 && opt.rank == 0){ printf("; [I] "__VA_ARGS__);}  }while(0);
+#define INFO_PAIR(...) do{ if(opt.verbosity > 1 && opt.rank == 0){ printf(__VA_ARGS__);}  }while(0);
 
 #define ERROR(...) do{ printf("; ERROR "__VA_ARGS__); }while(0);
 #define WARNING(...) do{ printf("; WARNING "__VA_ARGS__); }while(0);

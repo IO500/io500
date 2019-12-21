@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <mpi.h>
 #include <string.h>
+#include <errno.h>
 
 #include <io500-util.h>
 #include <io500-phase.h>
@@ -81,6 +82,31 @@ static void parse_ini_file(char * file, ini_section_t** cfg){
   free(buff);
 }
 
+static void init_result_dir(void){
+  int ret;
+  struct tm* tm_info;
+  time_t timer;
+
+  time(&timer);
+  char buffer[30];
+  tm_info = localtime(&timer);
+  strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
+
+  char resdir[2048];
+  sprintf(resdir, "./results/%s", buffer);
+  ret = mkdir("results", S_IRWXU);
+  printf("; Creating results dir: %s\n", resdir);
+  if(ret != 0 && errno != EEXIST){
+    FATAL("Couldn't create directory results (Error: %s)\n", strerror(errno));
+  }
+
+  ret = mkdir(resdir, S_IRWXU);
+  if(ret != 0){
+    FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
+  }
+  opt.resdir = strdup(resdir);
+}
+
 int main(int argc, char ** argv){
   ini_section_t ** cfg = options();
 
@@ -116,6 +142,19 @@ int main(int argc, char ** argv){
     goto help;
   }
 
+  if(opt.rank == 0){
+    init_result_dir();
+    // optionally distribute information about the results directory, in case needed
+    int len = strlen(opt.resdir) + 1;
+    MPI_Bcast(& len, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(opt.resdir, len, MPI_CHAR, 0, MPI_COMM_WORLD);
+  }else{
+    int len;
+    MPI_Bcast(& len, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    opt.resdir = u_malloc(len);
+    MPI_Bcast(opt.resdir, len, MPI_CHAR, 0, MPI_COMM_WORLD);
+  }
+
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
     printf("; START ");
@@ -139,19 +178,18 @@ int main(int argc, char ** argv){
       printf("\n");
     }
 
-    clock_t start = clock();
-
+    double start = GetTimeStamp();
     double score = phases[i]->run();
     if(opt.rank == 0){
       printf("score=%f\n", score);
     }
 
-    double runtime = u_time_diff(start);
-
+    double runtime = GetTimeStamp() - start;
+    // This is an additional sanity check
     if( phases[i]->verify_stonewall && opt.rank == 0){
       if(runtime < opt.stonewall){
         opt.is_valid_run = 0;
-        ERROR("Runtime of phase is below stonewall time. This shouldn't happen!\n");
+        ERROR("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
       }
     }
 

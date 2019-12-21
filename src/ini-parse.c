@@ -88,9 +88,10 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
       char * sname = token + match[1].rm_so;
       token[match[1].rm_eo] = '\0';
       DEBUG_INFO("Section: \"%s\"\n", sname);
+      section = NULL;
       for( ini_section_t ** ps = sections ; *ps != NULL; ps++){
-        section = *ps;
-        if(strcasecmp(section->name, sname) == 0){
+        if(strcasecmp((*ps)->name, sname) == 0){
+          section = *ps;
           break;
         }
       }
@@ -184,13 +185,15 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
   int error = 0;
   for( ini_section_t ** ps = sections ; *ps != NULL; ps++){
     ini_section_t * s = *ps;
-    
+
     for( ini_option_t * o = s->option ; o->name != NULL; o++){
       if( o->mandatory && o->default_val == NULL ){
           ERROR("[%s]: The mandatory option \"%s\" is not set\n", s->name, o->name);
           error = 1;
       }
-      if(o->default_val && o->var){
+      if(! o->var) continue;
+      // assing a value to the configuration
+      if(o->default_val){
         switch(o->type){
         case(INI_INT):{
           *(int*) o->var = atoi(o->default_val);
@@ -199,10 +202,26 @@ int u_parse_ini(char const * data, ini_section_t ** sections){
           *(unsigned*) o->var = atoi(o->default_val);
           break;
         }case(INI_BOOL):{
-          *(bool*) o->var = o->default_val[0] == 'T';
+          *(int*) o->var = o->default_val[0] == 'T';
           break;
         }case(INI_STRING):{
           *(char**) o->var = o->default_val;
+          break;
+        }
+        }
+      }else{
+        switch(o->type){
+        case(INI_INT):{
+          *(int*) o->var = INI_UNSET_INT;
+          break;
+        }case(INI_UINT):{
+          *(unsigned*) o->var = INI_UNSET_UINT;
+          break;
+        }case(INI_BOOL):{
+          *(int*) o->var = INI_UNSET_BOOL;
+          break;
+        }case(INI_STRING):{
+          *(char**) o->var = INI_UNSET_STRING;
           break;
         }
         }

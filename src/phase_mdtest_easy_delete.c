@@ -21,7 +21,7 @@ static void validate(void){
 }
 
 u_phase_t p_mdtest_easy_delete = {
-  "mdtest_easy_delete",
+  "mdtest-easy-delete",
   option,
   validate,
   NULL

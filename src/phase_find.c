@@ -33,6 +33,15 @@ static double run(void){
   if(opt.dry_run){
     return 0;
   }
+  {
+    char timestamp_file[2048];
+    sprintf(timestamp_file, "%s/timestampfile", opt.datadir);
+    FILE * f = fopen(timestamp_file, "r");
+    if(! f){
+      FATAL("Couldn't open timestampfile: %s\n", timestamp_file);
+    }
+    fclose(f);
+  }
 
   if(! of.ext_find){
     // pfind supports stonewalling timer -s, but ignore for now
@@ -51,7 +60,7 @@ static double run(void){
   }
 
   double performance;
-  clock_t start = clock();
+  double start = GetTimeStamp();
 
   FILE * fp = popen(of.command, "r");
   if (fp == NULL) {
@@ -60,23 +69,30 @@ static double run(void){
   }
   char line[1024];
   uint64_t hits = 0;
+  *line = '\0';
   while (fgets(line, sizeof(line), fp) != NULL) {
     DEBUG_ALL("Found: %s", line);
     hits++;
   }
   ret = pclose(fp);
-  double runtime = u_time_diff(start);
+  double runtime = GetTimeStamp() - start;
 
   // support two semantics, the count only semantics
+  if(*line != '\0'){
+    line[strlen(line) - 1] = 0;
+  }
+  printf("last-output=\"%s\"\n", line);
   if(strstr(line, "MATCHED ") == line){
     // the script is supposed to output the number of files in this line
     char * ptr   = line + 8;
     char * left  = strtok(ptr, "/");
     char * right = strtok(NULL, "/");
+    if(left == NULL || right == NULL || *left == 0 || * right == 0){
+      FATAL("Invalid output from the external script, expected: MATCHED <NUM>/<NUM>\n");
+    }
     hits = atoll(left);
     printf("total-files=%lld\n", atoll(right));
   }
-  printf("last-output=\"%s\"\n", line);
 
   performance = hits / runtime / 1000;
 
@@ -118,18 +134,18 @@ static void validate(void){
     of.command = strdup(command);
     of.nproc = 1;
   }else{
-    char timestamp[1024];
-    sprintf(timestamp, "%s/timestampfile", opt.datadir);
-    char * argv[] = {"./pfind", opt.datadir, "-newer", timestamp, "-size", strdup("3901c"), "-name", "*01*", "-C"};
+    u_argv_t * argv = u_argv_create();
+    u_argv_push(argv, "./pfind");
+    u_argv_push(argv, opt.datadir);
+    u_argv_push(argv, "-newer");
+    u_argv_push_printf(argv, "%s/timestampfile", opt.datadir);
+    u_argv_push(argv, "-size");
+    u_argv_push(argv, "3901c");
+    u_argv_push(argv, "-name");
+    u_argv_push(argv, "*01*");
+    u_argv_push(argv, "-C");
 
-    int argc = sizeof(argv)/sizeof(void*);
-    char command[2048];
-    char * p = command;
-    for(int i = 0; i < argc; i++){
-      if(i != 0) p+= sprintf(p, " ");
-      p += sprintf(p, "%s", argv[i]);
-    }
-    of.command = strdup(command);
+    of.command = u_flatten_argv(argv);
 
     MPI_Comm com = MPI_COMM_WORLD;
     if(of.nproc != 0){
@@ -142,9 +158,9 @@ static void validate(void){
       }
     }
 
-    of.command = strdup(command);
+    of.pfind_o = pfind_parse_args(argv->size, argv->vector, 0, com);
 
-    of.pfind_o = pfind_parse_args(argc, argv, 0, com);
+    u_argv_free(argv);
 
     if(of.nproc != 0){
       MPI_Comm_free(& com);

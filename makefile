@@ -1,6 +1,7 @@
 CC = @mpicc
 CFLAGS += -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
-CFLAGS += -g3 -lefence -I./include/ -I./build/pfind/src/
+CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
+LDFLAGS += -lm
 
 PROGRAM = io500
 SEARCHPATH += src
@@ -35,7 +36,7 @@ io500.a: $(OBJS)
 
 $(PROGRAM): io500.a main.o
 	@echo LD $@
-	$(CC) -o $@ main.o $(LDFLAGS) io500.a ./build/pfind/pfind.a
+	$(CC) -o $@ main.o $(LDFLAGS) io500.a ./build/pfind/pfind.a ./build/ior/src/libaiori.a  $(LDFLAGS)
 
 %.o: %.c $(DEPS)
 	@echo CC $@

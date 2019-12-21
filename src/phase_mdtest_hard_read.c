@@ -21,7 +21,7 @@ static void validate(void){
 }
 
 u_phase_t p_mdtest_hard_read = {
-  "mdtest_hard_read",
+  "mdtest-hard-read",
   option,
   validate,
   NULL

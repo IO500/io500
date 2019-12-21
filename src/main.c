@@ -100,10 +100,9 @@ static void init_result_dir(void){
     tm_info = localtime(&timer);
     strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
 
-    printf("; Creating results dir: results\n");
     ret = mkdir("results", S_IRWXU);
     if(ret != 0 && errno != EEXIST){
-      FATAL("Couldn't create directory results (Error: %s)\n", strerror(errno));
+      FATAL("Couldn't create directory: \"results\" (Error: %s)\n", strerror(errno));
     }
   }
   MPI_Bcast(buffer, 30, MPI_CHAR, 0, MPI_COMM_WORLD);
@@ -111,6 +110,7 @@ static void init_result_dir(void){
   char resdir[2048];
   sprintf(resdir, "./results/%s", buffer);
   if(opt.rank == 0){
+    PRINT_PAIR("result-dir", "%s\n", resdir);
     ret = mkdir(resdir, S_IRWXU);
     if(ret != 0){
       FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
@@ -162,6 +162,12 @@ int main(int argc, char ** argv){
 
   init_result_dir();
 
+  if(opt.rank == 0){
+    PRINT_PAIR_HEADER("config-hash");
+    u_ini_print_hash(stdout, cfg);
+    printf("\n");    
+  }
+
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
     printf("; START ");
@@ -176,14 +182,18 @@ int main(int argc, char ** argv){
     printf("\n");
   }
 
+
+
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
     MPI_Barrier(MPI_COMM_WORLD);
-    if(opt.verbosity > 0 && opt.rank == 0){
-      printf("[%s]\n", phases[i]->name);
-      PRINT_PAIR_HEADER("t_start");
-      u_print_timestamp();
-      printf("\n");
+    if(opt.rank == 0){
+      printf("\n[%s]\n", phases[i]->name);
+      if(opt.verbosity > 0){
+        PRINT_PAIR_HEADER("t_start");
+        u_print_timestamp();
+        printf("\n");
+      }
     }
 
     double start = GetTimeStamp();
@@ -206,15 +216,17 @@ int main(int argc, char ** argv){
       PRINT_PAIR("t_delta", "%.4f\n", runtime);
       PRINT_PAIR_HEADER("t_end");
       u_print_timestamp();
-      printf("\n\n");
+      printf("\n");
     }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  if(opt.verbosity > 0 && opt.rank == 0){
-    printf("; END ");
-    u_print_timestamp();
-    printf("\n");
+  if(opt.rank == 0){
+    if(opt.verbosity > 0){
+      printf("; END ");
+      u_print_timestamp();
+      printf("\n");
+    }
 
     // compute the overall score
     printf("\n[SCORE]\n");
@@ -241,7 +253,7 @@ int main(int argc, char ** argv){
       PRINT_PAIR(io500_phase_str[g], "%.3f\n", score);
       overall_score += score * score;
     }
-    PRINT_PAIR("SCORE", "%.3f\n", sqrt(overall_score));
+    PRINT_PAIR("SCORE", "%.3f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
   }
   MPI_Finalize();
   return 0;

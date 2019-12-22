@@ -143,9 +143,10 @@ int main(int argc, char ** argv){
     if(opt.rank != 0){
       exit(0);
     }
-    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup]\n\n", argv[0]);
+    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash]\n\n", argv[0]);
     r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
     r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
+    r0printf("--config-hash Compute the configuration hash\n");
     r0printf("Supported and current values of the ini file:\n");
     u_ini_print_values(cfg);
     exit(1);
@@ -153,6 +154,9 @@ int main(int argc, char ** argv){
 
   int verbosity_override = -1;
   int print_help = 0;
+
+  int config_hash_only = 0;
+  int cleanup_only = 0;
   if(argc > 2){
     for(int i = 2; i < argc; i++){
       if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0 ){
@@ -163,7 +167,9 @@ int main(int argc, char ** argv){
       }else if(strcmp(argv[i], "--dry-run") == 0 ){
         opt.dry_run = 1;
       }else if(strcmp(argv[i], "--cleanup") == 0 ){
-        opt.cleanup_only = 1;
+        cleanup_only = 1;
+      }else if(strcmp(argv[i], "--config-hash") == 0 ){
+        config_hash_only = 1;
       }else{
         FATAL("Unknown option: %s\n", argv[i]);
       }
@@ -182,8 +188,13 @@ int main(int argc, char ** argv){
 
   if(opt.rank == 0){
     PRINT_PAIR_HEADER("config-hash");
-    u_ini_print_hash(stdout, cfg);
+    uint32_t hash = u_ini_gen_hash(cfg);
+    u_hash_print(stdout, hash);
     printf("\n");
+  }
+  if(config_hash_only){
+    MPI_Finalize();
+    exit(0);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -200,11 +211,12 @@ int main(int argc, char ** argv){
     printf("\n");
   }
 
-
+  // manage a hash for the scores
+  uint32_t score_hash = 0;
 
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
-    if( opt.cleanup_only && phases[i]->type != IO500_PHASE_REMOVE ) continue;
+    if( cleanup_only && phases[i]->type != IO500_PHASE_REMOVE ) continue;
 
     if(opt.drop_caches && phases[i]->type != IO500_PHASE_DUMMY){
       DEBUG_INFO("Dropping cache\n");
@@ -231,6 +243,7 @@ int main(int argc, char ** argv){
       PRINT_PAIR("score", "%f\n", score);
     }
     phases[i]->score = score;
+    u_hash_update_key_val_dbl(& score_hash, phases[i]->name, score);
 
     double runtime = GetTimeStamp() - start;
     // This is an additional sanity check
@@ -274,9 +287,16 @@ int main(int argc, char ** argv){
       DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
       score = pow(score, 1.0/numbers);
       PRINT_PAIR(io500_phase_str[g], "%.3f\n", score);
+      u_hash_update_key_val_dbl(& score_hash, io500_phase_str[g], score);
+
       overall_score += score * score;
     }
     PRINT_PAIR("SCORE", "%.3f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
+    u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
+    if( ! opt.is_valid_run ){
+      u_hash_update_key_val(& score_hash, "valid", "NO");
+    }
+    PRINT_PAIR("hash", "%X\n", (int) score_hash);
   }
 
   for(int i=0; i < IO500_PHASES; i++){

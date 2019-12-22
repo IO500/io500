@@ -49,9 +49,15 @@ int u_parse_ini(char const * data, ini_section_t ** specification);
  Compute a hash based on the current values
  */
 uint32_t u_ini_gen_hash(ini_section_t ** sections);
-
-void u_ini_print_hash(FILE * file, ini_section_t ** sections);
 void u_ini_print_values(ini_section_t ** sections);
+
+/**
+ * Hash functions to increase integrity
+ */
+uint32_t u_hash_update(uint32_t hash, char const * str);
+void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val);
+void u_hash_update_key_val_dbl(uint32_t * hash, char const * key, double val);
+void u_hash_print(FILE * file, uint32_t hash);
 
 // imported from IOR
 double GetTimeStamp(void);

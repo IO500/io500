@@ -49,7 +49,8 @@ int main(void){
       };
     ret = u_parse_ini(" \t[general ] \n test \t= 24 ; ignore me\ndata=test string\ntest3 =-333", testsec);
     assert(ret == 1);
-    u_ini_print_hash(stdout, testsec);
+    uint32_t hash = u_ini_gen_hash(testsec);
+    u_hash_print(stdout, hash);
     printf("\n");
   }
 
@@ -66,7 +67,8 @@ int main(void){
       };
     ret = u_parse_ini(" \t[general ] \n test \t= 24 ; ignore me\ndata=test string\ntest3 =-333", testsec);
     assert(ret == 1);
-    u_ini_print_hash(stdout, testsec);
+    uint32_t hash = u_ini_gen_hash(testsec);
+    u_hash_print(stdout, hash);
     printf("\n");
   }
 
@@ -81,7 +83,8 @@ int main(void){
         NULL
       };
     ret = u_parse_ini(" \t[general ] \n test \t= 24 ; ignore me\ndata=test string\ntest3 =-333", testsec);
-    u_ini_print_hash(stdout, testsec);
+    uint32_t hash = u_ini_gen_hash(testsec);
+    u_hash_print(stdout, hash);
     printf("\n");
     assert(ret == 0);
   }

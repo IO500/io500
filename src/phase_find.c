@@ -53,6 +53,10 @@ static double run(void){
     of.found_files = of.pfind_res->found_files;
     of.runtime = of.pfind_res->runtime;
 
+    if( of.found_files == 0 ){
+      WARNING("Find didn't find anything, this is likely invalid.")
+      opt.is_valid_run = 0;
+    }
     PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
     PRINT_PAIR("total-files", "%"PRIu64"\n", of.pfind_res->total_files);
     return of.found_files / of.runtime / 1000;
@@ -102,6 +106,11 @@ static double run(void){
 
   of.found_files = hits;
   of.runtime = runtime;
+
+  if( of.found_files == 0 ){
+    WARNING("Find didn't find anything, this is likely invalid.")
+    opt.is_valid_run = 0;
+  }
 
   printf("found=%"PRIu64"\n", of.found_files);
 

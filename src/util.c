@@ -12,6 +12,38 @@
 #include <io500-util.h>
 #include <io500-opt.h>
 
+
+/**
+ * rotate the value and add the current character
+ */
+static uint32_t rotladd (uint32_t x, char c){
+  return ((x<<2) | (x>>(32-2))) + c;
+}
+
+uint32_t u_hash_update(uint32_t hash, char const * str){
+  for(char const * c = str; *c != 0; c++){
+    hash = rotladd(hash, *c);
+  }
+  return hash;
+}
+
+void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val){
+  uint32_t hsh = 0;
+  hsh = u_hash_update(hsh, key);
+  hsh = u_hash_update(hsh, val);
+  *hash = *hash ^ hsh;
+}
+
+void u_hash_update_key_val_dbl(uint32_t * hash, char const * key, double val){
+  char str[40];
+  sprintf(str, "%f", val);
+  u_hash_update_key_val(hash, key, str);
+}
+
+void u_hash_print(FILE * file, uint32_t hash){
+  fprintf(file, "%X", (int) hash);
+}
+
 void u_call_cmd(char const * str){
   int ret = system(str);
   if (ret != 0) {

@@ -7,7 +7,6 @@
 typedef struct{
   int drop_caches;
   char * drop_caches_cmd;
-  int cleanup_only;
 
   int stonewall;
 

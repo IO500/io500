@@ -5,18 +5,6 @@
 
 #include <io500-util.h>
 
-/**
- * rotate the value and add the current character
- */
-static uint32_t rotladd (uint32_t x, char c){
-  return ((x<<2) | (x>>(32-2))) + c;
-}
-
-void u_ini_print_hash(FILE * file, ini_section_t ** sections){
-  uint32_t hash = u_ini_gen_hash(sections);
-  fprintf(file, "%X", (int) hash);
-}
-
 uint32_t u_ini_gen_hash(ini_section_t ** sections){
   uint32_t value = 0;
   for( ini_section_t ** ps = sections ; *ps != NULL; ps++){
@@ -24,14 +12,7 @@ uint32_t u_ini_gen_hash(ini_section_t ** sections){
     for( ini_option_t * o = s->option ; o->name != NULL; o++){
       if(o->default_val){
         // compute a hash for each option individually to make it invariant to reordered options
-        uint32_t val = 0;
-        for(char const * c = o->name; *c != 0; c++){
-          val = rotladd(val, *c);
-        }
-        for(char * c = o->default_val; *c != 0; c++){
-          val = rotladd(val, *c);
-        }
-        value = value ^ val;
+        u_hash_update_key_val(& value, o->name, o->default_val);
       }
     }
   }

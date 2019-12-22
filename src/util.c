@@ -12,6 +12,12 @@
 #include <io500-util.h>
 #include <io500-opt.h>
 
+void u_call_cmd(char const * str){
+  int ret = system(str);
+  if (ret != 0) {
+    WARNING("Calling \"%s\" returned %d\n", str, ret);
+  }
+}
 void u_purge_datadir(char const * dir){
   if(opt.rank != 0){
     return;

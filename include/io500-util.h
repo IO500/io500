@@ -61,6 +61,9 @@ void u_purge_file(char const * file);
 
 void u_create_dir_recursive(char const * dir, char const * api);
 
+// invoke an external shell command
+void u_call_cmd(char const * command);
+
 void u_print_timestamp(void);
 void * u_malloc(int size);
 

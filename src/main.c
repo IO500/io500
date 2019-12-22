@@ -144,7 +144,7 @@ int main(int argc, char ** argv){
       exit(0);
     }
     r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup]\n\n", argv[0]);
-    r0printf("--dry-run will show the executed commands but not run them\n");
+    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
     r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
     r0printf("Supported and current values of the ini file:\n");
     u_ini_print_values(cfg);
@@ -205,6 +205,15 @@ int main(int argc, char ** argv){
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
     if( opt.cleanup_only && phases[i]->type != IO500_PHASE_REMOVE ) continue;
+
+    if(opt.drop_caches && phases[i]->type != IO500_PHASE_DUMMY){
+      DEBUG_INFO("Dropping cache\n");
+      if(opt.rank == 0)
+        u_call_cmd("LANG=C free -m");
+      u_call_cmd(opt.drop_caches_cmd);
+      if(opt.rank == 0)
+        u_call_cmd("LANG=C free -m");
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){

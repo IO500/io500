@@ -1,7 +1,6 @@
 #include <io500-phase.h>
 
 static ini_option_t option[] = {
-  {"drop-caches", "Purge the caches, this is useful for testing and needed for single node runs", 0, INI_BOOL, "false", & opt.drop_caches},
   {"stonewall-time", "The stonewall timer, set to a smaller value for testing", 0, INI_UINT, "300", & opt.stonewall},
   {NULL} };
 

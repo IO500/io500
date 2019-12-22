@@ -202,3 +202,90 @@ void u_res_file_close(FILE * out){
     fclose(out);
   }
 }
+
+typedef struct{
+  uint32_t score_hash;
+
+  char const * cfg_hash_read;
+  char const * score_hash_read;
+} res_file_data_t ;
+
+static res_file_data_t res_data;
+
+static void hash_func(bool is_section, char const * key, char const * val){
+  static char const * last_section = NULL;
+  if(is_section){
+    last_section = key;
+    return;
+  }
+  if(strcmp(key, "version") == 0){
+    printf("result file ver = %s\n", val);
+    if(strcmp(val, VERSION) != 0){
+      WARNING("Verify the output with the matching version of the benchmark.\n");
+    }
+    u_hash_update_key_val(& res_data.score_hash, key, val);
+    return;
+  }
+  if(strcmp(key, "config-hash") == 0){
+    res_data.cfg_hash_read = strdup(val);
+    return;
+  }
+
+  if(! last_section) return;
+
+  if(strcmp(last_section, "SCORE") == 0){
+    if(strcmp(key, "SCORE") == 0){
+      // might be followed with the info INVALID
+      char * strippedScore = strtok((char*)val, " ");
+      u_hash_update_key_val(& res_data.score_hash, key, strippedScore);
+    }else if(strcmp(key, "hash") == 0){
+      res_data.score_hash_read = strdup(val);
+    }else{
+      u_hash_update_key_val(& res_data.score_hash, key, val);
+    }
+    return;
+  }
+  if(strcmp(key, "score") == 0){
+    u_hash_update_key_val(& res_data.score_hash, last_section, val);
+    return;
+  }
+  DEBUG_INFO("ignored: [%s] %s %s\n", last_section, key, val);
+}
+
+void u_verify_result_files(ini_section_t ** cfg, char const * result){
+  uint32_t hash = 0;
+  int error = 0;
+
+  hash = u_ini_gen_hash(cfg);
+  u_ini_parse_file(result, NULL, hash_func);
+
+  printf("config-hash     = %s\n", res_data.cfg_hash_read);
+  printf("score-hash      = %s\n", res_data.score_hash_read);
+
+  char hash_str[30];
+  sprintf(hash_str, "%X", hash);
+  if(strcmp(hash_str, res_data.cfg_hash_read) != 0){
+    printf("ERROR: Configuration hash expected: %s read: %s\n", hash_str, res_data.cfg_hash_read);
+    error = 1;
+  }
+
+  sprintf(hash_str, "%X", res_data.score_hash);
+  // check if this is a valid run
+  if(strcmp(hash_str, res_data.score_hash_read) != 0){
+    char const * shash = strdup(hash_str);
+    u_hash_update_key_val(& res_data.score_hash, "valid", "NO");
+    sprintf(hash_str, "%X", res_data.score_hash);
+    error = 1;
+    if(strcmp(hash_str, res_data.score_hash_read) != 0){
+      printf("\nERROR: Score hash expected: \"%s\" read: \"%s\"\n", shash, res_data.score_hash_read);
+    }else{
+      printf("\n[OK] But this is an invalid run!\n");
+    }
+  }
+
+  if(error == 0){
+    printf("\n[OK]\n");
+  }
+
+  exit(error);
+}

@@ -28,6 +28,15 @@ Two INI files are provided, the config-minimal.ini and the config-some.ini.
 To see the currently active options, run:
 $ ./io500 <INI file> -h
 
+### Integrity check
+
+After a run is completed, the score obtained and the configuration file can be verified to ensure that it wasn't accidentially modified.
+
+$ ./io500 config-test-run.ini  --verify result.txt
+config-hash = 1065C0D
+score-hash  = C97CC873
+[OK] But this is an invalid run!
+
 ## Output
 
   - The benchmark will output a default set of information in the INI format to simplify parsing. When setting verbosity to 5, you will receive more information.

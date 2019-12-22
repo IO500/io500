@@ -9,6 +9,8 @@
 
 #include <io500-debug.h>
 
+#define VERSION "ISC20-testing"
+
 #define INI_UNSET_STRING NULL
 #define INI_UNSET_INT (-2147483648)
 #define INI_UNSET_UINT (unsigned)(-1)
@@ -39,11 +41,16 @@ typedef struct {
   ini_option_t * option;
 } ini_section_t;
 
+typedef void(*ini_call_back_f)(bool is_section, char const * key, char const * val);
+
 /**
  Parse the ini file in data according to the expected specification
  @Return 0 if parsing is successfull
  */
-int u_parse_ini(char const * data, ini_section_t ** specification);
+int u_parse_ini(char const * data, ini_section_t ** specification, ini_call_back_f func);
+
+
+void u_ini_parse_file(char const * file, ini_section_t** out_cfg, ini_call_back_f func);
 
 /**
  Compute a hash based on the current values
@@ -58,6 +65,7 @@ uint32_t u_hash_update(uint32_t hash, char const * str);
 void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val);
 void u_hash_update_key_val_dbl(uint32_t * hash, char const * key, double val);
 void u_hash_print(FILE * file, uint32_t hash);
+void u_verify_result_files(ini_section_t ** cfg, char const * result_file);
 
 // imported from IOR
 double GetTimeStamp(void);

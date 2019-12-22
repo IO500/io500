@@ -57,39 +57,7 @@ static ini_section_t ** options(void){
   return ini_section;
 }
 
-static void parse_ini_file(char * file, ini_section_t** cfg){
-  struct stat statbuf;
-  int ret = stat(file, & statbuf);
-  if(ret != 0){
-    FATAL("Cannot open config file %s\n", file);
-  }
 
-  char * buff = "";
-  if(statbuf.st_size > 0){
-    buff = malloc(statbuf.st_size + 1);
-    if(! buff){
-      FATAL("Cannot malloc();")
-    }
-
-    FILE * f = fopen(file, "r");
-    if(ret != 0){
-      FATAL("Cannot open config file %s\n", file);
-    }
-    ret = fread(buff, statbuf.st_size, 1, f);
-    fclose(f);
-    if( ret != 1 ){
-      FATAL("Couldn't read config file %s\n", file);
-    }
-    buff[statbuf.st_size] = '\0';
-  }
-
-  ret = u_parse_ini(buff, cfg);
-  if (ret != 0){
-    FATAL("Couldn't parse config file %s\n", file);
-  }
-
-  free(buff);
-}
 
 static void init_dirs(void){
   // load general IO backend for data dir
@@ -141,15 +109,19 @@ int main(int argc, char ** argv){
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
     help:
     if(opt.rank != 0){
+      MPI_Finalize();
       exit(0);
     }
     r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash]\n\n", argv[0]);
     r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
     r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
-    r0printf("--config-hash Compute the configuration hash\n");
+    r0printf("--config-hash Compute the configuration hash\n\n");
+    r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
+
     r0printf("Supported and current values of the ini file:\n");
     u_ini_print_values(cfg);
-    exit(1);
+    MPI_Finalize();
+    exit(0);
   }
 
   int verbosity_override = -1;
@@ -157,6 +129,7 @@ int main(int argc, char ** argv){
 
   int config_hash_only = 0;
   int cleanup_only = 0;
+  int verify_only = 0;
   if(argc > 2){
     for(int i = 2; i < argc; i++){
       if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0 ){
@@ -170,13 +143,17 @@ int main(int argc, char ** argv){
         cleanup_only = 1;
       }else if(strcmp(argv[i], "--config-hash") == 0 ){
         config_hash_only = 1;
+      }else if(strcmp(argv[i], "--verify") == 0 ){
+        verify_only = 1;
+        break;
       }else{
         FATAL("Unknown option: %s\n", argv[i]);
       }
     }
   }
 
-  parse_ini_file(argv[1], cfg);
+
+  u_ini_parse_file(argv[1], cfg, NULL);
   if(verbosity_override > -1){
     opt.verbosity = verbosity_override;
   }
@@ -184,7 +161,18 @@ int main(int argc, char ** argv){
     goto help;
   }
 
-  init_dirs();
+  PRINT_PAIR("version", "%s\n", VERSION);
+  
+  if(verify_only){
+    if(argc == 3){
+      FATAL("--verify option requires the output file as last parameter!");
+    }
+    if(verbosity_override == -1){
+      opt.verbosity = 0;
+    }
+    u_verify_result_files(cfg, argv[argc-1]);
+    exit(0);
+  }
 
   if(opt.rank == 0){
     PRINT_PAIR_HEADER("config-hash");
@@ -192,10 +180,13 @@ int main(int argc, char ** argv){
     u_hash_print(stdout, hash);
     printf("\n");
   }
+
   if(config_hash_only){
     MPI_Finalize();
     exit(0);
   }
+
+  init_dirs();
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
@@ -213,6 +204,7 @@ int main(int argc, char ** argv){
 
   // manage a hash for the scores
   uint32_t score_hash = 0;
+  u_hash_update_key_val(& score_hash, "version", VERSION);
 
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
@@ -239,11 +231,13 @@ int main(int argc, char ** argv){
 
     double start = GetTimeStamp();
     double score = phases[i]->run();
-    if(opt.rank == 0 && phases[i]->group > IO500_NO_SCORE){
-      PRINT_PAIR("score", "%f\n", score);
+    if(phases[i]->group > IO500_NO_SCORE){
+      if(opt.rank == 0){
+        PRINT_PAIR("score", "%f\n", score);
+      }
+      u_hash_update_key_val_dbl(& score_hash, phases[i]->name, score);
     }
     phases[i]->score = score;
-    u_hash_update_key_val_dbl(& score_hash, phases[i]->name, score);
 
     double runtime = GetTimeStamp() - start;
     // This is an additional sanity check
@@ -286,12 +280,12 @@ int main(int argc, char ** argv){
       }
       DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
       score = pow(score, 1.0/numbers);
-      PRINT_PAIR(io500_phase_str[g], "%.3f\n", score);
+      PRINT_PAIR(io500_phase_str[g], "%f\n", score);
       u_hash_update_key_val_dbl(& score_hash, io500_phase_str[g], score);
 
       overall_score += score * score;
     }
-    PRINT_PAIR("SCORE", "%.3f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
+    PRINT_PAIR("SCORE", "%f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
       u_hash_update_key_val(& score_hash, "valid", "NO");

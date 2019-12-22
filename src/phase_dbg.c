@@ -15,6 +15,7 @@ static void validate(void){
 
 u_phase_t p_debug = {
   "debug",
+  IO500_PHASE_DUMMY,
   option,
   validate,
   NULL

@@ -46,6 +46,7 @@ static double run(void){
 
 u_phase_t p_mdtest_hard_write = {
   "mdtest-hard-write",
+  IO500_PHASE_WRITE,
   option,
   validate,
   run,

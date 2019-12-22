@@ -43,6 +43,7 @@ void mdtest_easy_add_params(u_argv_t * argv){
 
 u_phase_t p_mdtest_easy = {
   "mdtest-easy",
+  IO500_PHASE_DUMMY,
   option,
   validate,
   NULL,

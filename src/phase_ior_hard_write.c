@@ -52,6 +52,7 @@ static double run(void){
 
 u_phase_t p_ior_hard_write = {
   "ior-hard-write",
+  IO500_PHASE_WRITE,
   option,
   validate,
   run,

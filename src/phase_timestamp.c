@@ -28,6 +28,7 @@ static double run(void){
 
 u_phase_t p_timestamp = {
   "timestamp",
+  IO500_PHASE_WRITE,
   option,
   validate,
   run,

@@ -43,6 +43,7 @@ static double run(void){
 
 u_phase_t p_mdtest_hard_delete = {
   "mdtest-hard-delete",
+  IO500_PHASE_REMOVE,
   option,
   validate,
   run,

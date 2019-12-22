@@ -67,6 +67,7 @@ void ior_hard_add_params(u_argv_t * argv){
 
 u_phase_t p_ior_hard = {
   "ior-hard",
+  IO500_PHASE_DUMMY,
   option,
   validate,
   NULL,

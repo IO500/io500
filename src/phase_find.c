@@ -174,6 +174,7 @@ static void validate(void){
 
 u_phase_t p_find = {
   "find",
+  IO500_PHASE_READ,
   option,
   validate,
   run,

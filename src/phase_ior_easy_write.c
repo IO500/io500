@@ -52,6 +52,7 @@ static double run(void){
 
 u_phase_t p_ior_easy_write = {
   "ior-easy-write",
+  IO500_PHASE_WRITE,
   option,
   validate,
   run,

@@ -42,6 +42,7 @@ static double run(void){
 
 u_phase_t p_mdtest_easy_stat = {
   "mdtest-easy-stat",
+  IO500_PHASE_READ,
   option,
   validate,
   run,

@@ -53,6 +53,7 @@ static double run(void){
 
 u_phase_t p_ior_hard_read = {
   "ior-hard-read",
+  IO500_PHASE_READ,
   option,
   validate,
   run,

@@ -143,7 +143,9 @@ int main(int argc, char ** argv){
     if(opt.rank != 0){
       exit(0);
     }
-    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run]\n\n", argv[0]);
+    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup]\n\n", argv[0]);
+    r0printf("--dry-run will show the executed commands but not run them\n");
+    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
     r0printf("Supported and current values of the ini file:\n");
     u_ini_print_values(cfg);
     exit(1);
@@ -160,6 +162,8 @@ int main(int argc, char ** argv){
         opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--dry-run") == 0 ){
         opt.dry_run = 1;
+      }else if(strcmp(argv[i], "--cleanup") == 0 ){
+        opt.cleanup_only = 1;
       }else{
         FATAL("Unknown option: %s\n", argv[i]);
       }
@@ -200,6 +204,8 @@ int main(int argc, char ** argv){
 
   for(int i=0; i < IO500_PHASES; i++){
     if(! phases[i]->run) continue;
+    if( opt.cleanup_only && phases[i]->type != IO500_PHASE_REMOVE ) continue;
+
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){
       printf("\n[%s]\n", phases[i]->name);

@@ -46,6 +46,7 @@ void mdtest_hard_add_params(u_argv_t * argv){
 
 u_phase_t p_mdtest_hard = {
   "mdtest-hard",
+  IO500_PHASE_DUMMY,
   option,
   validate,
   NULL,

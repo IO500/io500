@@ -5,7 +5,6 @@
 
 #include <io500-util.h>
 
-
 typedef enum {
   IO500_NO_SCORE,
   IO500_SCORE_MD,
@@ -13,9 +12,16 @@ typedef enum {
   IO500_SCORE_LAST
 } io500_phase_score_group;
 
+typedef enum {
+  IO500_PHASE_DUMMY,
+  IO500_PHASE_WRITE,
+  IO500_PHASE_READ,
+  IO500_PHASE_REMOVE,
+} io500_phase_type;
 
 typedef struct{
   char const * name;
+  io500_phase_type type;
   ini_option_t * options;
   void (*validate)(void); // check options
   double (*run)(void);    // returns the score

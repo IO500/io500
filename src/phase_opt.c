@@ -17,6 +17,7 @@ static void validate(void){
 
 u_phase_t p_opt = {
   "global",
+  IO500_PHASE_DUMMY,
   option,
   validate,
   NULL

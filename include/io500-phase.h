@@ -17,9 +17,10 @@ typedef enum {
 typedef struct{
   char const * name;
   ini_option_t * options;
-  void (*validate)(void);
-  double (*run)(void); // returns the score
-  bool verify_stonewall;
+  void (*validate)(void); // check options
+  double (*run)(void);    // returns the score
+  bool verify_stonewall;  // double check that runtime meets stonewall?
+  void (*cleanup)(void);  // remove generated files/directories if possible
 
   double score; // the measured score
   io500_phase_score_group group;

@@ -8,8 +8,30 @@
 #include <assert.h>
 
 
+#include <aiori.h>
 #include <io500-util.h>
 #include <io500-opt.h>
+
+void u_purge_datadir(char const * dir){
+  if(opt.rank != 0){
+    return;
+  }
+  char d[2048];
+  sprintf(d, "%s/%s", opt.datadir, dir);
+  DEBUG_INFO("Removing dir %s\n", d);
+
+  opt.aiori->rmdir(d, & opt.aiori_params);
+}
+
+void u_purge_file(char const * file){
+  if(opt.rank != 0){
+    return;
+  }
+  char f[2048];
+  sprintf(f, "%s/%s", opt.datadir, file);
+  DEBUG_INFO("Removing file %s\n", f);
+  opt.aiori->delete(f, & opt.aiori_params);
+}
 
 void u_create_datadir(char const * dir){
   if(opt.rank != 0){
@@ -17,6 +39,11 @@ void u_create_datadir(char const * dir){
   }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
+  u_create_dir_recursive(d, opt.api);
+}
+
+void u_create_dir_recursive(char const * dir, char const * api){
+  char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
 
@@ -29,13 +56,14 @@ void u_create_datadir(char const * dir){
     int ret = stat(outdir, & sb);
     if(ret != 0){
       DEBUG_INFO("Creating dir %s\n", outdir);
-      ret = mkdir(outdir, S_IRWXU);
+      ret = opt.aiori->mkdir(outdir, S_IRWXU, NULL);
       if(ret != 0){
         FATAL("Couldn't create directory %s (Error: %s)\n", outdir, strerror(errno));
       }
     }
     next = strtok(NULL, "/");
   }
+  free(d);
 }
 
 u_argv_t * u_argv_create(void){

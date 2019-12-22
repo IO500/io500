@@ -5,6 +5,8 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include <io500-util.h>
 #include <io500-phase.h>
@@ -89,8 +91,14 @@ static void parse_ini_file(char * file, ini_section_t** cfg){
   free(buff);
 }
 
-static void init_result_dir(void){
-  int ret;
+static void init_dirs(void){
+  // load general IO backend for data dir
+  aiori_initialize(NULL);
+  opt.aiori = aiori_select(opt.api);
+  if(opt.aiori == NULL){
+    FATAL("Could not load AIORI backend for %s\n", opt.api);
+  }
+
   char buffer[30];
 
   if(opt.rank == 0){
@@ -99,27 +107,26 @@ static void init_result_dir(void){
     time(&timer);
     tm_info = localtime(&timer);
     strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
-
-    ret = mkdir("results", S_IRWXU);
-    if(ret != 0 && errno != EEXIST){
-      FATAL("Couldn't create directory: \"results\" (Error: %s)\n", strerror(errno));
-    }
   }
-  MPI_Bcast(buffer, 30, MPI_CHAR, 0, MPI_COMM_WORLD);
+  UMPI_CHECK(MPI_Bcast(buffer, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
 
   char resdir[2048];
-  sprintf(resdir, "./results/%s", buffer);
-  if(opt.rank == 0){
-    PRINT_PAIR("result-dir", "%s\n", resdir);
-    ret = mkdir(resdir, S_IRWXU);
-    if(ret != 0){
-      FATAL("Couldn't create directory %s (Error: %s)\n", resdir, strerror(errno));
-    }
+  if(opt.timestamp_resdir){
+    sprintf(resdir, "%s/%s", opt.resdir, buffer);
+    opt.resdir = strdup(resdir);
   }
-  opt.resdir = strdup(resdir);
 
-  sprintf(resdir, "%s/%s", opt.datadir, buffer);
-  opt.datadir = strdup(resdir);
+  if(opt.timestamp_datadir){
+    sprintf(resdir, "%s/%s", opt.datadir, buffer);
+    opt.datadir = strdup(resdir);
+  }
+
+  if(opt.rank == 0){
+    PRINT_PAIR("result-dir", "%s\n", opt.resdir);
+    u_create_dir_recursive(opt.resdir, "POSIX");
+
+    u_create_datadir("");
+  }
 }
 
 int main(int argc, char ** argv){
@@ -128,6 +135,8 @@ int main(int argc, char ** argv){
   MPI_Init(& argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
+
+  init_IOR_Param_t(& opt.aiori_params);
 
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
     help:
@@ -140,13 +149,15 @@ int main(int argc, char ** argv){
     exit(1);
   }
 
+  int verbosity_override = -1;
   int print_help = 0;
   if(argc > 2){
     for(int i = 2; i < argc; i++){
       if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0 ){
         print_help = 1;
       }else if(strncmp(argv[i], "-v=", 3) == 0){
-        opt.verbosity = atoi(argv[i]+3);
+        verbosity_override = atoi(argv[i]+3);
+        opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--dry-run") == 0 ){
         opt.dry_run = 1;
       }else{
@@ -156,16 +167,19 @@ int main(int argc, char ** argv){
   }
 
   parse_ini_file(argv[1], cfg);
+  if(verbosity_override > -1){
+    opt.verbosity = verbosity_override;
+  }
   if(print_help){
     goto help;
   }
 
-  init_result_dir();
+  init_dirs();
 
   if(opt.rank == 0){
     PRINT_PAIR_HEADER("config-hash");
     u_ini_print_hash(stdout, cfg);
-    printf("\n");    
+    printf("\n");
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -222,12 +236,6 @@ int main(int argc, char ** argv){
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.rank == 0){
-    if(opt.verbosity > 0){
-      printf("; END ");
-      u_print_timestamp();
-      printf("\n");
-    }
-
     // compute the overall score
     printf("\n[SCORE]\n");
     double overall_score = 0;
@@ -255,6 +263,20 @@ int main(int argc, char ** argv){
     }
     PRINT_PAIR("SCORE", "%.3f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
   }
+
+  for(int i=0; i < IO500_PHASES; i++){
+    if(phases[i]->cleanup)
+      phases[i]->cleanup();
+  }
+
+  u_purge_datadir("");
+
+  if(opt.rank == 0 && opt.verbosity > 0){
+    printf("; END ");
+    u_print_timestamp();
+    printf("\n");
+  }
+
   MPI_Finalize();
   return 0;
 }

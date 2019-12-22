@@ -55,12 +55,15 @@ void u_ini_print_values(ini_section_t ** sections);
 
 // imported from IOR
 double GetTimeStamp(void);
+void u_create_datadir(char const * dir);
+void u_purge_datadir(char const * dir);
+void u_purge_file(char const * file);
+
+void u_create_dir_recursive(char const * dir, char const * api);
 
 void u_print_timestamp(void);
-
 void * u_malloc(int size);
 
-void u_create_datadir(char const * dir);
 
 FILE * u_res_file_prep(char const * name);
 void u_res_file_close(FILE * out);

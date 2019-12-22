@@ -19,6 +19,13 @@ static void validate(void){
 
 }
 
+static void cleanup(void){
+  if( ! opt.dry_run ){
+    u_purge_file("mdtest-easy-stonewall");
+    u_purge_datadir("mdtest-easy");
+  }
+}
+
 void mdtest_easy_add_params(u_argv_t * argv){
   opt_mdtest_easy d = mdtest_easy_o;
 
@@ -29,14 +36,15 @@ void mdtest_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-L");
   u_argv_push(argv, "-F");
   u_argv_push(argv, "-d");
-  u_argv_push_printf(argv, "%s/mdt_easy", opt.datadir);
+  u_argv_push_printf(argv, "%s/mdtest-easy", opt.datadir);
   u_argv_push(argv, "-x");
-  u_argv_push_printf(argv, "%s/mdt_easy-stonewall", opt.datadir);
+  u_argv_push_printf(argv, "%s/mdtest-easy-stonewall", opt.datadir);
 }
 
 u_phase_t p_mdtest_easy = {
   "mdtest-easy",
   option,
   validate,
-  NULL
+  NULL,
+  .cleanup = cleanup,
 };

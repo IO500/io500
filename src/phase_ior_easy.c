@@ -27,9 +27,15 @@ static void validate(void){
       FATAL("The hintsFileName must be a readable file %s\n", ior_easy_o.hintsFileName);
     }
   }
-  if(opt.rank == 0){
-    u_create_datadir("ior_easy");
+  u_create_datadir("ior-easy");
+}
+
+static void cleanup(void){
+  if( ! opt.dry_run ){
+    u_purge_file("ior-easy/stonewall");
+    u_purge_file("ior-easy/ior_file_easy");
   }
+  u_purge_datadir("ior-easy");
 }
 
 void ior_easy_add_params(u_argv_t * argv){
@@ -45,9 +51,9 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");
   u_argv_push(argv, "-o");
-  u_argv_push_printf(argv, "%s/ior_easy/ior_file_easy", opt.datadir);
+  u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
   u_argv_push(argv, "-O");
-  u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior_easy/stonewall", opt.datadir );
+  u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy/stonewall", opt.datadir );
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push(argv, "-t");
@@ -60,5 +66,6 @@ u_phase_t p_ior_easy = {
   "ior-easy",
   option,
   validate,
-  NULL
+  NULL,
+  .cleanup = cleanup,
 };

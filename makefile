@@ -22,7 +22,7 @@ TESTSEXE = $(patsubst %,%.exe,$(TESTS))
 
 all: $(PROGRAM) $(TESTSEXE)
 
-%.exe: %.o $(DEPS)
+%.exe: %.o $(DEPS) io500.a
 	@echo LD $@
 	$(CC) -o $@ $< $(LDFLAGS) io500.a
 

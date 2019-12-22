@@ -18,4 +18,18 @@
 #define WARNING(...) do{ printf("; WARNING "__VA_ARGS__); }while(0);
 
 #define r0printf(...) do{ if(opt.rank == 0){ printf(__VA_ARGS__);}  }while(0);
+
+
+#define UMPI_CHECK(MPI_STATUS) do {                                    \
+  char resultString[MPI_MAX_ERROR_STRING];                             \
+  int resultLength;                                                    \
+                                                                       \
+  if (MPI_STATUS != MPI_SUCCESS) {                                     \
+      MPI_Error_string(MPI_STATUS, resultString, &resultLength);       \
+      FATAL("MPI ERROR: MPI %s, (%s:%d)\n",                            \
+             resultString, __FILE__, __LINE__);                        \
+  }                                                                    \
+} while(0)
+
+
 #endif

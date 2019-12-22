@@ -32,10 +32,15 @@ $ ./io500 <INI file> -h
 
 After a run is completed, the score obtained and the configuration file can be verified to ensure that it wasn't accidentially modified.
 
+You can either use the full-featured io500 application:
+
 $ ./io500 config-test-run.ini  --verify result.txt
 config-hash = 1065C0D
 score-hash  = C97CC873
 [OK] But this is an invalid run!
+
+Or the lightweight verification tool which has less dependencies:
+$ ./io500-verify config-test-run.ini  result.txt
 
 ## Output
 

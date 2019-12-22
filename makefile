@@ -4,6 +4,7 @@ CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/
 LDFLAGS += -lm
 
 PROGRAM = io500
+VERIFIER = io500-verify
 SEARCHPATH += src
 SEARCHPATH += include
 SEARCHPATH += test
@@ -20,7 +21,7 @@ OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase
 TESTS += ini-test
 TESTSEXE = $(patsubst %,%.exe,$(TESTS))
 
-all: $(PROGRAM) $(TESTSEXE)
+all: $(VERIFIER) $(PROGRAM) $(TESTSEXE)
 
 %.exe: %.o $(DEPS) io500.a
 	@echo LD $@
@@ -33,6 +34,10 @@ clean:
 io500.a: $(OBJS)
 	@echo AR $@
 	ar rcsT $@ $(OBJS)
+
+$(VERIFIER): verifier.o io500.a
+	@echo LD $@
+	$(CC) -o $@ verifier.o io500.a $(LDFLAGS)
 
 $(PROGRAM): io500.a main.o
 	@echo LD $@

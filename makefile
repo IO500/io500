@@ -1,7 +1,7 @@
 CC = @mpicc
 CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
 CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
-LDFLAGS += -lm
+LDFLAGS += -lm # -lgpfs # may need some additional flags as provided to IOR
 
 PROGRAM = io500
 VERIFIER = io500-verify

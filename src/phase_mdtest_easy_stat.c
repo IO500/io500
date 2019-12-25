@@ -12,7 +12,7 @@ typedef struct{
 static opt_mdtest_easy_stat o;
 
 static ini_option_t option[] = {
-  {"API", "The API to be used", 0, INI_STRING, "POSIX", & o.g.api},
+  {"API", "The API to be used", 0, INI_STRING, NULL, & o.g.api},
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & o.g.odirect},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & o.g.no_run},
   {NULL} };

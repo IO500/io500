@@ -78,7 +78,7 @@ int main(int argc, char ** argv){
     r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
 
     r0printf("Supported and current values of the ini file:\n");
-    u_ini_print_values(cfg);
+    u_ini_print_values(stdout, cfg, TRUE);
     MPI_Finalize();
     exit(0);
   }
@@ -146,6 +146,18 @@ int main(int argc, char ** argv){
   }
 
   init_dirs();
+
+  if(opt.rank == 0){
+    // create configuration in result directory to ensure it is preserved
+    char file[2048];
+    sprintf(file, "%s/config.ini", opt.resdir);
+    FILE * fd = fopen(file, "w");
+    if(! fd){
+      FATAL("Couldn't write the configuration file to the result directory: %s (%s)\n", file, strerror(errno));
+    }
+    u_ini_print_values(fd, cfg, 0);
+    fclose(fd);
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){

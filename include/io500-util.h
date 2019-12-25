@@ -56,7 +56,7 @@ void u_ini_parse_file(char const * file, ini_section_t** out_cfg, ini_call_back_
  Compute a hash based on the current values
  */
 uint32_t u_ini_gen_hash(ini_section_t ** sections);
-void u_ini_print_values(ini_section_t ** sections);
+void u_ini_print_values(FILE * fd, ini_section_t ** sections, bool show_help);
 
 /**
  * Hash functions to increase integrity

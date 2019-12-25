@@ -274,17 +274,17 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
   return error;
 }
 
-void u_ini_print_values(ini_section_t ** sections){
+void u_ini_print_values(FILE * fd, ini_section_t ** sections, bool show_help){
   for( ini_section_t ** ps = sections ; *ps != NULL; ps++){
     ini_section_t * s = *ps;
-    printf("[%s]\n", s->name);
+    fprintf(fd, "[%s]\n", s->name);
 
     for( ini_option_t * o = s->option ; o->name != NULL; o++){
-      if (o->help){
-        printf("# %s\n", o->help);
+      if (o->help && show_help){
+        fprintf(fd, "# %s\n", o->help);
       }
-      printf("%s = %s\n", o->name, o->default_val ? o->default_val : "");
+      fprintf(fd, "%s = %s\n", o->name, o->default_val ? o->default_val : "");
     }
-    printf("\n");
+    fprintf(fd, "\n");
   }
 }

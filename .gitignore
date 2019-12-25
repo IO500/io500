@@ -5,6 +5,7 @@ bin/
 core
 vgcore.*
 io500
+io500-verify
 
 # Prerequisites
 *.d

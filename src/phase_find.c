@@ -17,6 +17,8 @@ typedef struct{
 
   pfind_options_t * pfind_o;
   pfind_find_results_t * pfind_res;
+  int pfind_queue_length;
+  int pfind_steal_from_next;
 
   uint64_t found_files;
   double runtime;
@@ -127,6 +129,8 @@ static ini_option_t option[] = {
   {"external-extra-args", "Extra arguments for external scripts", 0, INI_STRING, "", & of.ext_args},
   {"external-mpi-args", "Startup arguments for external scripts", 0, INI_STRING, "", & of.ext_mpi},
   {"nproc", "Set the number of processes for pfind", 0, INI_UINT, NULL, & of.nproc},
+  {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
+  {"pfind-steal-next", "Pfind Steal from next", 0, INI_BOOL, "FALSE", & of.pfind_steal_from_next},
   {NULL} };
 
 static void validate(void){
@@ -157,6 +161,11 @@ static void validate(void){
     u_argv_push(argv, "-name");
     u_argv_push(argv, "*01*");
     u_argv_push(argv, "-C");
+    if(of.pfind_steal_from_next){
+      u_argv_push(argv, "-N");
+    }
+    u_argv_push(argv, "-q");
+    u_argv_push_printf(argv, "%d", of.pfind_queue_length);
 
     of.command = u_flatten_argv(argv);
 

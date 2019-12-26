@@ -270,7 +270,9 @@ int main(int argc, char ** argv){
       phases[i]->cleanup();
   }
 
-  u_purge_datadir("");
+  if(opt.rank == 0){
+    u_purge_datadir("");
+  }
 
   if(opt.rank == 0 && opt.verbosity > 0){
     printf("; END ");

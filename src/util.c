@@ -53,9 +53,6 @@ void u_call_cmd(char const * str){
   }
 }
 void u_purge_datadir(char const * dir){
-  if(opt.rank != 0){
-    return;
-  }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
   DEBUG_INFO("Removing dir %s\n", d);
@@ -64,9 +61,6 @@ void u_purge_datadir(char const * dir){
 }
 
 void u_purge_file(char const * file){
-  if(opt.rank != 0){
-    return;
-  }
   char f[2048];
   sprintf(f, "%s/%s", opt.datadir, file);
   DEBUG_INFO("Removing file %s\n", f);

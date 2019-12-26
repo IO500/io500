@@ -20,7 +20,7 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run ){
+  if( ! opt.dry_run && opt.rank == 0){
     u_purge_file("mdtest-easy-stonewall");
     u_purge_datadir("mdtest-easy");
   }

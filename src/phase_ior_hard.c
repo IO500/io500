@@ -31,12 +31,13 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run ){
+  if( ! opt.dry_run && opt.rank == 0){
     u_purge_file("ior-hard/file");
     u_purge_file("ior-hard/stonewall");
   }
-
-  u_purge_datadir("ior-hard");
+  if(opt.rank == 0){
+    u_purge_datadir("ior-hard");
+  }
 }
 
 void ior_hard_add_params(u_argv_t * argv){

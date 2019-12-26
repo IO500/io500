@@ -31,10 +31,18 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run ){
+  if( ! opt.dry_run && opt.rank == 0){
     u_purge_file("ior-easy/stonewall");
-    u_purge_file("ior-easy/ior_file_easy");
+
+    if(! ior_easy_o.filePerProc){
+      u_purge_file("ior-easy/ior_file_easy");
+    }
   }
+  if( ! opt.dry_run && ior_easy_o.filePerProc){
+      char filename[2048];
+      sprintf(filename, "ior-easy/ior_file_easy.%08d", opt.rank);
+      u_purge_file(filename);
+    }
   u_purge_datadir("ior-easy");
 }
 
@@ -60,6 +68,10 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, d.transferSize);
   u_argv_push(argv, "-b");
   u_argv_push(argv, d.blockSize);
+
+  if(ior_easy_o.filePerProc){
+    u_argv_push(argv, "-F");
+  }
 }
 
 u_phase_t p_ior_easy = {

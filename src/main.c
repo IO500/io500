@@ -155,7 +155,7 @@ int main(int argc, char ** argv){
   init_dirs();
 
   FILE * res_summary = NULL;
-  if(rank == 0){
+  if(opt.rank == 0){
     char file[2048];
     sprintf(file, "%s/result_summary.txt", opt.resdir);
     res_summary = fopen(file, "w");
@@ -303,14 +303,13 @@ int main(int argc, char ** argv){
       scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
   }
 
-  fclose(res_summary);
-
   for(int i=0; i < IO500_PHASES; i++){
     if(phases[i]->cleanup)
       phases[i]->cleanup();
   }
 
   if(opt.rank == 0){
+    fclose(res_summary);    
     u_purge_datadir("");
   }
 

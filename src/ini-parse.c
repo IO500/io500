@@ -136,6 +136,7 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
           case ' ':
           case '\t':
           case '\r':
+          case '\0':
           token[p] = '\0';
           break;
           default:
@@ -145,6 +146,12 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
       end_loop:
 
       DEBUG_INFO("Var: \"%s\"=\"%s\"\n", var, val);
+
+      if(*val == '\0'){
+        // no argument
+        token = strtok_r(NULL, "\n", &saveptr);
+        continue;
+      }
 
       if(cb_func){ // callback handler for variables
         cb_func(0, var, val);

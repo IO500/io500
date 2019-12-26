@@ -256,7 +256,8 @@ int main(int argc, char ** argv){
 
       overall_score += score * score;
     }
-    PRINT_PAIR("SCORE", "%f %s\n", sqrt(overall_score), opt.is_valid_run ? "" : " [INVALID]");
+    overall_score = sqrt(overall_score);
+    PRINT_PAIR("SCORE", "%f %s\n", overall_score, opt.is_valid_run ? "" : " [INVALID]");
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
       u_hash_update_key_val(& score_hash, "valid", "NO");

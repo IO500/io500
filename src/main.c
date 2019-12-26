@@ -13,6 +13,8 @@
 
 #include <phase-definitions.h>
 
+FILE* file_out = NULL;
+
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "NO SCORE",
   "MD",
@@ -49,14 +51,27 @@ static void init_dirs(void){
   }
 
   if(opt.rank == 0){
-    PRINT_PAIR("result-dir", "%s\n", opt.resdir);
     u_create_dir_recursive(opt.resdir, "POSIX");
 
     u_create_datadir("");
   }
 }
 
+static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
+  if(opt.rank == 0){
+    PRINT_PAIR_HEADER("config-hash");
+    uint32_t hash = u_ini_gen_hash(cfg);
+    u_hash_print(out, hash);
+    fprintf(out, "\n");
+  }
+}
+
+#define dupprintf(...) do{ if(opt.rank == 0) { fprintf(res_summary, __VA_ARGS__); printf(__VA_ARGS__); } }while(0);
+
+
 int main(int argc, char ** argv){
+  file_out = stdout;
+
   ini_section_t ** cfg = u_options();
 
   MPI_Init(& argc, & argv);
@@ -120,8 +135,6 @@ int main(int argc, char ** argv){
     goto help;
   }
 
-  PRINT_PAIR("version", "%s\n", VERSION);
-
   if(verify_only){
     if(argc == 3){
       FATAL("--verify option requires the output file as last parameter!");
@@ -133,19 +146,32 @@ int main(int argc, char ** argv){
     exit(0);
   }
 
-  if(opt.rank == 0){
-    PRINT_PAIR_HEADER("config-hash");
-    uint32_t hash = u_ini_gen_hash(cfg);
-    u_hash_print(stdout, hash);
-    printf("\n");
-  }
-
   if(config_hash_only){
+    print_cfg_hash(stdout, cfg);
     MPI_Finalize();
     exit(0);
   }
 
   init_dirs();
+
+  FILE * res_summary = NULL;
+  if(rank == 0){
+    char file[2048];
+    sprintf(file, "%s/result_summary.txt", opt.resdir);
+    res_summary = fopen(file, "w");
+    if(! res_summary){
+      FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
+    }
+    sprintf(file, "%s/result.txt", opt.resdir);
+    file_out = fopen(file, "w");
+    if(! file_out){
+      FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
+    }
+  }
+
+  PRINT_PAIR("version", "%s\n", VERSION);
+  print_cfg_hash(file_out, cfg);
+  PRINT_PAIR("result-dir", "%s\n", opt.resdir);
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved
@@ -161,16 +187,16 @@ int main(int argc, char ** argv){
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
-    printf("; START ");
-    u_print_timestamp();
-    printf("\n");
+    fprintf(file_out, "; START ");
+    u_print_timestamp(file_out);
+    fprintf(file_out, "\n");
   }
 
   for(int i=0; i < IO500_PHASES; i++){
     phases[i]->validate();
   }
   if(opt.rank == 0){
-    printf("\n");
+    fprintf(file_out, "\n");
   }
 
   // manage a hash for the scores
@@ -178,10 +204,11 @@ int main(int argc, char ** argv){
   u_hash_update_key_val(& score_hash, "version", VERSION);
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(! phases[i]->run) continue;
-    if( cleanup_only && phases[i]->type != IO500_PHASE_REMOVE ) continue;
+    u_phase_t * phase = phases[i];
+    if(! phase->run) continue;
+    if( cleanup_only && phase->type != IO500_PHASE_REMOVE ) continue;
 
-    if(opt.drop_caches && phases[i]->type != IO500_PHASE_DUMMY){
+    if(opt.drop_caches && phase->type != IO500_PHASE_DUMMY){
       DEBUG_INFO("Dropping cache\n");
       if(opt.rank == 0)
         u_call_cmd("LANG=C free -m");
@@ -192,25 +219,30 @@ int main(int argc, char ** argv){
 
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){
-      printf("\n[%s]\n", phases[i]->name);
+      fprintf(file_out, "\n[%s]\n", phase->name);
       if(opt.verbosity > 0){
         PRINT_PAIR_HEADER("t_start");
-        u_print_timestamp();
-        printf("\n");
+        u_print_timestamp(file_out);
+        fprintf(file_out, "\n");
       }
     }
 
     double start = GetTimeStamp();
-    double score = phases[i]->run();
-    if(phases[i]->group > IO500_NO_SCORE){
+    double score = phase->run();
+    double runtime = GetTimeStamp() - start;
+
+    if(phase->group > IO500_NO_SCORE){
       if(opt.rank == 0){
         PRINT_PAIR("score", "%f\n", score);
+
+        char score_str[40];
+        sprintf(score_str, "%f", score);
+        dupprintf("[RESULT] %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s " : "IOPS", runtime);
       }
-      u_hash_update_key_val_dbl(& score_hash, phases[i]->name, score);
+      u_hash_update_key_val_dbl(& score_hash, phase->name, score);
     }
     phases[i]->score = score;
 
-    double runtime = GetTimeStamp() - start;
     // This is an additional sanity check
     if( phases[i]->verify_stonewall && opt.rank == 0){
       if(runtime < opt.stonewall && ! opt.dry_run){
@@ -222,16 +254,17 @@ int main(int argc, char ** argv){
     if(opt.verbosity > 0 && opt.rank == 0){
       PRINT_PAIR("t_delta", "%.4f\n", runtime);
       PRINT_PAIR_HEADER("t_end");
-      u_print_timestamp();
-      printf("\n");
+      u_print_timestamp(file_out);
+      fprintf(file_out, "\n");
     }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.rank == 0){
     // compute the overall score
-    printf("\n[SCORE]\n");
+    fprintf(file_out, "\n[SCORE]\n");
     double overall_score = 0;
+    double scores[IO500_SCORE_LAST];
 
     for(int g=1; g < IO500_SCORE_LAST; g++){
       char score_string[2048];
@@ -251,6 +284,7 @@ int main(int argc, char ** argv){
       }
       DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
       score = pow(score, 1.0/numbers);
+      scores[g] = score;
       PRINT_PAIR(io500_phase_str[g], "%f\n", score);
       u_hash_update_key_val_dbl(& score_hash, io500_phase_str[g], score);
 
@@ -263,7 +297,13 @@ int main(int argc, char ** argv){
       u_hash_update_key_val(& score_hash, "valid", "NO");
     }
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
+
+    dupprintf("[SCORE%s] Bandwidth %f GB/s : IOPS %f kiops : TOTAL %f\n",
+      opt.is_valid_run ? "" : " INVALID",
+      scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
   }
+
+  fclose(res_summary);
 
   for(int i=0; i < IO500_PHASES; i++){
     if(phases[i]->cleanup)
@@ -275,10 +315,12 @@ int main(int argc, char ** argv){
   }
 
   if(opt.rank == 0 && opt.verbosity > 0){
-    printf("; END ");
-    u_print_timestamp();
-    printf("\n");
+    fprintf(file_out, "; END ");
+    u_print_timestamp(file_out);
+    fprintf(file_out, "\n");
   }
+
+  fclose(file_out);
 
   MPI_Finalize();
   return 0;

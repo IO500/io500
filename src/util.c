@@ -9,6 +9,7 @@
 
 
 #include <aiori.h>
+
 #include <io500-util.h>
 #include <io500-opt.h>
 
@@ -168,7 +169,7 @@ void * u_malloc(int size){
   return buff;
 }
 
-void u_print_timestamp(void){
+void u_print_timestamp(FILE * out){
   char buffer[30];
   struct tm* tm_info;
   time_t timer;
@@ -176,7 +177,7 @@ void u_print_timestamp(void){
   time(&timer);
   tm_info = localtime(&timer);
   strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", tm_info);
-  printf("%s", buffer);
+  fprintf(out, "%s", buffer);
 }
 
 FILE * u_res_file_prep(char const * name){

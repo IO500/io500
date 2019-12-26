@@ -15,7 +15,10 @@ void pfind_parse_args(void){}
 IOR_test_t * ior_run(int argc, char **argv, MPI_Comm world_com, FILE * out_logfile){ return NULL; }
 void mdtest_run(void){}
 
+FILE* file_out;
+
 int main(int argc, char ** argv){
+  file_out = stdout;
   ini_section_t ** cfg = u_options();
 
   if (argc < 3){

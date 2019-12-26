@@ -3,7 +3,11 @@
 
 #include <io500-util.h>
 
+FILE * file_out;
+
 int main(void){
+  file_out = stdout;
+  
   int ret;
   {
     ini_section_t * testsec[] = {NULL};

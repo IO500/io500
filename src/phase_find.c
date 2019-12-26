@@ -56,7 +56,7 @@ static double run(void){
     of.runtime = of.pfind_res->runtime;
 
     if( of.found_files == 0 ){
-      WARNING("Find didn't find anything, this is likely invalid.")
+      WARNING("Find didn't find anything, this is likely invalid.\n")
       opt.is_valid_run = 0;
     }
     PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
@@ -110,7 +110,7 @@ static double run(void){
   of.runtime = runtime;
 
   if( of.found_files == 0 ){
-    WARNING("Find didn't find anything, this is likely invalid.")
+    WARNING("Find didn't find anything, this is likely invalid.\n")
     opt.is_valid_run = 0;
   }
 

@@ -81,6 +81,9 @@ void u_create_dir_recursive(char const * dir, char const * api){
   char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
+  if (dir[0] == '/'){
+    wp += sprintf(wp, "/");
+  }
 
   char * next = strtok(d, "/");
   while(next){

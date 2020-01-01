@@ -19,8 +19,7 @@ uint32_t u_ini_gen_hash(ini_section_t ** sections){
   return value;
 }
 
-
-void u_ini_parse_file(char const * file, ini_section_t** cfg, ini_call_back_f func){
+void u_ini_parse_file(char const * file, ini_section_t** cfg, ini_call_back_f func, char ** out_data){
   struct stat statbuf;
   int ret = stat(file, & statbuf);
   if(ret != 0){
@@ -51,6 +50,9 @@ void u_ini_parse_file(char const * file, ini_section_t** cfg, ini_call_back_f fu
     FATAL("Couldn't parse config file %s\n", file);
   }
 
+  if (out_data){
+    *out_data = strdup(buff);
+  }
   free(buff);
 }
 

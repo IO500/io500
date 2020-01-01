@@ -50,7 +50,7 @@ typedef void(*ini_call_back_f)(bool is_section, char const * key, char const * v
 int u_parse_ini(char const * data, ini_section_t ** specification, ini_call_back_f func);
 
 
-void u_ini_parse_file(char const * file, ini_section_t** out_cfg, ini_call_back_f func);
+void u_ini_parse_file(char const * file, ini_section_t** out_cfg, ini_call_back_f func, char ** out_buffer);
 
 /**
  Compute a hash based on the current values

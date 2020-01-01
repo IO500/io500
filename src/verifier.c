@@ -25,7 +25,7 @@ int main(int argc, char ** argv){
     printf("Synopsis: %s <INI file> <RESULT file>\n\n", argv[0]);
     exit(0);
   }
-  u_ini_parse_file(argv[1], cfg, NULL);
+  u_ini_parse_file(argv[1], cfg, NULL, NULL);
 
   PRINT_PAIR("version", "%s\n", VERSION);
 

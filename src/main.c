@@ -127,7 +127,25 @@ int main(int argc, char ** argv){
   }
 
 
-  u_ini_parse_file(argv[1], cfg, NULL);
+  char * ini_data = NULL;
+  {
+    int ini_len = 0;
+    if( opt.rank == 0){
+      u_ini_parse_file(argv[1], cfg, NULL, & ini_data);
+      ini_len = strlen(ini_data);
+      UMPI_CHECK(MPI_Bcast(& ini_len, 1, MPI_INT, 0, MPI_COMM_WORLD));
+      UMPI_CHECK(MPI_Bcast(ini_data, ini_len, MPI_CHAR, 0, MPI_COMM_WORLD));
+    }else{
+      UMPI_CHECK(MPI_Bcast(& ini_len, 1, MPI_INT, 0, MPI_COMM_WORLD));
+      ini_data = u_malloc(ini_len + 1);
+      ini_data[ini_len] = 0;
+      UMPI_CHECK(MPI_Bcast(ini_data, ini_len, MPI_CHAR, 0, MPI_COMM_WORLD));
+      int ret = u_parse_ini(ini_data, cfg, NULL);
+      if (ret != 0){
+        FATAL("Couldn't parse config file on rank %d\n", opt.rank);
+      }
+    }
+  }
   if(verbosity_override > -1){
     opt.verbosity = verbosity_override;
   }
@@ -167,6 +185,11 @@ int main(int argc, char ** argv){
     if(! file_out){
       FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
     }
+
+    sprintf(file, "%s/config-orig.ini", opt.resdir);
+    FILE * fd = fopen(file, "w");
+    fwrite(ini_data, strlen(ini_data), 1, fd);
+    fclose(fd);
   }
 
   PRINT_PAIR("version", "%s\n", VERSION);
@@ -309,7 +332,7 @@ int main(int argc, char ** argv){
   }
 
   if(opt.rank == 0){
-    fclose(res_summary);    
+    fclose(res_summary);
     u_purge_datadir("");
   }
 

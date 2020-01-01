@@ -114,7 +114,6 @@ int main(int argc, char ** argv){
         opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--dry-run") == 0 ){
         opt.dry_run = 1;
-        INVALID("DRY RUN MODE ACTIVATED\n");
       }else if(strcmp(argv[i], "--cleanup") == 0 ){
         cleanup_only = 1;
       }else if(strcmp(argv[i], "--config-hash") == 0 ){
@@ -208,6 +207,10 @@ int main(int argc, char ** argv){
     }
     u_ini_print_values(fd, cfg, 0);
     fclose(fd);
+  }
+
+  if(opt.dry_run){
+    INVALID("DRY RUN MODE ACTIVATED\n");
   }
 
   MPI_Barrier(MPI_COMM_WORLD);

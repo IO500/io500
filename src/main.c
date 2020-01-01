@@ -290,23 +290,23 @@ int main(int argc, char ** argv){
   if(opt.rank == 0){
     // compute the overall score
     fprintf(file_out, "\n[SCORE]\n");
-    double overall_score = 0;
+    double overall_score = 1;
     double scores[IO500_SCORE_LAST];
 
     for(int g=1; g < IO500_SCORE_LAST; g++){
       char score_string[2048];
       char *p = score_string;
-      double score = 0;
+      double score = 1;
       int numbers = 0;
       p += sprintf(p, " %s = (", io500_phase_str[g]);
       for(int i=0; i < IO500_PHASES; i++){
         if(phases[i]->group == g){
           double t = phases[i]->score;
-          score += t*t;
+          score *= t;
           if(numbers > 0)
-            p += sprintf(p, " + ");
+            p += sprintf(p, " * ");
           numbers++;
-          p += sprintf(p, "(%.3f*%.3f)", t, t);
+          p += sprintf(p, "%.8f", t);
         }
       }
       DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
@@ -315,7 +315,7 @@ int main(int argc, char ** argv){
       PRINT_PAIR(io500_phase_str[g], "%f\n", score);
       u_hash_update_key_val_dbl(& score_hash, io500_phase_str[g], score);
 
-      overall_score += score * score;
+      overall_score *= score;
     }
     overall_score = sqrt(overall_score);
     PRINT_PAIR("SCORE", "%f %s\n", overall_score, opt.is_valid_run ? "" : " [INVALID]");

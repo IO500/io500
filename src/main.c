@@ -79,6 +79,7 @@ int main(int argc, char ** argv){
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
 
   init_IOR_Param_t(& opt.aiori_params);
+  opt.is_valid_run = 1;
 
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
     help:
@@ -113,6 +114,7 @@ int main(int argc, char ** argv){
         opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--dry-run") == 0 ){
         opt.dry_run = 1;
+        INVALID("DRY RUN MODE ACTIVATED\n");
       }else if(strcmp(argv[i], "--cleanup") == 0 ){
         cleanup_only = 1;
       }else if(strcmp(argv[i], "--config-hash") == 0 ){
@@ -269,8 +271,7 @@ int main(int argc, char ** argv){
     // This is an additional sanity check
     if( phases[i]->verify_stonewall && opt.rank == 0){
       if(runtime < opt.stonewall && ! opt.dry_run){
-        opt.is_valid_run = 0;
-        ERROR("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
+        INVALID("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
       }
     }
 

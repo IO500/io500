@@ -13,12 +13,10 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   *res_out = p;
 
   if(res->errors){
-    WARNING("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
-    opt.is_valid_run = 0;
+    INVALID("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
   }
   if( p->time < opt.stonewall ){
-    WARNING("Write phase needed %fs instead of stonewall %ds. Stonewall was hit at %.1fs\n", p->time, opt.stonewall, p->stonewall_time);
-    opt.is_valid_run = 0;
+    INVALID("Write phase needed %fs instead of stonewall %ds. Stonewall was hit at %.1fs\n", p->time, opt.stonewall, p->stonewall_time);
   }
   INFO_PAIR("accessed-pairs", "%zu\n", p->pairs_accessed);
 
@@ -37,8 +35,7 @@ double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   *res_out = p;
 
   if(res->errors){
-    WARNING("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
-    opt.is_valid_run = 0;
+    INVALID("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
   }
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
   return tp;

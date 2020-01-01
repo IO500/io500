@@ -56,8 +56,7 @@ static double run(void){
     of.runtime = of.pfind_res->runtime;
 
     if( of.found_files == 0 ){
-      WARNING("Find didn't find anything, this is likely invalid.\n")
-      opt.is_valid_run = 0;
+      INVALID("Find didn't find anything, this is likely invalid.\n")
     }
     PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
     PRINT_PAIR("total-files", "%"PRIu64"\n", of.pfind_res->total_files);
@@ -110,15 +109,13 @@ static double run(void){
   of.runtime = runtime;
 
   if( of.found_files == 0 ){
-    WARNING("Find didn't find anything, this is likely invalid.\n")
-    opt.is_valid_run = 0;
+    INVALID("Find didn't find anything, this is likely invalid.\n")
   }
 
   printf("found=%"PRIu64"\n", of.found_files);
 
   if(ret != 0){
-    opt.is_valid_run = 0;
-    WARNING("Exit code != 0 from find command: \"%s\"\n", of.command);
+    INVALID("Exit code != 0 from find command: \"%s\"\n", of.command);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   return performance;

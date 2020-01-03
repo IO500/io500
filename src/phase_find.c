@@ -19,6 +19,7 @@ typedef struct{
   pfind_find_results_t * pfind_res;
   int pfind_queue_length;
   int pfind_steal_from_next;
+  int pfind_par_single_dir_access_hash;
 
   uint64_t found_files;
   double runtime;
@@ -38,7 +39,7 @@ static double run(void){
     return 0;
   }
   {
-    char timestamp_file[2048];
+    char timestamp_file[PATH_MAX];
     sprintf(timestamp_file, "%s/timestampfile", opt.resdir);
     FILE * f = fopen(timestamp_file, "r");
     if(! f){
@@ -51,6 +52,22 @@ static double run(void){
     // pfind supports stonewalling timer -s, but ignore for now
     pfind_find_results_t * res = pfind_find(of.pfind_o);
     of.pfind_res = pfind_aggregrate_results(res);
+
+    if(opt.rank == 0){
+      char res_file[PATH_MAX];
+      sprintf(res_file, "%s/find.txt", opt.resdir);
+      FILE * fd = fopen(res_file, "w");
+      fprintf(fd, "runtime: %f rate: %f\n", of.pfind_res->runtime, of.pfind_res->rate);
+      fprintf(fd, "rank, errors, unknown, found, total, checked\n");
+      fprintf(fd, "0, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64"\n", res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);
+      for(int i=1; i < opt.mpi_size; i++){
+        MPI_Recv(& res->errors, 5, MPI_LONG_LONG_INT, i, 4712, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        fprintf(fd, "%d, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64"\n", i, res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);
+      }
+      fclose(fd);
+    }else{
+      MPI_Send(& res->errors, 5, MPI_LONG_LONG_INT, 0, 4712, MPI_COMM_WORLD);
+    }
     free(res);
     of.found_files = of.pfind_res->found_files;
     of.runtime = of.pfind_res->runtime;
@@ -60,7 +77,7 @@ static double run(void){
     }
     PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
     PRINT_PAIR("total-files", "%"PRIu64"\n", of.pfind_res->total_files);
-    return of.found_files / of.runtime / 1000;
+    return of.pfind_res->total_files / of.runtime / 1000;
   }
   // only one process runs the external find
   if(opt.rank != 0){
@@ -128,6 +145,7 @@ static ini_option_t option[] = {
   {"nproc", "Set the number of processes for pfind", 0, INI_UINT, NULL, & of.nproc},
   {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
   {"pfind-steal-next", "Pfind Steal from next", 0, INI_BOOL, "FALSE", & of.pfind_steal_from_next},
+  {"pfind-parallelize-single-dir-access-using-hashing", "Parallelize the readdir by using hashing. Your system must support this!", 0, INI_BOOL, "FALSE", &  of.pfind_par_single_dir_access_hash},
   {NULL} };
 
 static void validate(void){
@@ -160,6 +178,10 @@ static void validate(void){
     u_argv_push(argv, "-C");
     if(of.pfind_steal_from_next){
       u_argv_push(argv, "-N");
+    }
+    if(of.pfind_par_single_dir_access_hash){
+      u_argv_push(argv, "-H");
+      u_argv_push(argv, "1");
     }
     u_argv_push(argv, "-q");
     u_argv_push_printf(argv, "%d", of.pfind_queue_length);

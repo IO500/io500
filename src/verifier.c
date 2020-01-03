@@ -26,6 +26,7 @@ int main(int argc, char ** argv){
     exit(0);
   }
   u_ini_parse_file(argv[1], cfg, NULL, NULL);
+  opt.verbosity = 0;
 
   PRINT_PAIR("version", "%s\n", VERSION);
 

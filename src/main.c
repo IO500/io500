@@ -265,7 +265,7 @@ int main(int argc, char ** argv){
 
         char score_str[40];
         sprintf(score_str, "%f", score);
-        dupprintf("[RESULT] %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s " : "IOPS", runtime);
+        dupprintf("[RESULT] %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s " : "kIOPS", runtime);
       }
       u_hash_update_key_val_dbl(& score_hash, phase->name, score);
     }

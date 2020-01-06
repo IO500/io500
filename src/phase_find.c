@@ -38,7 +38,8 @@ static double run(void){
   if(opt.dry_run){
     return 0;
   }
-  {
+  if(opt.rank == 0){
+    // check the existance of the timestamp file just for correctness
     char timestamp_file[PATH_MAX];
     sprintf(timestamp_file, "%s/timestampfile", opt.resdir);
     FILE * f = fopen(timestamp_file, "r");

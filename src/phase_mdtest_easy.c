@@ -35,6 +35,8 @@ void mdtest_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-u");
   u_argv_push(argv, "-L");
   u_argv_push(argv, "-F");
+  u_argv_push(argv, "-N");
+  u_argv_push(argv, "1");
   u_argv_push(argv, "-d");
   u_argv_push_printf(argv, "%s/mdtest-easy", opt.datadir);
   u_argv_push(argv, "-x");

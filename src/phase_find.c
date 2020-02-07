@@ -172,7 +172,7 @@ static void validate(void){
       FATAL("The external-script must be a executable file %s\n", of.ext_find);
     }
     char arguments[1024];
-    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
+    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.datadir);
 
     char command[2048];
     sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
@@ -183,7 +183,7 @@ static void validate(void){
     u_argv_push(argv, "./pfind");
     u_argv_push(argv, opt.datadir);
     u_argv_push(argv, "-newer");
-    u_argv_push_printf(argv, "%s/timestampfile", opt.resdir);
+    u_argv_push_printf(argv, "%s/timestampfile", opt.datadir);
     u_argv_push(argv, "-size");
     u_argv_push(argv, "3901c");
     u_argv_push(argv, "-name");

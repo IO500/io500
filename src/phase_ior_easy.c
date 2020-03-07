@@ -13,6 +13,7 @@ static ini_option_t option[] = {
   {"blockSize", "Block size; must be a multiple of transferSize", 0, INI_STRING, "9920000m", & ior_easy_o.blockSize},
   {"hintsFileName", "Filename for MPI hint file", 0, INI_STRING, NULL, & ior_easy_o.hintsFileName},
   {"filePerProc", "Create one file per process", 0, INI_BOOL, "TRUE", & ior_easy_o.filePerProc},
+  {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, NULL, & ior_easy_o.uniqueDir},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_easy_o.no_run},
   {NULL} };
 
@@ -69,9 +70,14 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-b");
   u_argv_push(argv, d.blockSize);
 
+  if(ior_easy_o.uniqueDir){
+    u_argv_push(argv, "-u");
+  }
+
   if(ior_easy_o.filePerProc){
     u_argv_push(argv, "-F");
   }
+
 }
 
 u_phase_t p_ior_easy = {

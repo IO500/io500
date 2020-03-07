@@ -10,6 +10,7 @@ typedef struct{
   int odirect;
 
   int filePerProc;
+  int uniqueDir;
   char * transferSize;
   char * blockSize;
   char * hintsFileName;

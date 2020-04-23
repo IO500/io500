@@ -40,3 +40,4 @@ double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
   return tp;
 }
+

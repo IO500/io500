@@ -9,8 +9,6 @@
 
 #include <io500-debug.h>
 
-#define VERSION "ISC20-testing"
-
 #define INI_UNSET_STRING NULL
 #define INI_UNSET_INT (-2147483648)
 #define INI_UNSET_UINT (unsigned)(-1)

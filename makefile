@@ -1,8 +1,11 @@
 CC = @mpicc
 CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
 CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
+
 LDFLAGS += -lm # -lgpfs # may need some additional flags as provided to IOR
 
+VERSION=$(shell git describe)$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")
+CFLAGS += -DVERSION="\"$(VERSION)\""
 PROGRAM = io500
 VERIFIER = io500-verify
 SEARCHPATH += src
@@ -16,7 +19,6 @@ DEPS += io500-util.h io500-debug.h io500-opt.h
 OBJS += util.o
 OBJS += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
 OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o
-
 
 TESTS += ini-test
 TESTSEXE = $(patsubst %,%.exe,$(TESTS))
@@ -42,6 +44,11 @@ $(VERIFIER): verifier.o io500.a
 $(PROGRAM): io500.a main.o
 	@echo LD $@
 	$(CC) -o $@ main.o $(LDFLAGS) io500.a ./build/pfind/pfind.a ./build/ior/src/libaiori.a  $(LDFLAGS)
+
+.PHONY: main.o
+main.o: main.c $(DEPS)
+	@echo CC $@
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o: %.c $(DEPS)
 	@echo CC $@

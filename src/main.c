@@ -231,6 +231,8 @@ int main(int argc, char ** argv){
   uint32_t score_hash = 0;
   u_hash_update_key_val(& score_hash, "version", VERSION);
 
+  dupprintf("IO500 version %s\n", VERSION);
+
   for(int i=0; i < IO500_PHASES; i++){
     u_phase_t * phase = phases[i];
     if(! phase->run) continue;

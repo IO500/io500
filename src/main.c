@@ -70,34 +70,37 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 
 int main(int argc, char ** argv){
+  int mpi_init = 0;
   file_out = stdout;
 
   ini_section_t ** cfg = u_options();
 
+  if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
+    help:
+    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash]\n\n", argv[0]);
+    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
+    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
+    r0printf("--config-hash Compute the configuration hash\n");
+    r0printf("--list list available options for the .ini file\n");
+    r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
+
+    goto out;
+  }
+  if (argc < 2 || strcmp(argv[1], "-l") == 0 || strcmp(argv[1], "--list") == 0){
+    if (rank == 0){
+      r0printf("Supported and current values of the ini file:\n");
+      u_ini_print_values(stdout, cfg, TRUE);
+    }
+    goto out;
+  }
+
+  mpi_init = 1;
   MPI_Init(& argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
 
   init_IOR_Param_t(& opt.aiori_params);
   opt.is_valid_run = 1;
-
-  if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-    help:
-    if(opt.rank != 0){
-      MPI_Finalize();
-      exit(0);
-    }
-    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash]\n\n", argv[0]);
-    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
-    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
-    r0printf("--config-hash Compute the configuration hash\n\n");
-    r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
-
-    r0printf("Supported and current values of the ini file:\n");
-    u_ini_print_values(stdout, cfg, TRUE);
-    MPI_Finalize();
-    exit(0);
-  }
 
   int verbosity_override = -1;
   int print_help = 0;
@@ -162,13 +165,12 @@ int main(int argc, char ** argv){
       opt.verbosity = 0;
     }
     u_verify_result_files(cfg, argv[argc-1]);
-    exit(0);
+    goto out;
   }
 
   if(config_hash_only){
     print_cfg_hash(stdout, cfg);
-    MPI_Finalize();
-    exit(0);
+    goto out;
   }
 
   init_dirs();
@@ -349,7 +351,8 @@ int main(int argc, char ** argv){
   }
 
   fclose(file_out);
-
-  MPI_Finalize();
+out:
+  if (mpi_init)
+    MPI_Finalize();
   return 0;
 }

@@ -8,6 +8,7 @@ echo It will output OK at the end if builds succeed
 echo
 
 IOR_HASH=
+IO500_HASH=
 MDREAL_HASH=
 
 INSTALL_DIR=$PWD
@@ -21,10 +22,12 @@ function main {
 
   get_ior
   get_pfind
+  get_io500_dev
   #get_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
 
   build_ior
   build_pfind
+  build_io500_dev
 #  build_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
 
   echo
@@ -33,14 +36,14 @@ function main {
 }
 
 function setup {
-  rm -rf $BUILD $BIN
+  #rm -rf $BUILD $BIN
   mkdir -p $BUILD $BIN
   #cp utilities/find/mmfind.sh $BIN
 }
 
 function git_co {
   pushd $BUILD
-  git clone $1
+  [ -d "$2" ] || git clone $1 $2
   cd $2
   # turning off the hash thing for now because too many changes happening too quickly
   git checkout $3
@@ -59,16 +62,12 @@ function get_ior {
 
 function get_pfind {
   echo "Preparing parallel find"
-  pushd $BUILD
-  # this is the old python pfind that has been problematic
-  #rm -rf pwalk
-  #git clone https://github.com/johnbent/pwalk.git
+  git_co https://github.com/VI4IO/pfind.git pfind
+}
 
-  # this is the new C pfind
-  git clone https://github.com/VI4IO/pfind.git
-  echo "Pfind: OK"
-  echo
-  popd
+function get_io500_dev {
+  echo "Getting IO500-dev"
+  git_co https://github.com/VI4IO/io-500-dev io500-dev $IO500_HASH
 }
 
 function get_mdrealio {
@@ -81,17 +80,22 @@ function get_mdrealio {
 
 ###### BUILD FUNCTIONS
 function build_ior {
-  pushd $BUILD
-  cd ior/src # just build the source
+  pushd $BUILD/ior/src
   $MAKE install
   echo "IOR: OK"
   echo
   popd
 }
 
+function build_io500_dev {
+  pushd $BUILD/io500-dev/build
+  ln -s $BUILD/ior
+  ln -s $BUILD/pfind
+  popd
+}
+
 function build_pfind {
-  pushd $BUILD
-  cd pfind
+  pushd $BUILD/pfind
   ./prepare.sh
   ./compile.sh
   echo "Pfind: OK"
@@ -100,8 +104,7 @@ function build_pfind {
 }
 
 function build_mdrealio {
-  cd $BUILD/md-real-io
-  pushd build
+  pushd $BUILD/build
   $MAKE install
   #mv src/md-real-io $BIN
   echo "MD-REAL-IO: OK"

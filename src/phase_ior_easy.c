@@ -63,8 +63,6 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy/stonewall", opt.datadir );
-  u_argv_push(argv, "-O");
-  u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push(argv, "-t");
   u_argv_push(argv, d.transferSize);
   u_argv_push(argv, "-b");

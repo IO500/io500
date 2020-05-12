@@ -88,6 +88,8 @@ function build_ior {
 }
 
 function build_io500_dev {
+  ln -s $BUILD/pfind/pfind $BIN/pfind
+  mkdir $BUILD/io500-dev/build
   pushd $BUILD/io500-dev/build
   ln -s $BUILD/ior
   ln -s $BUILD/pfind

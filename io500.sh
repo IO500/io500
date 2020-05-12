@@ -15,6 +15,11 @@ if [[ ! -s "$io500_ini" ]]; then
   exit 2
 fi
 
+if [[ ! -s "system-information.txt" ]]; then
+  echo "error: please create the file system-information.txt pasting the information from https://vi4io.org/io500-info-creator/"
+  exit 2
+fi
+
 function get_ini_section_param() {
   local section="$1"
   local param="$2"
@@ -58,7 +63,7 @@ function get_ini_global_param() {
   local param="$1"
   local default="$2"
   local val
-  
+
   val=$(get_ini_section_param global $param |
 	sed -e 's/FALSE/False/' -e 's/TRUE/True/')
 
@@ -210,9 +215,10 @@ function run_benchmarks {
 # Use https://vi4io.org/io500-info-creator/ to generate information about your hardware
 # that you want to include publicly!
 function extra_description {
-  # TODO: Please add your information using the info-creator!
+  # UPDATE: Please add your information into "system-information.txt" pasting the output of the info-creator
   # EXAMPLE:
-  io500_info_system_name='xxx'      # e.g. Oakforest-PACS
+  # io500_info_system_name='xxx'
+  # DO NOT ADD IT HERE
 }
 
 main

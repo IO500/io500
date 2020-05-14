@@ -15,6 +15,7 @@ static ini_option_t option[] = {
   {"filePerProc", "Create one file per process", 0, INI_BOOL, "TRUE", & ior_easy_o.filePerProc},
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_easy_o.no_run},
+  {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_easy_o.verbosity},
   {NULL} };
 
 static void validate(void){
@@ -51,6 +52,9 @@ void ior_easy_add_params(u_argv_t * argv){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
+  for(int i=0; i < ior_easy_o.verbosity; i++){
+    u_argv_push(argv, "-v");
+  }
   u_argv_push(argv, "-C");
   u_argv_push(argv, "-Q");
   u_argv_push(argv, "1");

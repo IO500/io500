@@ -14,6 +14,7 @@ typedef struct{
   char * transferSize;
   char * blockSize;
   char * hintsFileName;
+  int verbosity;
 } opt_ior_easy;
 
 opt_ior_easy ior_easy_o;
@@ -25,6 +26,7 @@ typedef struct{
   char * hintsFileName;
 
   int segments;
+  int verbosity;
 } opt_ior_hard;
 
 opt_ior_hard ior_hard_o;

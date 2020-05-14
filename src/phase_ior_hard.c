@@ -12,6 +12,7 @@ static ini_option_t option[] = {
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_hard_o.hintsFileName},
   {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_hard_o.segments},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_hard_o.no_run},
+  {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_hard_o.verbosity},
   {NULL} };
 
 
@@ -44,6 +45,9 @@ void ior_hard_add_params(u_argv_t * argv){
   opt_ior_hard d = ior_hard_o;
 
   u_argv_push(argv, "./ior");
+  for(int i=0; i < ior_hard_o.verbosity; i++){
+    u_argv_push(argv, "-v");
+  }
   u_argv_push(argv, "-C");
   u_argv_push(argv, "-Q");
   u_argv_push(argv, "1");

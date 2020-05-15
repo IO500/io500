@@ -20,7 +20,8 @@ typedef struct{
   int rank;
   int mpi_size;
 
-  char* api;
+  char * api;
+  char * timestamp;
   int timestamp_resdir;
   int timestamp_datadir;
 

@@ -99,8 +99,8 @@ io500_stonewall_timer=$(get_ini_param debug stonewall-time 300)
 # Choose regular for an official regular submission or scc for a Student Cluster Competition submission to execute the test cases for 30 seconds instead of 300 seconds
 io500_rules="regular"
 
-# to run this benchmark, find and edit each of these functions.
-# please also edit 'extra_description' function to help us collect the required data.
+# to run this benchmark, find and edit each of these functions.  Please also
+# also edit 'extra_description' function to help us collect the required data.
 function main {
   setup_directories
   setup_paths
@@ -112,8 +112,7 @@ function main {
   setup_mdreal   # optional
   run_benchmarks
 
-  #run the io500-app binary as well
-  #myrun $PWD/io500 $io500_ini
+  create_tarball
 }
 
 function setup_directories {
@@ -123,14 +122,14 @@ function setup_directories {
   # set directories for where the benchmark files are created and where the results will go.
   # If you want to set up stripe tuning on your output directories or anything similar, then this is good place to do it.
   timestamp=$(date +%Y.%m.%d-%H.%M.%S)           # create a uniquifier
-  [ $(get_ini_global_param timestamp-datadir False) != "False" ] &&
-	ts=.$timestamp || ts=""
+  [ $(get_ini_global_param timestamp-datadir True) != "False" ] &&
+	ts="$timestamp" || ts="io500"
   # directory where the data will be stored
-  io500_workdir=$(get_ini_global_param datadir $PWD/datafiles/io500)$ts
+  io500_workdir=$(get_ini_global_param datadir $PWD/datafiles)/$ts-scr
   [ $(get_ini_global_param timestamp-resultdir True) != "False" ] &&
-	ts=.$timestamp || ts=""
+	ts="$timestamp" || ts="io500"
   # the directory where the output results will be kept
-  io500_result_dir=$(get_ini_global_param resultdir $PWD/results/)$ts
+  io500_result_dir=$(get_ini_global_param resultdir $PWD/results)/$ts-scr
   mkdir -p $io500_workdir $io500_result_dir
 }
 
@@ -155,6 +154,8 @@ function setup_ior_easy {
   [ -n "$val" ] && params+=" -U $val"
   val="$(get_ini_param ior-easy posix.odirect)"
   [ "$val" = "True" ] && params+=" --posix.odirect"
+  val="$(get_ini_param ior-easy verbosity)"
+  [ -n "$val" ] && params+=" $(yes ' -v' | head -$val)"
   io500_ior_easy_params="$params"
   echo -n ""
 }
@@ -180,6 +181,8 @@ function setup_ior_hard {
   [ -n "$val" ] && params+=" -U $val"
   val="$(get_ini_param ior-hard posix.odirect)"
   [ "$val" = "True" ] && params+=" --posix.odirect"
+  val="$(get_ini_param ior-easy verbosity)"
+  [ -n "$val" ] && params+="$(yes ' -v' | head -$val)"
   io500_ior_hard_api_specific_options="$params"
   echo -n ""
 }
@@ -195,7 +198,7 @@ function setup_mdt_hard {
 function setup_find {
   val="$(get_ini_param find external-script)"
   [ -z "$val" ] && io500_find_mpi="True" && io500_find_cmd="$PWD/bin/pfind" ||
-  	io500_find_cmd="$val"
+    io500_find_cmd="$val"
   # uses stonewalling, run pfind
   io500_find_cmd_args="$(get_ini_param find external-args)"
   echo -n ""
@@ -206,19 +209,41 @@ function setup_mdreal {
 }
 
 function run_benchmarks {
-  # Important: source the io500_fixed.sh script.  Do not change it. If you discover
-  # a need to change it, please email the mailing list to discuss
-  source build/io500-dev/utilities/io500_fixed.sh 2>&1 | tee $io500_result_dir/io-500-summary.$timestamp.txt
+  local app_first=$((RANDOM % 100))
+  local app_rc=0
+
+  # run the app and C version in random order to try and avoid bias
+  (( app_first >= 50 )) && $io500_mpirun $io500_mpiargs $PWD/io500 $io500_ini --timestamp $timestamp || app_rc=$?
+
+  # Important: source the io500_fixed.sh script.  Do not change it. If you
+  # discover a need to change it, please email the mailing list to discuss.
+  source build/io500-dev/utilities/io500_fixed.sh 2>&1 |
+    tee $io500_result_dir/io-500-summary.$timestamp.txt
+
+  (( $app_first >= 50 )) && return $app_rc
+
+  # run the app and C version in random order to try and avoid bias
+  $io500_mpirun $io500_mpiargs $PWD/io500 $io500_ini --timestamp $timestamp
+}
+
+create_tarball() {
+  local sourcedir=$(dirname $io500_result_dir)
+  local fname=$(basename ${io500_result_dir%-scr})
+  local tarball=$sourcedir/io500-$HOSTNAME-$fname.tgz
+
+  tar czf $tarball -C $sourcedir $fname-{app,scr}
+  echo "Created result tarball $tarball"
 }
 
 # Information fields; these provide information about your system hardware
-# Use https://vi4io.org/io500-info-creator/ to generate information about your hardware
-# that you want to include publicly!
+# Use https://vi4io.org/io500-info-creator/ to generate information about
+# your hardware that you want to include publicly!
 function extra_description {
   # UPDATE: Please add your information into "system-information.txt" pasting the output of the info-creator
   # EXAMPLE:
   # io500_info_system_name='xxx'
   # DO NOT ADD IT HERE
+  :
 }
 
 main

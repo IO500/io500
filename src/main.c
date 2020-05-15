@@ -28,27 +28,31 @@ static void init_dirs(void){
     FATAL("Could not load AIORI backend for %s\n", opt.api);
   }
 
-  char buffer[30];
-
-  if(opt.rank == 0){
+  if(opt.rank == 0 && opt.timestamp == NULL){
+    char buffer[30];
     struct tm* tm_info;
     time_t timer;
     time(&timer);
     tm_info = localtime(&timer);
     strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
+    opt.timestamp = strdup(buffer);
   }
-  UMPI_CHECK(MPI_Bcast(buffer, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
+  UMPI_CHECK(MPI_Bcast(opt.timestamp, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
 
-  char resdir[2048];
+  char resdir[PATH_MAX];
   if(opt.timestamp_resdir){
-    sprintf(resdir, "%s/%s", opt.resdir, buffer);
-    opt.resdir = strdup(resdir);
+    sprintf(resdir, "%s/%s-app", opt.resdir, opt.timestamp);
+  }else{
+    sprintf(resdir, "%s/io500-app", opt.resdir);
   }
+  opt.resdir = strdup(resdir);
 
   if(opt.timestamp_datadir){
-    sprintf(resdir, "%s/%s", opt.datadir, buffer);
-    opt.datadir = strdup(resdir);
+    sprintf(resdir, "%s/%s-app", opt.datadir, opt.timestamp);
+  }else{
+    sprintf(resdir, "%s/io500-app", opt.datadir);
   }
+  opt.datadir = strdup(resdir);
 
   if(opt.rank == 0){
     u_create_dir_recursive(opt.resdir, "POSIX");
@@ -77,11 +81,12 @@ int main(int argc, char ** argv){
 
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
     help:
-    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash]\n\n", argv[0]);
-    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
-    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
+    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash] [--timestamp <timestamp>]\n\n", argv[0]);
     r0printf("--config-hash Compute the configuration hash\n");
+    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
+    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
     r0printf("--list list available options for the .ini file\n");
+    r0printf("--timestamp use <timestamp> for the output directory\n");
     r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
 
     goto out;
@@ -115,12 +120,19 @@ int main(int argc, char ** argv){
       }else if(strncmp(argv[i], "-v=", 3) == 0){
         verbosity_override = atoi(argv[i]+3);
         opt.verbosity = verbosity_override;
-      }else if(strcmp(argv[i], "--dry-run") == 0 ){
-        opt.dry_run = 1;
       }else if(strcmp(argv[i], "--cleanup") == 0 ){
         cleanup_only = 1;
       }else if(strcmp(argv[i], "--config-hash") == 0 ){
         config_hash_only = 1;
+      }else if(strcmp(argv[i], "--dry-run") == 0 ){
+        opt.dry_run = 1;
+      }else if(strncmp(argv[i], "--timestamp", sizeof("--timestamp") - 1) == 0){
+        if (strchr(argv[i], '=') != NULL)
+          opt.timestamp = strdup(strchr(argv[i], '=') + 1);
+        else if (argv[i + 1] != NULL && argv[i + 1][0] != '\0')
+          opt.timestamp = strdup(argv[++i]);
+        else
+          FATAL("Missing timestamp argument\n");
       }else if(strcmp(argv[i], "--verify") == 0 ){
         verify_only = 1;
         break;
@@ -269,7 +281,10 @@ int main(int argc, char ** argv){
 
         char score_str[40];
         sprintf(score_str, "%f", score);
-        dupprintf("[RESULT] %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s " : "kIOPS", runtime);
+        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n",
+		  phase->type == IO500_PHASE_WRITE && runtime < IO500_MINWRITE ?
+			"-invalid" : "",
+		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s " : "kIOPS", runtime);
       }
       u_hash_update_key_val_dbl(& score_hash, phase->name, score);
     }
@@ -330,7 +345,7 @@ int main(int argc, char ** argv){
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
 
     dupprintf("[SCORE%s] Bandwidth %f GB/s : IOPS %f kiops : TOTAL %f\n",
-      opt.is_valid_run ? "" : " INVALID",
+      opt.is_valid_run ? "" : "-invalid",
       scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
   }
 

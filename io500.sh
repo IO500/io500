@@ -5,6 +5,16 @@
 
 set -eo pipefail  # better error handling
 
+function setup_paths {
+  # Set the paths to the binaries and how to launch MPI jobs.
+  # If you ran ./utilities/prepare.sh successfully, then binaries are in ./bin/
+  io500_ior_cmd=$PWD/bin/ior
+  io500_mdtest_cmd=$PWD/bin/mdtest
+  io500_mdreal_cmd=$PWD/bin/md-real-io
+  io500_mpirun="mpiexec"
+  io500_mpiargs="-np 2"
+}
+
 io500_ini="${1:-""}"
 if [[ -z "$io500_ini" ]]; then
   echo "error: ini file must be specified.  usage: $0 <config.ini>"
@@ -16,7 +26,8 @@ if [[ ! -s "$io500_ini" ]]; then
 fi
 
 if [[ ! -s "system-information.txt" ]]; then
-  echo "error: please create the file system-information.txt pasting the information from https://vi4io.org/io500-info-creator/"
+  echo "error: please create the file system-information.txt by copying"
+  echo "the information from https://vi4io.org/io500-info-creator/"
   exit 2
 fi
 
@@ -131,15 +142,6 @@ function setup_directories {
   # the directory where the output results will be kept
   io500_result_dir=$(get_ini_global_param resultdir $PWD/results)/$ts-scr
   mkdir -p $io500_workdir $io500_result_dir
-}
-
-function setup_paths {
-  # Set the paths to the binaries.  If you ran ./utilities/prepare.sh successfully, then binaries are in ./bin/
-  io500_ior_cmd=$PWD/bin/ior
-  io500_mdtest_cmd=$PWD/bin/mdtest
-  io500_mdreal_cmd=$PWD/bin/md-real-io
-  io500_mpirun="mpiexec"
-  io500_mpiargs="-np 2"
 }
 
 function setup_ior_easy {

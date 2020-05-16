@@ -32,25 +32,6 @@ To see the currently active options, run:
 
     $ ./io500 <file.ini> -h
 
-### IO500 Benchmark Run
-
-To run a full benchmark session, the stonewall-time must be set to 300.
-Use the io500.sh script to run both a pass with the bash-script and a
-second run with the C-app.  The results will be put into two separate
-directories and tarred up for submission.  The io500.sh script also
-uses the same .ini file for most options, but at a minimum needs the
-io500_mpirun and io500_mpiargs values set for your system in the
-setup_paths() function at the start of the io500.sh script.  The
-paths to the installed IOR and mdtest binaries are also needed if
-they were installed separately.  The script must be run from within
-the Git checkout tree.
-
-    $ ./io500.sh <file.ini>
-
-It may also be desirable to update the setup_directories() function
-to create the top-level output directories for the test files.
-These are created before the test run, and may hold directory and
-file layout parameters.
 
 ### Integrity check
 

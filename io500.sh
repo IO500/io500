@@ -3,8 +3,6 @@
 # INSTRUCTIONS:
 # This script takes its parameters from the same .ini file as io500 binary.
 
-set -eo pipefail  # better error handling
-
 function setup_paths {
   # Set the paths to the binaries and how to launch MPI jobs.
   # If you ran ./utilities/prepare.sh successfully, then binaries are in ./bin/
@@ -14,6 +12,34 @@ function setup_paths {
   io500_mpirun="mpiexec"
   io500_mpiargs="-np 2"
 }
+
+function setup_directories {
+  local workdir
+  local resultdir
+  local ts
+
+  # set directories where benchmark files are created and where the results go
+  # If you want to set up stripe tuning on your output directories or anything
+  # similar, then this is the right place to do it.  This creates the output
+  # directories for both the app run and the script run.
+
+  timestamp=$(date +%Y.%m.%d-%H.%M.%S)           # create a uniquifier
+  [ $(get_ini_global_param timestamp-datadir True) != "False" ] &&
+	ts="$timestamp" || ts="io500"
+  # directory where the data will be stored
+  workdir=$(get_ini_global_param datadir $PWD/datafiles)/$ts
+  io500_workdir=$workdir-scr
+  [ $(get_ini_global_param timestamp-resultdir True) != "False" ] &&
+	ts="$timestamp" || ts="io500"
+  # the directory where the output results will be kept
+  resultdir=$(get_ini_global_param resultdir $PWD/results)/$ts
+  io500_result_dir=$resultdir-scr
+
+  mkdir -p $workdir-{scr,app} $resultdir-{scr,app}
+}
+
+# you should not edit anything below this line
+set -eo pipefail  # better error handling
 
 io500_ini="${1:-""}"
 if [[ -z "$io500_ini" ]]; then
@@ -126,24 +152,6 @@ function main {
   create_tarball
 }
 
-function setup_directories {
-  local dir
-  local ts
-
-  # set directories for where the benchmark files are created and where the results will go.
-  # If you want to set up stripe tuning on your output directories or anything similar, then this is good place to do it.
-  timestamp=$(date +%Y.%m.%d-%H.%M.%S)           # create a uniquifier
-  [ $(get_ini_global_param timestamp-datadir True) != "False" ] &&
-	ts="$timestamp" || ts="io500"
-  # directory where the data will be stored
-  io500_workdir=$(get_ini_global_param datadir $PWD/datafiles)/$ts-scr
-  [ $(get_ini_global_param timestamp-resultdir True) != "False" ] &&
-	ts="$timestamp" || ts="io500"
-  # the directory where the output results will be kept
-  io500_result_dir=$(get_ini_global_param resultdir $PWD/results)/$ts-scr
-  mkdir -p $io500_workdir $io500_result_dir
-}
-
 function setup_ior_easy {
   local params
 
@@ -233,6 +241,7 @@ create_tarball() {
   local fname=$(basename ${io500_result_dir%-scr})
   local tarball=$sourcedir/io500-$HOSTNAME-$fname.tgz
 
+  cp -v $0 $io500_ini $io500_result_dir
   tar czf $tarball -C $sourcedir $fname-{app,scr}
   echo "Created result tarball $tarball"
 }

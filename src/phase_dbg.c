@@ -1,9 +1,10 @@
 #include <io500-phase.h>
 
-#define STRINGIFY(foo)  #foo
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 static ini_option_t option[] = {
-  {"stonewall-time", "The stonewall timer, set to a smaller value for testing", 0, INI_UINT, STRINGIFY(IO500_MINWRITE), & opt.stonewall},
+  {"stonewall-time", "Stonewall timer must be "TOSTRING(IO500_MINWRITE)" for a valid result, can be smaller for testing", 0, INI_UINT, TOSTRING(IO500_MINWRITE), & opt.stonewall},
   {NULL} };
 
 

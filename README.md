@@ -13,8 +13,8 @@ Then you can compile the io500 application running make.
 
 ## Usage
 
-The benchmark requires a INI file containing the options.
-The INI file is structured in sections depending on the phase.
+The benchmark requires a .ini file containing the options.
+The .ini file is structured in sections depending on the phase.
 
 Detailed help for the available options is provided when running:
 
@@ -23,13 +23,34 @@ Detailed help for the available options is provided when running:
 
 The benchmark output the commands it would run (equivalence of command line invocations of ior/mdtest). Use --dry-run to not invoke any command.
 
-Two INI files are provided, the config-minimal.ini and the config-some.ini.
+Three .ini files are provided, the config-minimal.ini and the config-some.ini.
   - The minimal example contains the only mandatory parameter, the data directory. It also sets the stonewalling to 1 for testing.
   - The config-some illustrates the setting of various options. For more details, run ./io500 -h.
+  - The config-all shows all available configuration options and their default values.  This is generated from ./io500 --list.
 
 To see the currently active options, run:
 
-    $ ./io500 <INI file> -h
+    $ ./io500 <file.ini> -h
+
+### IO500 Benchmark Run
+
+To run a full benchmark session, the stonewall-time must be set to 300.
+Use the io500.sh script to run both a pass with the bash-script and a
+second run with the C-app.  The results will be put into two separate
+directories and tarred up for submission.  The io500.sh script also
+uses the same .ini file for most options, but at a minimum needs the
+io500_mpirun and io500_mpiargs values set for your system in the
+setup_paths() function at the start of the io500.sh script.  The
+paths to the installed IOR and mdtest binaries are also needed if
+they were installed separately.  The script must be run from within
+the Git checkout tree.
+
+    $ ./io500.sh <file.ini>
+
+It may also be desirable to update the setup_directories() function
+to create the top-level output directories for the test files.
+These are created before the test run, and may hold directory and
+file layout parameters.
 
 ### Integrity check
 
@@ -42,7 +63,7 @@ You can either use the full-featured io500 application:
     score-hash  = C97CC873
     [OK] But this is an invalid run!
 
-Or the lightweight verification tool which has less dependencies:
+Or the lightweight verification tool which has fewer dependencies:
 
     $ ./io500-verify config-test-run.ini result.txt
 

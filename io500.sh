@@ -234,6 +234,9 @@ function run_benchmarks {
 
   (( $app_first >= 50 )) && return $app_rc
 
+  echo "The io500.sh was run"
+  echo
+  echo "Running the C version of the benchmark now"
   # run the app and C version in random order to try and avoid bias
   $io500_mpirun $io500_mpiargs $PWD/io500 $io500_ini --timestamp $timestamp
 }

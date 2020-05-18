@@ -88,11 +88,10 @@ function build_ior {
 }
 
 function build_io500_dev {
-  ln -s $BUILD/pfind/pfind $BIN/pfind
-  mkdir $BUILD/io500-dev/build
+  mkdir -p $BUILD/io500-dev/build
   pushd $BUILD/io500-dev/build
-  ln -s $BUILD/ior
-  ln -s $BUILD/pfind
+  ln -sf $BUILD/ior
+  ln -sf $BUILD/pfind
   popd
 }
 
@@ -100,6 +99,7 @@ function build_pfind {
   pushd $BUILD/pfind
   ./prepare.sh
   ./compile.sh
+  ln -sf $BUILD/pfind/pfind $BIN/pfind
   echo "Pfind: OK"
   echo
   popd

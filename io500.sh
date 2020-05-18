@@ -143,12 +143,14 @@ function main {
   setup_mdreal   # optional
   run_benchmarks
 
-  create_tarball
-
-  if [[ ! -s "system-information.txt" ]]; then
-    echo "Warning: please create a system information, e.g. (system-information.txt) by copying"
-    echo "the information from https://vi4io.org/io500-info-creator/"
+  if [[ -s "system-information.txt" ]]; then
+    echo "Warning: please create a system-information.txt description by"
+    echo "copying the information from https://vi4io.org/io500-info-creator/"
+  else
+    cp "system-information.txt" $io500_result_dir
   fi
+
+  create_tarball
 }
 
 function setup_ior_easy {

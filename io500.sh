@@ -51,12 +51,6 @@ if [[ ! -s "$io500_ini" ]]; then
   exit 2
 fi
 
-if [[ ! -s "system-information.txt" ]]; then
-  echo "error: please create the file system-information.txt by copying"
-  echo "the information from https://vi4io.org/io500-info-creator/"
-  exit 2
-fi
-
 function get_ini_section_param() {
   local section="$1"
   local param="$2"
@@ -150,6 +144,11 @@ function main {
   run_benchmarks
 
   create_tarball
+
+  if [[ ! -s "system-information.txt" ]]; then
+    echo "Warning: please create a system information, e.g. (system-information.txt) by copying"
+    echo "the information from https://vi4io.org/io500-info-creator/"
+  fi
 }
 
 function setup_ior_easy {

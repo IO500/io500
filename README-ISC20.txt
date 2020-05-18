@@ -11,7 +11,8 @@ they were installed separately.  The script must be run from within
 the Git checkout tree.
 
 In detail, to setup the run:
-1) Use https://vi4io.org/io500-info-creator/
+1) Create a system information -- this can be done later after the run as well but please ensure it is consistent.
+Visit the page: https://vi4io.org/io500-info-creator/
 and store the output into "system-information.txt"
 
 2) Setup a configuration, the minimal configuration is provided in config-minimal.ini describing the data directory.
@@ -33,4 +34,4 @@ Example:
    $ ./io500.sh config-minimal.ini
    This will then automatically create a TAR file for upload.
 
-4) Submit the TAR file together with the batch file to *TODO*
+4) Submit the TAR file together with system-information.txt and the batch file via the submission page.

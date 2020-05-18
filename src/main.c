@@ -28,16 +28,20 @@ static void init_dirs(void){
     FATAL("Could not load AIORI backend for %s\n", opt.api);
   }
 
-  if(opt.rank == 0 && opt.timestamp == NULL){
-    char buffer[30];
-    struct tm* tm_info;
-    time_t timer;
-    time(&timer);
-    tm_info = localtime(&timer);
-    strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
-    opt.timestamp = strdup(buffer);
+  if(opt.timestamp == NULL){
+    if(opt.rank == 0){
+      char buffer[30];
+      struct tm* tm_info;
+      time_t timer;
+      time(&timer);
+      tm_info = localtime(&timer);
+      strftime(buffer, 30, "%Y.%m.%d-%H.%M.%S", tm_info);
+      opt.timestamp = strdup(buffer);
+    }else{
+      opt.timestamp = malloc(30);
+    }
+    UMPI_CHECK(MPI_Bcast(opt.timestamp, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
   }
-  UMPI_CHECK(MPI_Bcast(opt.timestamp, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
 
   char resdir[PATH_MAX];
   if(opt.timestamp_resdir){

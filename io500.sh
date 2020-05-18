@@ -76,7 +76,8 @@ function get_ini_param() {
   [ -n "$val" ] || val="$(get_ini_section_param ${section%-*} $param)"
   [ -n "$val" ] || val="$(get_ini_section_param global $param)"
 
-  echo "${val:-$default}" | sed -e 's/FALSE/False/' -e 's/TRUE/True/'
+  echo "${val:-$default}" |
+  	sed -e 's/[Ff][Aa][Ll][Ss][Ee]/False/' -e 's/[Tt][Rr][Uu][Ee]/True/'
 }
 
 function get_ini_run_param() {
@@ -87,7 +88,7 @@ function get_ini_run_param() {
   val=$(get_ini_section_param $section noRun)
 
   # logic is reversed from "noRun=TRUE" to "run=False"
-  [[ $val = TRUE ]] && echo "False" || echo "$default"
+  [[ $val = [Tt][Rr][Uu][Ee] ]] && echo "False" || echo "$default"
 }
 
 function get_ini_global_param() {
@@ -96,7 +97,7 @@ function get_ini_global_param() {
   local val
 
   val=$(get_ini_section_param global $param |
-	sed -e 's/FALSE/False/' -e 's/TRUE/True/')
+  	sed -e 's/[Ff][Aa][Ll][Ss][Ee]/False/' -e 's/[Tt][Rr][Uu][Ee]/True/')
 
   echo "${val:-$default}"
 }

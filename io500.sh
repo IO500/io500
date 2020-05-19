@@ -167,7 +167,11 @@ function setup_ior_easy {
   val="$(get_ini_param ior-easy posix.odirect)"
   [ "$val" = "True" ] && params+=" --posix.odirect"
   val="$(get_ini_param ior-easy verbosity)"
-  [ -n "$val" ] && params+=" $(yes ' -v' | head -$val)"
+  if [ -n "$val" ]; then
+    for i in $(seq $val); do
+      params+=" -v"
+    done
+  fi
   io500_ior_easy_params="$params"
   echo -n ""
 }

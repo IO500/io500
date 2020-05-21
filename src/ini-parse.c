@@ -211,7 +211,7 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
       // must be the empty line
       reti = regexec(&r_empty, token, 0, NULL, 0);
       if (reti != 0) {
-          ERROR("Parsing error in section %s line %d, unexpected content: \"%s\"\n", section->name, line, token);
+          ERROR("Parsing error in section %s line %d, unexpected content: \"%s\"\n", section ? section->name : "no_section", line, token);
           return 1;
       }
     }

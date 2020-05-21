@@ -28,6 +28,7 @@ function main {
   build_ior
   build_pfind
   build_io500_dev
+  build_io500_app
 #  build_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
 
   echo
@@ -92,6 +93,8 @@ function build_io500_dev {
   pushd $BUILD/io500-dev/build
   ln -sf $BUILD/ior
   ln -sf $BUILD/pfind
+  echo "io500-dev: OK"
+  echo
   popd
 }
 
@@ -103,6 +106,12 @@ function build_pfind {
   echo "Pfind: OK"
   echo
   popd
+}
+
+function build_io500_app {
+  make
+  echo "io500-app: OK"
+  echo
 }
 
 function build_mdrealio {

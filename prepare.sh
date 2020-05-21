@@ -8,7 +8,7 @@ echo It will output OK at the end if builds succeed
 echo
 
 IOR_HASH=48eb1880
-IO500_HASH=afb0b23
+IO500_HASH=io500-isc20
 MDREAL_HASH=io500-isc20
 
 INSTALL_DIR=$PWD

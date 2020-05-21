@@ -22,9 +22,9 @@ Change the MPI options in io500.sh
    io500_mpiargs='-np 2'
    io500_mpirun="mpiexec"
 
-It may also be desirable to update the setup_directories() function
-to create the top-level output directories for the test files.
-These are created before the test run for both C-App and IO500 script, and may hold directory and
+It may also be desirable to update the setup_directories() function 
+to create the top-level output directories for the test files and set, e.g., striping parameters for Lustre.
+These directories are created before the test run for both C-App and IO500 script, and may hold directory and
 file layout parameters.
 
 3) Create a batch submission file which executes the benchmark script.
@@ -35,3 +35,6 @@ Example:
    This will then automatically create a TAR file for upload.
 
 4) Submit the TAR file together with system-information.txt and the batch file via the submission page.
+
+   You can find examples for running the scripts and the generated output
+   * for Lustre: http://vi4io.org/assets/io500/2020-06/isc-20-dkrz-10nodes.tgz

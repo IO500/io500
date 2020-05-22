@@ -98,7 +98,7 @@ int main(int argc, char ** argv){
   if (argc < 2 || strcmp(argv[1], "-l") == 0 || strcmp(argv[1], "--list") == 0){
     if (rank == 0){
       /* print this as a comment, in case it is saved into the .ini file */
-      r0printf(stderr, "# Supported and current values of the ini file:\n");
+      r0printf("# Supported and current values of the ini file:\n");
       u_ini_print_values(stdout, cfg, TRUE);
     }
     goto out;

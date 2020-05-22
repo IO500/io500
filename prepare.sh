@@ -82,6 +82,7 @@ function get_mdrealio {
 ###### BUILD FUNCTIONS
 function build_ior {
   pushd $BUILD/ior/src
+  $MAKE clean
   $MAKE install
   echo "IOR: OK"
   echo

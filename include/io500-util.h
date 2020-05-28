@@ -96,6 +96,8 @@ void u_argv_free(u_argv_t * argv);
 void u_argv_push(u_argv_t * argv, char const * str);
 
 void u_argv_push_default_if_set(u_argv_t * argv, char * const arg, char const * dflt, char const * var);
+/* if the first argument is the API, subsequent options provided with --api.option will be permitted*/
+void u_argv_push_default_if_set_api_options(u_argv_t * argv, char * const arg, char const * dflt, char const * var);
 void u_argv_push_default_if_set_bool(u_argv_t * argv, char * const arg, int dflt, int var);
 
 void u_argv_push_printf(u_argv_t * argv, char const * format, ...)

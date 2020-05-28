@@ -12,7 +12,7 @@ void p_mdtest_run(u_argv_t * argv, FILE * out, mdtest_generic_res * d, mdtest_te
 }
 
 void mdtest_add_generic_params(u_argv_t * argv, opt_mdtest_generic * dflt, opt_mdtest_generic * generic){
-  u_argv_push_default_if_set(argv, "-a", dflt->api, generic->api);
+  u_argv_push_default_if_set_api_options(argv, "-a", dflt->api, generic->api);
   u_argv_push_default_if_set_bool(argv, "--posix.odirect", dflt->odirect, generic->odirect);
 
   generic->command = u_flatten_argv(argv);

@@ -133,6 +133,40 @@ void u_argv_push_default_if_set_bool(u_argv_t * argv, char * const arg, int dflt
   }
 }
 
+static void push_api_args(u_argv_t * argv, char const * var){
+  char * str = strdup(var);
+  char * saveptr;
+  char * t = strtok_r(str, " ", & saveptr);
+  u_argv_push(argv, str); // this is the API
+  if(t){
+    int len = strlen(str) + 3;
+    char buff[len + 1];
+    sprintf(buff, "--%s.", str);
+    while(true){
+      t = strtok_r(NULL, " ", & saveptr);
+      if(! t){
+        break;
+      }
+      if(strncasecmp(buff, t, len) == 0){
+        u_argv_push(argv, t);
+      }else{
+        FATAL("Provided API option %s appears to be no API supported version", t);
+      }
+    }
+  }
+  free(str);
+}
+
+void u_argv_push_default_if_set_api_options(u_argv_t * argv, char * const arg, char const * dflt, char const * var){
+  if(var != INI_UNSET_STRING){
+    u_argv_push(argv, arg);
+    push_api_args(argv, var);
+  }else if(dflt != INI_UNSET_STRING){
+    u_argv_push(argv, arg);
+    push_api_args(argv, dflt);
+  }
+}
+
 void u_argv_push_default_if_set(u_argv_t * argv, char * const arg, char const * dflt, char const * var){
   if(var != INI_UNSET_STRING){
     u_argv_push(argv, arg);

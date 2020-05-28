@@ -36,7 +36,7 @@ static double run(void){
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
-  u_argv_push_default_if_set(argv, "-a", d.api, o.api);
+  u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);

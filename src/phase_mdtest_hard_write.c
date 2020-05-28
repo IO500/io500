@@ -26,6 +26,7 @@ static double run(void){
   u_argv_t * argv = u_argv_create();
   mdtest_hard_add_params(argv);
   u_argv_push(argv, "-C");
+  u_argv_push(argv, "-Y");
   u_argv_push(argv, "-W");
   u_argv_push_printf(argv, "%d", opt.stonewall);
 

@@ -23,9 +23,17 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
 static void init_dirs(void){
   // load general IO backend for data dir
   aiori_initialize(NULL);
+  // check selected API, might be followed by API options
+  char * api = strdup(opt.api);
+  char * sep = strstr(api, " ");
+  if(sep){
+    *sep = '\0';
+    opt.apiArgs = strdup(opt.api);
+    opt.api = api;
+  }
   opt.aiori = aiori_select(opt.api);
   if(opt.aiori == NULL){
-    FATAL("Could not load AIORI backend for %s\n", opt.api);
+    FATAL("Could not load AIORI backend for %s with options: %s\n", opt.api, opt.apiArgs);
   }
 
   if(opt.timestamp == NULL){
@@ -80,6 +88,7 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 int main(int argc, char ** argv){
   int mpi_init = 0;
   file_out = stdout;
+  memset(& opt, 0, sizeof(opt));
 
   ini_section_t ** cfg = u_options();
 

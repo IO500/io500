@@ -164,6 +164,14 @@ void u_argv_push_default_if_set_api_options(u_argv_t * argv, char * const arg, c
   }else if(dflt != INI_UNSET_STRING){
     u_argv_push(argv, arg);
     push_api_args(argv, dflt);
+  }else{
+    // add generic args
+    u_argv_push(argv, arg);
+    if(opt.apiArgs){
+      push_api_args(argv, opt.apiArgs);
+    }else{
+      u_argv_push(argv, opt.api);
+    }
   }
 }
 

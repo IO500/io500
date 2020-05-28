@@ -21,6 +21,7 @@ typedef struct{
   int mpi_size;
 
   char * api;
+  char * apiArgs; // for IOR and mdtest
   char * timestamp;
   int timestamp_resdir;
   int timestamp_datadir;

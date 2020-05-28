@@ -7,7 +7,7 @@
 opt_ior_easy ior_easy_o;
 
 static ini_option_t option[] = {
-  {"API", "The API to be used", 0, INI_STRING, "POSIX", & ior_easy_o.api},
+  {"API", "The API to be used", 0, INI_STRING, NULL, & ior_easy_o.api},
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & ior_easy_o.odirect},
   {"transferSize", "Transfer size", 0, INI_STRING, "2m", & ior_easy_o.transferSize},
   {"blockSize", "Block size; must be a multiple of transferSize", 0, INI_STRING, "9920000m", & ior_easy_o.blockSize},

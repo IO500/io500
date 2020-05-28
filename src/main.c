@@ -21,8 +21,6 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "BW"};
 
 static void init_dirs(void){
-  // load general IO backend for data dir
-  aiori_initialize(NULL);
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
   char * sep = strstr(api, " ");
@@ -34,6 +32,9 @@ static void init_dirs(void){
   opt.aiori = aiori_select(opt.api);
   if(opt.aiori == NULL){
     FATAL("Could not load AIORI backend for %s with options: %s\n", opt.api, opt.apiArgs);
+  }
+  if (opt.aiori->initialize){
+    opt.aiori->initialize();
   }
 
   if(opt.timestamp == NULL){

@@ -57,13 +57,18 @@ function get_ini_section_param() {
   local inside=false
 
   while read LINE; do
-    LINE=$(sed -e 's/ *#.*//' -e 's/ *= */=/' <<<$LINE)
+    LINE=$(sed -e 's/ *#.*//' -e '1s/ *= */=/' <<<$LINE)
     $inside && [[ "$LINE" =~ "[.*]" ]] && inside=false && break
     [[ -n "$section" && "$LINE" =~ "[$section]" ]] && inside=true && continue
     ! $inside && continue
-    echo $LINE | awk -F = "/^$param/ { print \$2 }"
-    [[ "$LINE" =~ "$param" ]] && break
+    #echo $LINE | awk -F = "/^$param/ { print \$2 }"
+    if [[ $(echo $LINE | grep "^$param *=" ) != "" ]] ; then
+      # echo "$section : $param : $inside : $LINE" >> parsed.txt # debugging
+      echo $LINE | sed -e "s/[^=]*=[ \t]*\(.*\)/\1/"
+      return
+    fi
   done < $io500_ini
+  echo ""
 }
 
 function get_ini_param() {
@@ -142,6 +147,7 @@ function main {
   setup_mdt_hard # required if you want a complete score
   setup_find     # required if you want a complete score
   setup_mdreal   # optional
+
   run_benchmarks
 
   if [[ -s "system-information.txt" ]]; then
@@ -198,7 +204,11 @@ function setup_ior_hard {
   val="$(get_ini_param ior-hard posix.odirect)"
   [ "$val" = "True" ] && params+=" --posix.odirect"
   val="$(get_ini_param ior-easy verbosity)"
-  [ -n "$val" ] && params+="$(yes ' -v' | head -$val)"
+  if [ -n "$val" ]; then
+    for i in $(seq $val); do
+      params+=" -v"
+    done
+  fi
   io500_ior_hard_api_specific_options="$params"
   echo -n ""
 }

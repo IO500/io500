@@ -130,10 +130,13 @@ static double run(void){
       FATAL("Invalid output from the external script, expected: MATCHED <NUM>/<NUM>\n");
     }
     hits = atoll(left);
-    PRINT_PAIR("total-files", "%lld\n", atoll(right));
+    long long totals = atoll(right);
+    PRINT_PAIR("total-files", "%lld\n", totals);
+    performance = totals / runtime / 1000;
+  }else{
+    WARNING("Couldn't find \"MATCHED x/y\" as last output, badly approximate using hits.\n");
+    performance = hits / runtime / 1000;
   }
-
-  performance = hits / runtime / 1000;
 
   of.found_files = hits;
   of.runtime = runtime;
@@ -142,7 +145,7 @@ static double run(void){
     INVALID("Find didn't find anything, this is likely invalid.\n")
   }
 
-  printf("found=%"PRIu64"\n", of.found_files);
+  PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
 
   if(ret != 0){
     INVALID("Exit code != 0 from find command: \"%s\"\n", of.command);

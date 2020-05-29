@@ -150,7 +150,7 @@ static void push_api_args(u_argv_t * argv, char const * var){
       if(strncasecmp(buff, t, len) == 0){
         u_argv_push(argv, t);
       }else{
-        FATAL("Provided API option %s appears to be no API supported version", t);
+        FATAL("Provided API option %s appears to be no API supported version\n", t);
       }
     }
   }

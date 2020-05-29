@@ -23,11 +23,43 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
 static void init_dirs(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
-  char * sep = strstr(api, " ");
-  if(sep){
-    *sep = '\0';
+  char * token = strstr(api, " ");
+  if(token){
+    *token = '\0';
     opt.apiArgs = strdup(opt.api);
     opt.api = api;
+
+    // parse the API options, a bit cumbersome at the moment
+    option_help options [] = {
+      LAST_OPTION
+    };
+    options_all_t * global_options = airoi_create_all_module_options(options);
+    // find the next token for all the APIs
+    token++;
+    for(char * p = token ; ; p++){
+      if(*p == ' '){
+        *p = '\0';
+        if( p - token > 1 && *token != ' '){
+          DEBUG_INFO("API token: \"%s\"\n", token);
+          if( option_parse_str(token, global_options) ){
+            FATAL("Couldn't parse API option: %s\n", token);
+          }
+        }
+        token = p + 1;
+      }else if(*p == '\0'){
+        break;
+      }else if(p[0] == '\\' && p[1] == ' '){
+        // skip escaped whitespace by moving it forward
+        for(char * c = p ; *c != '\0' ; c++){
+          c[0] = c[1];
+        }
+        p++;
+      }
+    }
+    DEBUG_INFO("API token: \"%s\"\n", token);
+    if( option_parse_str(token, global_options) ){
+      FATAL("Coudln't parse API option: %s\n", token);
+    }
   }
   opt.aiori = aiori_select(opt.api);
   if(opt.aiori == NULL){
@@ -378,6 +410,10 @@ int main(int argc, char ** argv){
     fprintf(file_out, "; END ");
     u_print_timestamp(file_out);
     fprintf(file_out, "\n");
+  }
+
+  if (opt.aiori->finalize){
+    opt.aiori->finalize();
   }
 
   fclose(file_out);

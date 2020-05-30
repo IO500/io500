@@ -24,16 +24,17 @@ static void init_dirs(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
   char * token = strstr(api, " ");
+
+  option_help options [] = {
+    LAST_OPTION
+  };
+  options_all_t * global_options = airoi_create_all_module_options(options);
   if(token){
     *token = '\0';
     opt.apiArgs = strdup(opt.api);
     opt.api = api;
 
     // parse the API options, a bit cumbersome at the moment
-    option_help options [] = {
-      LAST_OPTION
-    };
-    options_all_t * global_options = airoi_create_all_module_options(options);
     // find the next token for all the APIs
     token++;
     for(char * p = token ; ; p++){
@@ -62,8 +63,12 @@ static void init_dirs(void){
     }
   }
   opt.aiori = aiori_select(opt.api);
+  opt.aiori_params.backend_options = airoi_update_module_options(opt.aiori, global_options);
   if(opt.aiori == NULL){
     FATAL("Could not load AIORI backend for %s with options: %s\n", opt.api, opt.apiArgs);
+  }
+  if(opt.aiori->check_params){
+    opt.aiori->check_params(& opt.aiori_params);
   }
   if (opt.aiori->initialize){
     opt.aiori->initialize();

@@ -84,24 +84,21 @@ static void init_dirs(void){
     UMPI_CHECK(MPI_Bcast(opt.timestamp, 30, MPI_CHAR, 0, MPI_COMM_WORLD));
   }
 
-  char resdir[PATH_MAX];
   if(opt.timestamp_resdir){
-    sprintf(resdir, "%s/%s-app", opt.resdir, opt.timestamp);
-  }else{
-    sprintf(resdir, "%s/io500-app", opt.resdir);
+    char resdir[PATH_MAX];
+    sprintf(resdir, "%s/%s", opt.resdir, opt.timestamp);
+    opt.resdir = strdup(resdir);
   }
-  opt.resdir = strdup(resdir);
 
   if(opt.timestamp_datadir){
-    sprintf(resdir, "%s/%s-app", opt.datadir, opt.timestamp);
-  }else{
-    sprintf(resdir, "%s/io500-app", opt.datadir);
+    char resdir[PATH_MAX];
+    sprintf(resdir, "%s/%s", opt.datadir, opt.timestamp);
+    opt.datadir = strdup(resdir);
   }
-  opt.datadir = strdup(resdir);
 
   if(opt.rank == 0){
-    u_create_dir_recursive(opt.resdir, "POSIX");
-
+    ior_aiori_t const * posix = aiori_select("POSIX");
+    u_create_dir_recursive(opt.resdir, posix);
     u_create_datadir("");
   }
 }

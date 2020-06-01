@@ -226,7 +226,7 @@ function setup_find {
   [ -z "$val" ] && io500_find_mpi="True" && io500_find_cmd="$PWD/bin/pfind" ||
     io500_find_cmd="$val"
   # uses stonewalling, run pfind
-  io500_find_cmd_args="$(get_ini_param find external-args)"
+  io500_find_cmd_args="$(get_ini_param find external-extra-args)"
   echo -n ""
 }
 

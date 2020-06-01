@@ -180,8 +180,16 @@ static void validate(void){
     char command[2048];
     sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
     of.command = strdup(command);
+
+    if(of.nproc != opt.mpi_size && of.nproc != 1 && of.nproc != INI_UNSET_UINT){
+      WARNING("An external-script will be run with nproc=1\n");
+    }
     of.nproc = 1;
   }else{
+    if(*of.ext_args == '\0' || *of.ext_mpi == '\0'){
+      WARNING("Using internal pfind, will ignore any arguments to the external script\n");
+    }
+
     u_argv_t * argv = u_argv_create();
     u_argv_push(argv, "./pfind");
     u_argv_push(argv, opt.datadir);

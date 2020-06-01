@@ -10,7 +10,6 @@
 typedef struct{
   char * ext_find;
   char * ext_args;
-  char * ext_mpi;
   int nproc;
 
   char * command;
@@ -92,6 +91,8 @@ static double run(void){
     PRINT_PAIR("total-files", "%"PRIu64"\n", of.pfind_res->total_files);
     return of.pfind_res->total_files / of.runtime / 1000;
   }
+
+  //WARNING("Running the external script with nproc=%d\n", );
   // only one process runs the external find
   if(opt.rank != 0){
     MPI_Barrier(MPI_COMM_WORLD);
@@ -100,10 +101,10 @@ static double run(void){
 
   double performance;
   double start = GetTimeStamp();
-
+  system(of.command);
   FILE * fp = popen(of.command, "r");
   if (fp == NULL) {
-    ERROR("Failed to run find command: \"%s\"\n", of.command);
+    ERROR("Failed to run find command: \"%s\" error: %s\n", of.command, strerror(errno));
     return -1;
   }
   char line[1024];
@@ -111,9 +112,14 @@ static double run(void){
   *line = '\0';
   while (fgets(line, sizeof(line), fp) != NULL) {
     DEBUG_ALL("Found: %s", line);
+    printf("Found: %s", line);
     hits++;
   }
   ret = pclose(fp);
+  if(ret != 0){
+    INVALID("Exit code %d != 0 from find command: \"%s\"\nPossible error: %s\n", ret, of.command, strerror(ret));
+  }
+
   double runtime = GetTimeStamp() - start;
 
   // support two semantics, the count only semantics
@@ -147,18 +153,14 @@ static double run(void){
 
   PRINT_PAIR("found", "%"PRIu64"\n", of.found_files);
 
-  if(ret != 0){
-    INVALID("Exit code != 0 from find command: \"%s\"\n", of.command);
-  }
   MPI_Barrier(MPI_COMM_WORLD);
   return performance;
 }
 
 static ini_option_t option[] = {
   {"external-script", "Set to an external script to perform the find phase", 0, INI_STRING, NULL, & of.ext_find},
-  {"external-extra-args", "Extra arguments for external scripts", 0, INI_STRING, "", & of.ext_args},
-  {"external-mpi-args", "Startup arguments for external scripts", 0, INI_STRING, "", & of.ext_mpi},
-  {"nproc", "Set the number of processes for pfind", 0, INI_UINT, NULL, & of.nproc},
+  {"external-extra-args", "Extra arguments for the external scripts", 0, INI_STRING, "", & of.ext_args},
+  {"nproc", "Set the number of processes for pfind/the external script", 0, INI_UINT, NULL, & of.nproc},
   {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
   {"pfind-steal-next", "Pfind Steal from next", 0, INI_BOOL, "FALSE", & of.pfind_steal_from_next},
   {"pfind-parallelize-single-dir-access-using-hashing", "Parallelize the readdir by using hashing. Your system must support this!", 0, INI_BOOL, "FALSE", &  of.pfind_par_single_dir_access_hash},
@@ -178,15 +180,14 @@ static void validate(void){
     sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.datadir);
 
     char command[2048];
-    sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
+    sprintf(command, "%s %s %s", of.ext_find, of.ext_args, arguments);
     of.command = strdup(command);
 
     if(of.nproc != opt.mpi_size && of.nproc != 1 && of.nproc != INI_UNSET_UINT){
-      WARNING("An external-script will be run with nproc=1\n");
+      WARNING("An external-script will always be run with nproc=1, note that MPI does not support to run MPI programs from an MPI program\n");
     }
-    of.nproc = 1;
   }else{
-    if(*of.ext_args == '\0' || *of.ext_mpi == '\0'){
+    if(*of.ext_args == '\0' ){
       WARNING("Using internal pfind, will ignore any arguments to the external script\n");
     }
 

@@ -47,6 +47,7 @@ function git_co {
   [ -d "$2" ] || git clone $1 $2
   cd $2
   # turning off the hash thing for now because too many changes happening too quickly
+  git fetch
   git checkout $3
   popd
 }
@@ -55,10 +56,6 @@ function git_co {
 function get_ior {
   echo "Getting IOR and mdtest"
   git_co https://github.com/hpc/ior.git ior $IOR_HASH
-  pushd $BUILD/ior
-  ./bootstrap
-  ./configure --prefix=$INSTALL_DIR
-  popd
 }
 
 function get_pfind {
@@ -74,14 +71,14 @@ function get_io500_dev {
 function get_mdrealio {
   echo "Preparing MD-REAL-IO"
   git_co https://github.com/JulianKunkel/md-real-io md-real-io $MDREAL_HASH
-  pushd $BUILD/md-real-io
-  ./configure --prefix=$INSTALL_DIR --minimal
-  popd
 }
 
 ###### BUILD FUNCTIONS
 function build_ior {
-  pushd $BUILD/ior/src
+  pushd $BUILD/ior
+  ./bootstrap
+  ./configure --prefix=$INSTALL_DIR
+  cd src
   $MAKE clean
   $MAKE install
   echo "IOR: OK"
@@ -116,7 +113,8 @@ function build_io500_app {
 }
 
 function build_mdrealio {
-  pushd $BUILD/build
+  pushd $BUILD/md-real-io
+  ./configure --prefix=$INSTALL_DIR --minimal
   $MAKE install
   #mv src/md-real-io $BIN
   echo "MD-REAL-IO: OK"

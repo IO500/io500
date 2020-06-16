@@ -10,6 +10,7 @@
 typedef struct{
   char * ext_find;
   char * ext_args;
+  char * ext_mpi;
   int nproc;
 
   char * command;
@@ -101,7 +102,6 @@ static double run(void){
 
   double performance;
   double start = GetTimeStamp();
-  system(of.command);
   FILE * fp = popen(of.command, "r");
   if (fp == NULL) {
     ERROR("Failed to run find command: \"%s\" error: %s\n", of.command, strerror(errno));
@@ -112,7 +112,6 @@ static double run(void){
   *line = '\0';
   while (fgets(line, sizeof(line), fp) != NULL) {
     DEBUG_ALL("Found: %s", line);
-    printf("Found: %s", line);
     hits++;
   }
   ret = pclose(fp);
@@ -159,6 +158,7 @@ static double run(void){
 
 static ini_option_t option[] = {
   {"external-script", "Set to an external script to perform the find phase", 0, INI_STRING, NULL, & of.ext_find},
+  {"external-mpi-args", "Startup arguments for external scripts, some MPI's may not support this!", 0, INI_STRING, "", & of.ext_mpi},
   {"external-extra-args", "Extra arguments for the external scripts", 0, INI_STRING, "", & of.ext_args},
   {"nproc", "Set the number of processes for pfind/the external script", 0, INI_UINT, NULL, & of.nproc},
   {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
@@ -180,14 +180,14 @@ static void validate(void){
     sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.datadir);
 
     char command[2048];
-    sprintf(command, "%s %s %s", of.ext_find, of.ext_args, arguments);
+    sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
     of.command = strdup(command);
 
     if(of.nproc != opt.mpi_size && of.nproc != 1 && of.nproc != INI_UNSET_UINT){
-      WARNING("An external-script will always be run with nproc=1, note that MPI does not support to run MPI programs from an MPI program\n");
+      WARNING("An external-script will always be run with nproc=1, note that some MPI implementations do not support to run MPI programs from an MPI program\n");
     }
   }else{
-    if(*of.ext_args == '\0' ){
+    if(*of.ext_args != '\0' || *of.ext_mpi != '\0' ){
       WARNING("Using internal pfind, will ignore any arguments to the external script\n");
     }
 

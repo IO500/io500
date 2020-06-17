@@ -150,7 +150,7 @@ function main {
 
   run_benchmarks
 
-  if [[ -s "system-information.txt" ]]; then
+  if [[ ! -s "system-information.txt" ]]; then
     echo "Warning: please create a system-information.txt description by"
     echo "copying the information from https://vi4io.org/io500-info-creator/"
   else

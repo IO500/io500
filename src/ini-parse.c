@@ -64,7 +64,7 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
   if (reti){
     FATAL("Could not compile regex\n");
   }
-  reti = regcomp(& r_str, "^[[:space:]]*([0-9a-zA-Z_.-]+)[[:space:]]*=[[:space:]]*([^#;]+)[[:space:]]*([[:space:]][#;].*)?$", REG_EXTENDED);
+  reti = regcomp(& r_str, "^[[:space:]]*([0-9a-zA-Z_.-]+)[[:space:]]*=[[:space:]]*([^#;]*)[[:space:]]*([[:space:]][#;].*)?$", REG_EXTENDED);
   if (reti){
     FATAL("Could not compile regex\n");
   }

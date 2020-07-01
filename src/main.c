@@ -362,6 +362,8 @@ int main(int argc, char ** argv){
     dupprintf("[SCORE%s] Bandwidth %f GB/s : IOPS %f kiops : TOTAL %f\n",
       opt.is_valid_run ? "" : "-invalid",
       scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
+
+    printf("\nThe result files are stored in the directory: %s\n", opt.resdir);
   }
 
   for(int i=0; i < IO500_PHASES; i++){

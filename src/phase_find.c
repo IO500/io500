@@ -60,6 +60,10 @@ static double run(void){
 
     // pfind supports stonewalling timer -s, but ignore for now
     pfind_find_results_t * res = pfind_find(of.pfind_o);
+    if(! res){
+      INVALID("PFind returned with an error, this is invalid.\n")
+      return 0.0;
+    }
     of.pfind_res = pfind_aggregrate_results(res);
 
     if(rank == 0){

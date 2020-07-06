@@ -30,6 +30,6 @@ typedef struct{
   ior_aiori_t const * aiori;
 } io500_opt_t;
 
-io500_opt_t opt;
+extern io500_opt_t opt;
 
 #endif

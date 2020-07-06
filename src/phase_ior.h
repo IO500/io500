@@ -17,7 +17,7 @@ typedef struct{
   int verbosity;
 } opt_ior_easy;
 
-opt_ior_easy ior_easy_o;
+extern opt_ior_easy ior_easy_o;
 
 typedef struct{
   int no_run;
@@ -29,7 +29,7 @@ typedef struct{
   int verbosity;
 } opt_ior_hard;
 
-opt_ior_hard ior_hard_o;
+extern opt_ior_hard ior_hard_o;
 
 void ior_easy_add_params(u_argv_t * argv);
 void ior_hard_add_params(u_argv_t * argv);

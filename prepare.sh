@@ -7,7 +7,7 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=2de42103112ec
+IOR_HASH=8f14166a7939d644e
 IO500_HASH=io500-isc20
 MDREAL_HASH=io500-isc20
 

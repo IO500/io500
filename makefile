@@ -1,14 +1,15 @@
 CC = mpicc
 CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
 
-IORCFLAGS = $(shell grep CFLAGS ./build/ior/Makefile | cut -d "=" -f 2-)
+IORCFLAGS = $(shell grep CFLAGS ./build/ior/src/build.conf | cut -d "=" -f 2-)
 CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
-IORLIBS = $(shell grep LIBS ./build/ior/Makefile | cut -d "=" -f 2-)
+IORLIBS = $(shell grep LDFLAGS ./build/ior/src/build.conf | cut -d "=" -f 2-)
 LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS) # -lgpfs # may need some additional flags as provided to IOR
 
 VERSION_GIT=$(shell git describe --always --abbrev=12)
+VERSION_HASH=$(shell git log --pretty=format:'%h' -n 1)
 VERSION_TREE=$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")
-VERSION=$(VERSION_GIT)$(VERSION_TREE)
+VERSION=$(VERSION_HASH)$(VERSION_TREE)
 CFLAGS += -DVERSION="\"$(VERSION)\""
 PROGRAM = io500
 VERIFIER = io500-verify

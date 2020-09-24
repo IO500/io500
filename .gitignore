@@ -6,6 +6,18 @@ core
 vgcore.*
 io500
 io500-verify
+system-information.txt
+
+# Temporary files
+*.orig
+*.tmp
+*.swo
+*.swp
+*.diff
+*.patch
+*~
+tags
+TAGS
 
 # Prerequisites
 *.d

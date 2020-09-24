@@ -8,8 +8,8 @@ echo It will output OK at the end if builds succeed
 echo
 
 IOR_HASH=2de42103112ec
-IO500_HASH=io500-isc20
-MDREAL_HASH=io500-isc20
+IO500_HASH=48eb1880e92d
+#PFIND_HASH=9d77056adce6
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
@@ -22,14 +22,10 @@ function main {
 
   get_ior
   get_pfind
-  get_io500_dev
-  #get_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
 
   build_ior
   build_pfind
-  build_io500_dev
-  build_io500_app
-#  build_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
+  build_io500
 
   echo
   echo "OK: All required software packages are now prepared"
@@ -43,12 +39,16 @@ function setup {
 }
 
 function git_co {
+  local repo=$1
+  local dir=$2
+  local tag=$3
+
   pushd $BUILD
-  [ -d "$2" ] || git clone $1 $2
-  cd $2
+  [ -d "$dir" ] || git clone $repo $dir
+  cd $dir
   # turning off the hash thing for now because too many changes happening too quickly
   git fetch
-  git checkout $3
+  git checkout $tag
   popd
 }
 
@@ -60,17 +60,7 @@ function get_ior {
 
 function get_pfind {
   echo "Preparing parallel find"
-  git_co https://github.com/VI4IO/pfind.git pfind
-}
-
-function get_io500_dev {
-  echo "Getting IO500-dev"
-  git_co https://github.com/VI4IO/io-500-dev io500-dev $IO500_HASH
-}
-
-function get_mdrealio {
-  echo "Preparing MD-REAL-IO"
-  git_co https://github.com/JulianKunkel/md-real-io md-real-io $MDREAL_HASH
+  git_co https://github.com/VI4IO/pfind.git pfind $PFIND_HASH
 }
 
 ###### BUILD FUNCTIONS
@@ -86,16 +76,6 @@ function build_ior {
   popd
 }
 
-function build_io500_dev {
-  mkdir -p $BUILD/io500-dev/build
-  pushd $BUILD/io500-dev/build
-  ln -sf $BUILD/ior
-  ln -sf $BUILD/pfind
-  echo "io500-dev: OK"
-  echo
-  popd
-}
-
 function build_pfind {
   pushd $BUILD/pfind
   ./prepare.sh
@@ -106,20 +86,10 @@ function build_pfind {
   popd
 }
 
-function build_io500_app {
+function build_io500 {
   make
-  echo "io500-app: OK"
+  echo "io500: OK"
   echo
-}
-
-function build_mdrealio {
-  pushd $BUILD/md-real-io
-  ./configure --prefix=$INSTALL_DIR --minimal
-  $MAKE install
-  #mv src/md-real-io $BIN
-  echo "MD-REAL-IO: OK"
-  echo
-  popd
 }
 
 ###### CALL MAIN

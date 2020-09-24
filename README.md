@@ -76,7 +76,7 @@ This information is also saved in the file result_summary.txt in the respective 
 
 In the same directory, you will also find the result.txt file that contains more information and is stored using the INI file format.
 
-    version         = ISC20-testing
+    version         = SC20-testing
     config-hash     = 25C33C96
     result-dir      = ./results/
     ; START 2020-01-06 10:23:49

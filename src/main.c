@@ -20,7 +20,7 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "MD",
   "BW"};
 
-static void init_dirs(void){
+static void prepare_aiori(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
   char * token = strstr(api, " ");
@@ -63,15 +63,19 @@ static void init_dirs(void){
     }
   }
   opt.aiori = aiori_select(opt.api);
-  opt.aiori_params.backend_options = airoi_update_module_options(opt.aiori, global_options);
+  opt.backend_opt = airoi_update_module_options(opt.aiori, global_options);
   if(opt.aiori == NULL){
     FATAL("Could not load AIORI backend for %s with options: %s\n", opt.api, opt.apiArgs);
   }
+  if (opt.aiori->xfer_hints){
+    memset(& opt.backend_hints, 0, sizeof(opt.backend_hints));
+    opt.aiori->xfer_hints(& opt.backend_hints);
+  }
   if(opt.aiori->check_params){
-    opt.aiori->check_params(& opt.aiori_params);
+    opt.aiori->check_params(opt.backend_opt);
   }
   if (opt.aiori->initialize){
-    opt.aiori->initialize();
+    opt.aiori->initialize(opt.backend_opt);
   }
 
   if(opt.timestamp == NULL){
@@ -140,7 +144,7 @@ int main(int argc, char ** argv){
     goto out;
   }
   if (argc < 2 || strcmp(argv[1], "-l") == 0 || strcmp(argv[1], "--list") == 0){
-    if (rank == 0){
+    if (opt.rank == 0){
       /* print this as a comment, in case it is saved into the .ini file */
       r0printf("# Supported and current values of the ini file:\n");
       u_ini_print_values(stdout, cfg, TRUE);
@@ -153,7 +157,6 @@ int main(int argc, char ** argv){
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
 
-  init_IOR_Param_t(& opt.aiori_params);
   opt.is_valid_run = 1;
 
   int verbosity_override = -1;
@@ -234,7 +237,7 @@ int main(int argc, char ** argv){
     goto out;
   }
 
-  init_dirs();
+  prepare_aiori();
 
   FILE * res_summary = NULL;
   if(opt.rank == 0){
@@ -415,7 +418,7 @@ int main(int argc, char ** argv){
   }
 
   if (opt.aiori->finalize){
-    opt.aiori->finalize();
+    opt.aiori->finalize(opt.backend_opt);
   }
 
   fclose(file_out);

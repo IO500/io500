@@ -4,6 +4,8 @@
 #include <io500-util.h>
 #include <io500-phase.h>
 
+#include <ior.h>
+
 #include <phase-definitions.h>
 
 // Dummy prototypes to satisfy need for depending modules

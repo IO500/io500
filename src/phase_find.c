@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <mpi.h>
 #include <string.h>
+#include <errno.h>
 
 
 #include <pfind-options.h>

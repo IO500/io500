@@ -58,14 +58,14 @@ void u_purge_datadir(char const * dir){
   sprintf(d, "%s/%s", opt.datadir, dir);
   DEBUG_INFO("Removing dir %s\n", d);
 
-  opt.aiori->rmdir(d, & opt.aiori_params);
+  opt.aiori->rmdir(d, opt.backend_opt);
 }
 
 void u_purge_file(char const * file){
   char f[2048];
   sprintf(f, "%s/%s", opt.datadir, file);
   DEBUG_INFO("Removing file %s\n", f);
-  opt.aiori->delete(f, & opt.aiori_params);
+  opt.aiori->delete(f, opt.backend_opt);
 }
 
 void u_create_datadir(char const * dir){

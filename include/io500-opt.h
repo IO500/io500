@@ -26,7 +26,8 @@ typedef struct{
   int timestamp_resdir;
   int timestamp_datadir;
 
-  IOR_param_t aiori_params;
+  aiori_xfer_hint_t backend_hints;
+  aiori_mod_opt_t * backend_opt;
   ior_aiori_t const * aiori;
 } io500_opt_t;
 

@@ -3,11 +3,12 @@
 
 #include <io500-util.h>
 
-FILE * file_out;
+FILE* file_out;
+FILE* out_logfile;
 
 int main(void){
   file_out = stdout;
-  
+
   int ret;
   {
     ini_section_t * testsec[] = {NULL};

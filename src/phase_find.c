@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <mpi.h>
 #include <string.h>
+#include <errno.h>
 
 
 #include <pfind-options.h>
@@ -12,7 +13,7 @@ typedef struct{
   char * ext_args;
   char * ext_mpi;
   int nproc;
-
+  int no_run;
   char * command;
 
   pfind_options_t * pfind_o;
@@ -29,6 +30,8 @@ typedef struct{
 static opt_find of;
 
 static double run(void){
+  if(of.no_run == 1) return 0.0;
+
   int ret = 0;
 
   PRINT_PAIR("exe", "%s\n", of.command);
@@ -42,7 +45,7 @@ static double run(void){
   if(opt.rank == 0){
     // check the existance of the timestamp file just for correctness
     char timestamp_file[PATH_MAX];
-    sprintf(timestamp_file, "%s/timestampfile", opt.datadir);
+    sprintf(timestamp_file, "%s/timestampfile", opt.resdir);
     FILE * f = fopen(timestamp_file, "r");
     if(! f){
       FATAL("Couldn't open timestampfile: %s\n", timestamp_file);
@@ -165,12 +168,14 @@ static ini_option_t option[] = {
   {"external-mpi-args", "Startup arguments for external scripts, some MPI's may not support this!", 0, INI_STRING, "", & of.ext_mpi},
   {"external-extra-args", "Extra arguments for the external scripts", 0, INI_STRING, "", & of.ext_args},
   {"nproc", "Set the number of processes for pfind/the external script", 0, INI_UINT, NULL, & of.nproc},
+  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & of.no_run},
   {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
   {"pfind-steal-next", "Pfind Steal from next", 0, INI_BOOL, "FALSE", & of.pfind_steal_from_next},
   {"pfind-parallelize-single-dir-access-using-hashing", "Parallelize the readdir by using hashing. Your system must support this!", 0, INI_BOOL, "FALSE", &  of.pfind_par_single_dir_access_hash},
   {NULL} };
 
 static void validate(void){
+  if(of.no_run == 1) return;
   if(of.ext_find){
     struct stat sb;
     int ret = stat(of.ext_find, & sb);
@@ -181,7 +186,7 @@ static void validate(void){
       FATAL("The external-script must be a executable file %s\n", of.ext_find);
     }
     char arguments[1024];
-    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.datadir);
+    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
 
     char command[2048];
     sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
@@ -199,7 +204,7 @@ static void validate(void){
     u_argv_push(argv, "./pfind");
     u_argv_push(argv, opt.datadir);
     u_argv_push(argv, "-newer");
-    u_argv_push_printf(argv, "%s/timestampfile", opt.datadir);
+    u_argv_push_printf(argv, "%s/timestampfile", opt.resdir);
     u_argv_push(argv, "-size");
     u_argv_push(argv, "3901c");
     u_argv_push(argv, "-name");

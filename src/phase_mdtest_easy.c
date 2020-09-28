@@ -21,7 +21,9 @@ static void validate(void){
 
 static void cleanup(void){
   if( ! opt.dry_run && opt.rank == 0){
-    u_purge_file("mdtest-easy-stonewall");
+    char filename[PATH_MAX];
+    sprintf(filename, "%s/mdtest-easy.stonewall", opt.resdir);
+    unlink(filename);
     u_purge_datadir("mdtest-easy");
   }
 }
@@ -41,7 +43,7 @@ void mdtest_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-d");
   u_argv_push_printf(argv, "%s/mdtest-easy", opt.datadir);
   u_argv_push(argv, "-x");
-  u_argv_push_printf(argv, "%s/mdtest-easy-stonewall", opt.datadir);
+  u_argv_push_printf(argv, "%s/mdtest-easy.stonewall", opt.resdir);
 }
 
 u_phase_t p_mdtest_easy = {

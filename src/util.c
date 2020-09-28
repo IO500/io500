@@ -58,14 +58,14 @@ void u_purge_datadir(char const * dir){
   sprintf(d, "%s/%s", opt.datadir, dir);
   DEBUG_INFO("Removing dir %s\n", d);
 
-  opt.aiori->rmdir(d, & opt.aiori_params);
+  opt.aiori->rmdir(d, opt.backend_opt);
 }
 
 void u_purge_file(char const * file){
   char f[2048];
   sprintf(f, "%s/%s", opt.datadir, file);
   DEBUG_INFO("Removing file %s\n", f);
-  opt.aiori->delete(f, & opt.aiori_params);
+  opt.aiori->delete(f, opt.backend_opt);
 }
 
 void u_create_datadir(char const * dir){
@@ -74,10 +74,10 @@ void u_create_datadir(char const * dir){
   }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
-  u_create_dir_recursive(d, opt.api);
+  u_create_dir_recursive(d, opt.aiori);
 }
 
-void u_create_dir_recursive(char const * dir, char const * api){
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api){
   char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
@@ -94,7 +94,7 @@ void u_create_dir_recursive(char const * dir, char const * api){
     int ret = stat(outdir, & sb);
     if(ret != 0){
       DEBUG_INFO("Creating dir %s\n", outdir);
-      ret = opt.aiori->mkdir(outdir, S_IRWXU, NULL);
+      ret = api->mkdir(outdir, S_IRWXU, NULL);
       if(ret != 0){
         FATAL("Couldn't create directory %s (Error: %s)\n", outdir, strerror(errno));
       }
@@ -150,7 +150,7 @@ static void push_api_args(u_argv_t * argv, char const * var){
       if(strncasecmp(buff, t, len) == 0){
         u_argv_push(argv, t);
       }else{
-        FATAL("Provided API option %s appears to be no API supported version", t);
+        FATAL("Provided API option %s appears to be no API supported version\n", t);
       }
     }
   }

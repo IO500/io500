@@ -111,11 +111,11 @@ function main {
   [ $(get_ini_global_param timestamp-datadir True) != "False" ] &&
     ts="$timestamp" || ts="io500"
   # working directory where the test files will be created
-  export io500_workdir=$(get_ini_global_param datadir $PWD/datafiles)/$ts-app
+  export io500_workdir=$(get_ini_global_param datadir $PWD/datafiles)/$ts
   [ $(get_ini_global_param timestamp-resultdir True) != "False" ] &&
     ts="$timestamp" || ts="io500"
   # the directory where the output results will be kept
-  export io500_resultdir=$(get_ini_global_param resultdir $PWD/results)/$ts-app
+  export io500_resultdir=$(get_ini_global_param resultdir $PWD/results)/$ts
 
   setup_directories
   setup_paths

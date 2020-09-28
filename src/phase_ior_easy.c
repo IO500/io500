@@ -34,7 +34,9 @@ static void validate(void){
 
 static void cleanup(void){
   if( ! opt.dry_run && opt.rank == 0){
-    u_purge_file("ior-easy/stonewall");
+    char filename[PATH_MAX];
+    sprintf(filename, "%s/ior-easy.stonewall", opt.resdir);
+    unlink(filename);
 
     if(! ior_easy_o.filePerProc){
       u_purge_file("ior-easy/ior_file_easy");
@@ -66,7 +68,7 @@ void ior_easy_add_params(u_argv_t * argv){
   u_argv_push(argv, "-o");
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
   u_argv_push(argv, "-O");
-  u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy/stonewall", opt.datadir );
+  u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
   u_argv_push(argv, "-t");
   u_argv_push(argv, d.transferSize);
   u_argv_push(argv, "-b");

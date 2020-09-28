@@ -4,6 +4,8 @@
 #include <io500-util.h>
 #include <io500-phase.h>
 
+#include <ior.h>
+
 #include <phase-definitions.h>
 
 // Dummy prototypes to satisfy need for depending modules
@@ -14,7 +16,7 @@ double GetTimeStamp(void){ return 0; }
 void pfind_parse_args(void){}
 IOR_test_t * ior_run(int argc, char **argv, MPI_Comm world_com, FILE * out_logfile){ return NULL; }
 void mdtest_run(void){}
-
+FILE* out_logfile;
 FILE* file_out;
 
 int main(int argc, char ** argv){

@@ -71,7 +71,7 @@ void u_create_datadir(char const * dir);
 void u_purge_datadir(char const * dir);
 void u_purge_file(char const * file);
 
-void u_create_dir_recursive(char const * dir, char const * api);
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api);
 
 // invoke an external shell command
 void u_call_cmd(char const * command);

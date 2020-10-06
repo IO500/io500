@@ -333,8 +333,8 @@ int main(int argc, char ** argv){
 
         char score_str[40];
         sprintf(score_str, "%f", score);
-        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", phase->score == 0.0 ||
-		  (phase->type == IO500_PHASE_WRITE && runtime < IO500_MINWRITE) ?
+        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", (score == 0.0 ||
+		  (phase->type == IO500_PHASE_WRITE && runtime < IO500_MINWRITE)) ?
 			"-invalid" : "",
 		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
       }

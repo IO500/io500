@@ -11,6 +11,7 @@ static ini_option_t option[] = {
   {"drop-caches", "Purge the caches, this is useful for testing and needed for single node runs", 0, INI_BOOL, "FALSE", & opt.drop_caches},
   {"drop-caches-cmd", "Cache purging command, invoked before each I/O phase", 0, INI_STRING, "sudo -n bash -c \"echo 3 > /proc/sys/vm/drop_caches\"", & opt.drop_caches_cmd},
   {"verbosity", "The verbosity level between 1 and 10", 0, INI_UINT, "1", & opt.verbosity},
+  {"scc", "Declare 30 seconds stonewall for Student luster Competition", 0, INI_BOOL, "FALSE", & opt.scc},
   {NULL} };
 
 static void validate(void){

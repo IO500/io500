@@ -7,6 +7,7 @@
 #include <ior.h>
 
 #include <phase-definitions.h>
+int IO500_MINWRITE;
 
 // Dummy prototypes to satisfy need for depending modules
 // TODO use ifdefs to strip dependency

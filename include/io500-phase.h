@@ -32,7 +32,7 @@ typedef struct{
   io500_phase_score_group group;
 } u_phase_t;
 
-extern int IO500_MINWRITE 
+extern int IO500_MINWRITE;
 #define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5)
 
 extern u_phase_t p_opt;

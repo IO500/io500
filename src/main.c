@@ -14,7 +14,7 @@
 #include <phase-definitions.h>
 
 FILE* file_out = NULL;
-int IO500_MINWRITE=300;
+int IO500_MINWRITE;
 
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "NO SCORE",
@@ -287,9 +287,9 @@ int main(int argc, char ** argv){
     fprintf(file_out, "\n");
   }
 
-  if(opt.scc) {
-     IO500_MINWRITE=30;
-  }
+  
+  IO500_MINWRITE=opt.minwrite;
+  
 
   for(int i=0; i < IO500_PHASES; i++){
     phases[i]->validate();

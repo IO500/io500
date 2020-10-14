@@ -26,6 +26,9 @@ typedef struct{
   int timestamp_resdir;
   int timestamp_datadir;
 
+  int scc;
+  int minwrite;
+
   aiori_xfer_hint_t backend_hints;
   aiori_mod_opt_t * backend_opt;
   ior_aiori_t const * aiori;

@@ -396,7 +396,7 @@ int main(int argc, char ** argv){
     }
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
 
-    dupprintf("[SCORE%s] Bandwidth %f GB/s : IOPS %f kiops : TOTAL %f\n",
+    dupprintf("[SCORE%s] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n",
       opt.is_valid_run ? "" : "-invalid",
       scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
 

@@ -214,6 +214,12 @@ int main(int argc, char ** argv){
       }
     }
   }
+  if(opt.scc){
+    // student cluster competition
+    opt.minwrite = 30;
+  }else{
+    opt.minwrite = 300;
+  }
   if(verbosity_override > -1){
     opt.verbosity = verbosity_override;
   }
@@ -334,7 +340,7 @@ int main(int argc, char ** argv){
         char score_str[40];
         sprintf(score_str, "%f", score);
         dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", (score == 0.0 ||
-		  (phase->type == IO500_PHASE_WRITE && runtime < IO500_MINWRITE)) ?
+		  (phase->type == IO500_PHASE_WRITE && runtime < opt.minwrite)) ?
 			"-invalid" : "",
 		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
       }

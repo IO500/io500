@@ -23,10 +23,11 @@ Detailed help for the available options is provided when running:
 
 The benchmark output the commands it would run (equivalence of command line invocations of ior/mdtest). Use --dry-run to not invoke any command.
 
-Three .ini files are provided, the config-minimal.ini and the config-some.ini.
-  - The minimal example contains the only mandatory parameter, the data directory. It also sets the stonewalling to 1 for testing.
-  - The config-some illustrates the setting of various options. For more details, run ./io500 -h.
-  - The config-all shows all available configuration options and their default values.  This is generated from ./io500 --list.
+In order to create a new INI file with all the options, you can execute:
+
+    $ ./io500 --list > config-all.ini
+
+The config-some illustrates the setting of various options. For more details, run ./io500 -h.
 
 To see the currently active options, run:
 

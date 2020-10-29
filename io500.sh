@@ -13,6 +13,7 @@
 
 # Set the paths to the binaries and how to launch MPI jobs.
 # If you ran ./prepare.sh successfully, then binaries are in ./bin/
+
 function setup_paths {
   io500_ior_cmd=$PWD/bin/ior
   io500_mdtest_cmd=$PWD/bin/mdtest
@@ -40,11 +41,14 @@ function setup_directories {
   #mkdir $io500_workdir/mdtest-easy $io500_workdir/mdtest-hard
   #local osts=$(lfs df $io500_workdir | grep -c OST)
   # Try overstriping for ior-hard to improve scaling, or use wide striping
-  #lfs setstripe -C $((osts * 4)) $io500_workdir/ior-hard ||
-  #  lfs setstripe -c -1 $io500_workdir/ior-hard
+  #lfs setstripe -C $((osts * 4)) $io500_workdir/ior-hard || lfs setstripe -c -1 $io500_workdir/ior-hard
   # Try to use DoM if available, otherwise use default for small files
   #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-easy || true #DoM?
   #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-hard || true #DoM?
+  # Output Lustre options (for manual checking)
+  #lfs df $io500_workdir
+  #lfs getstripe $io500_workdir/ior-easy
+  #lfs getstripe $io500_workdir/ior-hard
 }
 
 # *****  YOU SHOULD NOT EDIT ANYTHING BELOW THIS LINE  *****

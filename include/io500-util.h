@@ -14,13 +14,15 @@
 #define INI_UNSET_UINT (unsigned)(-1)
 #define INI_UNSET_UINT64 (uint64_t)(-1)
 #define INI_UNSET_BOOL 2
+#define INI_UNSET_FLOAT 1e307
 
 typedef enum{
   INI_STRING,
   INI_INT,
   INI_UINT,
   INI_UINT64,
-  INI_BOOL
+  INI_BOOL,
+  INI_FLOAT
 } ini_var_type_e;
 
 typedef struct {

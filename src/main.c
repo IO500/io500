@@ -293,7 +293,9 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    phases[i]->validate();
+    if(phases[i]->validate){
+      phases[i]->validate();
+    }
   }
   if(opt.rank == 0){
     fprintf(file_out, "\n");

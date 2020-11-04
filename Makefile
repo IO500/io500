@@ -22,7 +22,7 @@ vpath %.h $(SEARCHPATH)
 DEPS += io500-util.h io500-debug.h io500-opt.h
 OBJS += util.o
 OBJS += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
-OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd.o phase_ior_rnd_write.o phase_ior_rnd_read.o
+OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd.o phase_ior_rnd_write.o phase_ior_rnd_read.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o
 
 TESTS += ini-test
 TESTSEXE = $(patsubst %,%.exe,$(TESTS))

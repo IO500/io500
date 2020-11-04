@@ -16,6 +16,7 @@ typedef enum {
   IO500_PHASE_DUMMY,
   IO500_PHASE_WRITE,
   IO500_PHASE_READ,
+  IO500_PHASE_UPDATE,
   IO500_PHASE_REMOVE,
 } io500_phase_type;
 
@@ -32,7 +33,7 @@ typedef struct{
   io500_phase_score_group group;
 } u_phase_t;
 
-#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5 + 3)
+#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5 + 3 + 4)
 
 extern u_phase_t p_opt;
 extern u_phase_t p_debug;
@@ -48,6 +49,11 @@ extern u_phase_t p_ior_hard_read;
 extern u_phase_t p_ior_rnd;
 extern u_phase_t p_ior_rnd_write;
 extern u_phase_t p_ior_rnd_read;
+
+extern u_phase_t p_mdworkbench;
+extern u_phase_t p_mdworkbench_create;
+extern u_phase_t p_mdworkbench_bench;
+extern u_phase_t p_mdworkbench_delete;
 
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;

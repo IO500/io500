@@ -9,6 +9,8 @@ typedef struct{
   char * api;
   int verbosity;
   float waiting_time;
+  uint64_t precreate_per_set;
+  uint64_t files_per_proc;
 } opt_mdworkbench;
 
 extern opt_mdworkbench mdworkbench_o;

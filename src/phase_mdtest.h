@@ -41,4 +41,8 @@ void mdtest_easy_add_params(u_argv_t * argv);
 void mdtest_hard_add_params(u_argv_t * argv);
 
 void p_mdtest_run(u_argv_t * argv, FILE * out, mdtest_generic_res * d, mdtest_test_num_t test);
+
+// retrieve results in a later stage
+mdtest_generic_res* mdtest_easy_write_get_result(void);
+
 #endif

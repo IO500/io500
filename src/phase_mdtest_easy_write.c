@@ -17,6 +17,10 @@ static ini_option_t option[] = {
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & o.g.no_run},
   {NULL} };
 
+mdtest_generic_res * mdtest_easy_write_get_result(){
+  return & o.res;
+}
+
 
 static void validate(void){
 

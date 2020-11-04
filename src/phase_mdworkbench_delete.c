@@ -8,7 +8,7 @@
 typedef struct{
   int no_run;
   char * command;
-  phase_stat_t * res;
+  mdworkbench_results_t * res;
 } opt_mdworkbench_delete;
 
 static opt_mdworkbench_delete o;
@@ -31,7 +31,9 @@ static double run(void){
     return 0;
   }
   FILE * out = u_res_file_prep(p_mdworkbench_delete.name);
-  return mdworkbench_process(argv, out, & o.res);
+  mdworkbench_process(argv, out, & o.res);
+
+  return 0;
 }
 
 

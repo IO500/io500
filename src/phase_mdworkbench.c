@@ -32,16 +32,15 @@ static void validate(void){
 }
 
 
-double mdworkbench_process(u_argv_t * argv, FILE * out, phase_stat_t ** res_out){
-  phase_stat_t * res = md_workbench_run(argv->size, argv->vector, MPI_COMM_WORLD, out);
+void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out){
+  mdworkbench_results_t * res = md_workbench_run(argv->size, argv->vector, MPI_COMM_WORLD, out);
   u_res_file_close(out);
   u_argv_free(argv);
 
-  if(res->t){
-  //  INVALID("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
+  if(res->errors != 0){
+    INVALID("Errors (%d) occured during the md-workbench phase. This invalidates your run.\n", res->errors);
   }
-  double tp = 1;
-  return tp;
+  *res_out = res;
 }
 
 
@@ -58,7 +57,6 @@ void mdworkbench_add_params(u_argv_t * argv){
   u_argv_push(argv, d.api);
   u_argv_push_printf(argv, "-o=%s/mdworkbench", opt.datadir);
   u_argv_push_printf(argv, "-t=%f", d.waiting_time);
-  u_argv_push(argv, "-R=1");
   u_argv_push(argv, "-O=1");
   u_argv_push_printf(argv, "--run-info-file=%s/mdworkbench.status", opt.resdir );
 

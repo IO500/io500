@@ -242,6 +242,7 @@ FILE * u_res_file_prep(char const * name){
 void u_res_file_close(FILE * out){
   if(opt.rank == 0){
     fclose(out);
+    out_logfile = stdout;
   }
 }
 

@@ -72,11 +72,11 @@ void mdworkbench_add_params(u_argv_t * argv){
     mdtest_generic_res* mdtest = mdtest_easy_write_get_result();
     if( mdtest->rate <= 0.0 ){
       WARNING("MDWorkbench uses the MDTest rates to determine suitable options but MDTest didn't run, will use a low (and sane) default instead\n");
-      mdtest->rate = 1000.0;
+      mdtest->rate = 10.0;
     }
     // run for 60s
     int time = opt.stonewall < 60 ? opt.stonewall : 60;
-    precreate_per_set = (uint64_t) (mdtest->rate * time * 1000) / 10;
+    precreate_per_set = (uint64_t) (mdtest->rate * time * 1000 / opt.mpi_size) / 10;
     files_per_proc = precreate_per_set;
   }
   // we have 10 sets

@@ -1,6 +1,8 @@
 # io500
 
-This is the C version of the IO500 benchmark.
+This is an extended IO500 benchmark for the purpose to evaluate the impact of these options in order to prepare a change requests (according to the IO500 rules).
+It is not the *official* IO500 benchmark but merely a fork.
+Nevertheless, it should produce the same individual scores than the original IO500 benchmark.
 
 ## Preparation
 

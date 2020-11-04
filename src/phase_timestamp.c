@@ -2,7 +2,6 @@
 #include <unistd.h>
 
 #include <io500-phase.h>
-#include <phase_mdtest.h>
 
 static ini_option_t option[] = {
   {NULL} };

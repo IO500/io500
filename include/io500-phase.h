@@ -32,7 +32,7 @@ typedef struct{
   io500_phase_score_group group;
 } u_phase_t;
 
-#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5)
+#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5 + 3)
 
 extern u_phase_t p_opt;
 extern u_phase_t p_debug;
@@ -44,6 +44,10 @@ extern u_phase_t p_find;
 extern u_phase_t p_ior_hard;
 extern u_phase_t p_ior_hard_write;
 extern u_phase_t p_ior_hard_read;
+
+extern u_phase_t p_ior_rnd;
+extern u_phase_t p_ior_rnd_write;
+extern u_phase_t p_ior_rnd_read;
 
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;

@@ -31,8 +31,22 @@ typedef struct{
 
 extern opt_ior_hard ior_hard_o;
 
+typedef struct{
+  int no_run;
+  char * api;
+  bool odirect;
+  char * hintsFileName;
+
+  int segments;
+  int verbosity;
+} opt_ior_rnd;
+
+extern opt_ior_rnd ior_rnd_o;
+
+
 void ior_easy_add_params(u_argv_t * argv);
 void ior_hard_add_params(u_argv_t * argv);
+void ior_rnd_add_params(u_argv_t * argv);
 
 // Generic helpers
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);

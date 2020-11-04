@@ -8,6 +8,8 @@
 #include <io500-phase.h>
 #include "phase_find.h"
 
+// for testing purpose, ugly code copied, refactoring can be done if useful
+
 typedef struct{
   char * ext_find;
   char * ext_args;
@@ -186,7 +188,7 @@ static void validate(void){
       FATAL("The external-script must be a executable file %s\n", of.ext_find);
     }
     char arguments[1024];
-    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
+    sprintf(arguments, "%s/mdtest-hard/ -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
 
     char command[2048];
     sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
@@ -202,7 +204,7 @@ static void validate(void){
 
     u_argv_t * argv = u_argv_create();
     u_argv_push(argv, "./pfind");
-    u_argv_push(argv, opt.datadir);
+    u_argv_push_printf(argv, "%s/mdtest-hard/", opt.datadir);
     u_argv_push(argv, "-newer");
     u_argv_push_printf(argv, "%s/timestampfile", opt.resdir);
     u_argv_push(argv, "-size");
@@ -246,8 +248,8 @@ static void validate(void){
   }
 }
 
-u_phase_t p_find = {
-  "find",
+u_phase_t p_find_hard = {
+  "find_hard",
   IO500_PHASE_READ,
   option,
   validate,

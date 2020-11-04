@@ -16,6 +16,8 @@ static u_phase_t * phases[IO500_PHASES] = {
 
   & p_timestamp,
 
+  & p_find_easy,
+
   & p_ior_hard,
   & p_ior_hard_write,
 
@@ -27,6 +29,8 @@ static u_phase_t * phases[IO500_PHASES] = {
   & p_ior_rnd_read,
 
   & p_mdworkbench_bench,
+
+  & p_find_hard,
 
   & p_ior_easy_read,
   & p_mdtest_easy_stat,

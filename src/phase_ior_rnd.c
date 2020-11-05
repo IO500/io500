@@ -10,7 +10,7 @@ static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_rnd_o.api},
   {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & ior_rnd_o.odirect},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_rnd_o.hintsFileName},
-  {"segmentCount", "Number of segments", 0, INI_INT, "1000000000", & ior_rnd_o.segments},
+  {"segmentCount", "Number of segments", 0, INI_INT, "1000000", & ior_rnd_o.segments}, // FIXME in IOR
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_rnd_o.no_run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_rnd_o.verbosity},
   {NULL} };

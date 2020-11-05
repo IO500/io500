@@ -73,7 +73,7 @@ static double run(void){
 
     if(rank == 0){
       char res_file[PATH_MAX];
-      sprintf(res_file, "%s/find.csv", opt.resdir);
+      sprintf(res_file, "%s/find-easy.csv", opt.resdir);
       FILE * fd = fopen(res_file, "w");
       fprintf(fd, "runtime: %f rate: %f\n", of.pfind_res->runtime, of.pfind_res->rate);
       fprintf(fd, "rank, errors, unknown, found, total, checked, job steal msgs received, work items send, job steal msgs send, work items stolen, time spend in job stealing in s, number of completion tokens send\n");
@@ -245,7 +245,7 @@ static void validate(void){
 }
 
 u_phase_t p_find_easy = {
-  "find_easy",
+  "find-easy",
   IO500_PHASE_READ,
   option,
   validate,

@@ -107,8 +107,7 @@ static void prepare_aiori(void){
 
   if(opt.rank == 0){
     ior_aiori_t const * posix = aiori_select("POSIX");
-    u_create_dir_recursive(opt.resdir, posix);
-    u_create_datadir("");
+    u_create_dir_recursive(opt.resdir, posix, NULL);
   }
 }
 

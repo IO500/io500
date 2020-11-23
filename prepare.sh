@@ -66,7 +66,7 @@ function get_pfind {
 function build_ior {
   pushd $BUILD/ior
   ./bootstrap
-  ./configure --prefix=$INSTALL_DIR
+  ./configure --prefix=$INSTALL_DIR --with-S3-libs3 LDFLAGS="/home/kunkel/ur-git/ior/ior-master/S3EmbeddedLib/libS3.so"
   cd src
   $MAKE clean
   $MAKE install

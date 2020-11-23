@@ -74,10 +74,10 @@ void u_create_datadir(char const * dir){
   }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
-  u_create_dir_recursive(d, opt.aiori);
+  u_create_dir_recursive(d, opt.aiori, opt.backend_opt);
 }
 
-void u_create_dir_recursive(char const * dir, ior_aiori_t const * api){
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * module_options){
   char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
@@ -91,10 +91,10 @@ void u_create_dir_recursive(char const * dir, ior_aiori_t const * api){
     wp += sprintf(wp, "%s/", next);
 
     struct stat sb;
-    int ret = stat(outdir, & sb);
+    int ret = api->stat(outdir, & sb, module_options);
     if(ret != 0){
       DEBUG_INFO("Creating dir %s\n", outdir);
-      ret = api->mkdir(outdir, S_IRWXU, NULL);
+      ret = api->mkdir(outdir, S_IRWXU, module_options);
       if(ret != 0){
         FATAL("Couldn't create directory %s (Error: %s)\n", outdir, strerror(errno));
       }

@@ -53,7 +53,7 @@ void mdworkbench_add_params(u_argv_t * argv){
     u_argv_push(argv, "-v");
   }
   u_argv_push(argv, "--process-reports");
-  u_argv_push_default_if_set(argv, "-a", opt.api, d->api);
+  u_argv_push_default_if_set_api_options(argv, "-a", d->api, d->api);
   u_argv_push_printf(argv, "-o=%s/mdworkbench", opt.datadir);
   u_argv_push_printf(argv, "-t=%f", d->waiting_time);
   u_argv_push(argv, "-O=1");

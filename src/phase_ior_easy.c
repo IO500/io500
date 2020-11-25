@@ -55,31 +55,31 @@ void ior_easy_add_params(u_argv_t * argv){
 
   u_argv_push(argv, "./ior");
   for(int i=0; i < ior_easy_o.verbosity; i++){
-    u_argv_push(argv, "-v");
+    u_argv_push(argv, "-v");	/* verbose */
   }
-  u_argv_push(argv, "-C");
-  u_argv_push(argv, "-Q");
+  u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
+  u_argv_push(argv, "-Q");	/* task per node offset */
   u_argv_push(argv, "1");
-  u_argv_push(argv, "-g");
-  u_argv_push(argv, "-G");
+  u_argv_push(argv, "-g");	/* barriers between open, read, write, close */
+  u_argv_push(argv, "-G");	/* use fixed timestamp signature */
   u_argv_push(argv, "271");
-  u_argv_push(argv, "-k");
-  u_argv_push(argv, "-e");
-  u_argv_push(argv, "-o");
+  u_argv_push(argv, "-k");	/* keep file after program exit */
+  u_argv_push(argv, "-e");	/* fsync upon write close */
+  u_argv_push(argv, "-o");	/* filename for output file */
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
-  u_argv_push(argv, "-O");
+  u_argv_push(argv, "-O");	/* additional IOR options */
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
-  u_argv_push(argv, "-t");
+  u_argv_push(argv, "-t");	/* transfer size */
   u_argv_push(argv, d.transferSize);
-  u_argv_push(argv, "-b");
+  u_argv_push(argv, "-b");	/* blocksize in bytes */
   u_argv_push(argv, d.blockSize);
 
   if(ior_easy_o.uniqueDir){
-    u_argv_push(argv, "-u");
+    u_argv_push(argv, "-u");	/* unique directory for each output file */
   }
 
   if(ior_easy_o.filePerProc){
-    u_argv_push(argv, "-F");
+    u_argv_push(argv, "-F");	/* write a separate file per process */
   }
 
 }

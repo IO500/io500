@@ -7,7 +7,6 @@
 typedef struct{
   int no_run;
   char * api;
-  int odirect;
 
   uint64_t files_per_proc;
   char * command;

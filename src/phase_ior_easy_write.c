@@ -8,7 +8,6 @@
 
 typedef struct{
   char * api;
-  int odirect;
   char * hintsFileName;
 
   char * command;
@@ -19,7 +18,6 @@ static opt_ior_easy_write o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
-  {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & o.odirect},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
@@ -39,7 +37,6 @@ static double run(void){
   u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
-  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);
 

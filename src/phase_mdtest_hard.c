@@ -10,7 +10,6 @@ opt_mdtest_hard mdtest_hard_o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & mdtest_hard_o.g.api},
-  {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & mdtest_hard_o.g.odirect},
   {"n", "Files per proc", 0, INI_UINT64, "1000000", & mdtest_hard_o.g.files_per_proc},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & mdtest_hard_o.g.no_run},
   {NULL} };

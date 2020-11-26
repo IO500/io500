@@ -8,7 +8,6 @@ opt_ior_hard ior_hard_o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_hard_o.api},
-  {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & ior_hard_o.odirect},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_hard_o.hintsFileName},
   {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_hard_o.segments},
   {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_hard_o.no_run},

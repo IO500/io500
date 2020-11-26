@@ -8,7 +8,6 @@
 
 typedef struct{
   char * api;
-  int odirect;
   char * hintsFileName;
 
   char * command;

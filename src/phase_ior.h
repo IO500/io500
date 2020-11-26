@@ -7,7 +7,6 @@
 typedef struct{
   int no_run;
   char * api;
-  int odirect;
 
   int filePerProc;
   int uniqueDir;
@@ -22,7 +21,6 @@ extern opt_ior_easy ior_easy_o;
 typedef struct{
   int no_run;
   char * api;
-  bool odirect;
   char * hintsFileName;
 
   int segments;
@@ -34,7 +32,6 @@ extern opt_ior_hard ior_hard_o;
 typedef struct{
   int no_run;
   char * api;
-  bool odirect;
   char * hintsFileName;
 
   int segments;

@@ -12,12 +12,14 @@ typedef struct{
 
   char * command;
   IOR_point_t * res;
+  int collective;
 } opt_ior_hard_write;
 
 static opt_ior_hard_write o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
+  {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & o.collective},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
@@ -31,6 +33,7 @@ static double run(void){
   u_argv_t * argv = u_argv_create();
   ior_hard_add_params(argv);
   u_argv_push(argv, "-w");
+  u_argv_push_default_if_set_bool(argv, "-c", d.collective, o.collective);
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);

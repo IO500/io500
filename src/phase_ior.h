@@ -20,6 +20,7 @@ extern opt_ior_easy ior_easy_o;
 
 typedef struct{
   int no_run;
+  int collective;
   char * api;
   char * hintsFileName;
 

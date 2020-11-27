@@ -9,6 +9,7 @@ typedef struct{
   char * api;
 
   uint64_t files_per_proc;
+  uint64_t files_per_dir;
   char * command;
 } opt_mdtest_generic;
 

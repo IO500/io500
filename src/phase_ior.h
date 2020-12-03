@@ -35,7 +35,8 @@ typedef struct{
   char * api;
   char * hintsFileName;
 
-  int segments;
+  int random_prefill_bytes;
+  uint64_t block_size;
   int verbosity;
 } opt_ior_rnd;
 

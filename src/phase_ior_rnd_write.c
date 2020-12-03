@@ -36,6 +36,9 @@ static double run(void){
   u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-k");
+  if(d.random_prefill_bytes > 0){
+    u_argv_push_printf(argv, "--randomPrefill=%u", d.random_prefill_bytes);
+  }
 
   o.command = u_flatten_argv(argv);
 

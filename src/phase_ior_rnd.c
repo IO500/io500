@@ -78,9 +78,6 @@ void ior_rnd_add_params(u_argv_t * argv){
   u_argv_push(argv, "4096");
   u_argv_push(argv, "-b");
   u_argv_push_printf(argv, "%ld", d.block_size);
-  if(d.random_prefill_bytes > 0){
-    u_argv_push_printf(argv, "--randomPrefill=%u", d.random_prefill_bytes);
-  }
   u_argv_push(argv, "-s");
   u_argv_push_printf(argv, "%d", 10000000);
 }

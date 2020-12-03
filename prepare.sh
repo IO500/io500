@@ -7,7 +7,7 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=b12742e1ad92195059a3341eebd648c073859a41
+IOR_HASH=21237e019a5a
 PFIND_HASH=62c3a7e31
 
 INSTALL_DIR=$PWD
@@ -66,7 +66,8 @@ function get_pfind {
 function build_ior {
   pushd $BUILD/ior
   ./bootstrap
-  ./configure --prefix=$INSTALL_DIR --with-S3-libs3 LDFLAGS="/home/kunkel/ur-git/ior/ior-master/S3EmbeddedLib/libS3.so"
+  # Add here extra flags
+  ./configure --prefix=$INSTALL_DIR
   cd src
   $MAKE clean
   $MAKE install

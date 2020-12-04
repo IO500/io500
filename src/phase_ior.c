@@ -20,7 +20,7 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   }
   INFO_PAIR("accessed-pairs", "%zu\n", p->pairs_accessed);
 
-  PRINT_PAIR("throughput-stonewall","%.2f\n", p->stonewall_avg_data_accessed / p->time / GIBIBYTE * opt.mpi_size);
+  PRINT_PAIR("throughput-stonewall","%.2f\n", p->stonewall_avg_data_accessed * opt.mpi_size / p->stonewall_time / GIBIBYTE);
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
 
   return tp;

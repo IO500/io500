@@ -22,7 +22,7 @@ static double run(void){
   opt_mdworkbench d = mdworkbench_o;
 
   u_argv_t * argv = u_argv_create();
-  mdworkbench_add_params(argv);
+  mdworkbench_add_params(argv, 1);
   u_argv_push(argv, "-1");
 
   o.command = u_flatten_argv(argv);
@@ -42,7 +42,7 @@ static double run(void){
 
 u_phase_t p_mdworkbench_create = {
   "mdworkbench-create",
-  IO500_PHASE_WRITE,
+  IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL,
   option,
   NULL,
   run,

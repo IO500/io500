@@ -309,9 +309,9 @@ int main(int argc, char ** argv){
   for(int i=0; i < IO500_PHASES; i++){
     u_phase_t * phase = phases[i];
     if(! phase->run) continue;
-    if( cleanup_only && phase->type != IO500_PHASE_REMOVE ) continue;
+    if( cleanup_only && ! (phase->type & IO500_PHASE_REMOVE) ) continue;
 
-    if(opt.drop_caches && phase->type != IO500_PHASE_DUMMY){
+    if(opt.drop_caches && ! (phase->type & IO500_PHASE_DUMMY) ){
       DEBUG_INFO("Dropping cache\n");
       if(opt.rank == 0)
         u_call_cmd("LANG=C free -m");
@@ -341,7 +341,7 @@ int main(int argc, char ** argv){
         char score_str[40];
         sprintf(score_str, "%f", score);
         dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", (score == 0.0 ||
-		  (phase->type == IO500_PHASE_WRITE && runtime < opt.minwrite)) ?
+		  ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite)) ?
 			"-invalid" : "",
 		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
       }

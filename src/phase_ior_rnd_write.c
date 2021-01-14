@@ -53,7 +53,7 @@ static double run(void){
 
 u_phase_t p_ior_rnd_write = {
   "ior-rnd-write",
-  IO500_PHASE_WRITE,
+  IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,
   run,

@@ -28,6 +28,16 @@ static void validate(void){
       FATAL("The hintsFileName must be a readable file %s\n", ior_rnd_o.hintsFileName);
     }
   }
+  opt_ior_rnd d = ior_rnd_o;
+  if(d.block_size < 1024){
+    FATAL("Random blocksize must be larger than 1024\n");
+  }
+  if(d.random_prefill_bytes > 0 && (d.block_size % d.random_prefill_bytes) != 0){
+    FATAL("Random prefill bytes must divide blocksize\n");
+  }
+  if(d.random_prefill_bytes > 0 && d.block_size < d.random_prefill_bytes){
+    FATAL("Random prefill bytes must be < blocksize\n");
+  }
   u_create_datadir("ior-rnd");
 }
 
@@ -38,17 +48,8 @@ static void cleanup(void){
     unlink(filename);
   }
   if(opt.rank == 0){
+    u_purge_file("ior-rnd/file");
     u_purge_datadir("ior-rnd");
-  }
-  opt_ior_rnd d = ior_rnd_o;
-  if(d.block_size < 1024){
-    FATAL("Random blocksize must be larger than 1024\n");
-  }
-  if(d.random_prefill_bytes > 0 && (d.block_size % d.random_prefill_bytes) != 0){
-    FATAL("Random prefill bytes must divide blocksize\n");
-  }
-  if(d.random_prefill_bytes > 0 && d.block_size < d.random_prefill_bytes){
-    FATAL("Random prefill bytes must be < blocksize\n");
   }
 }
 
@@ -61,7 +62,7 @@ void ior_rnd_add_params(u_argv_t * argv){
   }
   u_argv_push(argv, "-Q");
   u_argv_push(argv, "1");
-  u_argv_push(argv, "-F");
+  //u_argv_push(argv, "-F");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
   u_argv_push(argv, "4711");

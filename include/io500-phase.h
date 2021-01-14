@@ -12,12 +12,14 @@ typedef enum {
   IO500_SCORE_LAST
 } io500_phase_score_group;
 
+// bitfield of the type
 typedef enum {
-  IO500_PHASE_DUMMY,
-  IO500_PHASE_WRITE,
-  IO500_PHASE_READ,
-  IO500_PHASE_UPDATE,
-  IO500_PHASE_REMOVE,
+  IO500_PHASE_DUMMY = 1,
+  IO500_PHASE_WRITE = 2,
+  IO500_PHASE_READ = 4,
+  IO500_PHASE_UPDATE = 8,
+  IO500_PHASE_REMOVE = 16,
+  IO500_PHASE_FLAG_OPTIONAL = 32
 } io500_phase_type;
 
 typedef struct{

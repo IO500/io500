@@ -250,7 +250,7 @@ static void validate(void){
 
 u_phase_t p_find_hard = {
   "find-hard",
-  IO500_PHASE_READ,
+  IO500_PHASE_READ | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,
   run,

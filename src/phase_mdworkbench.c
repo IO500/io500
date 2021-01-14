@@ -45,7 +45,7 @@ void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** r
 
 
 
-void mdworkbench_add_params(u_argv_t * argv){
+void mdworkbench_add_params(u_argv_t * argv, int is_create){
   opt_mdworkbench * d = & mdworkbench_o;
 
   u_argv_push(argv, "./md-workbench");
@@ -69,13 +69,41 @@ void mdworkbench_add_params(u_argv_t * argv){
     files_per_proc = d->files_per_proc;
   }else{
     mdtest_generic_res* mdtest = mdtest_easy_write_get_result();
+    char file[2048];
+    sprintf(file, "%s/mdworkbench-size", opt.resdir);
+    if (is_create && opt.rank == 0){
+      // store the actual processed size, allows easy deletion
+      FILE * f = fopen(file, "w");
+      if(! f){
+        WARNING("Couldn't open mdworkbench-file: %s\n", file);
+      }else{
+        fwrite(& mdtest->rate, sizeof(mdtest->rate), 1, f);
+      }
+      fclose(f);
+    }
+    if(! is_create && mdtest->rate <= 0.0){
+      // read the size back as this is a deletion run
+      if(opt.rank == 0){
+        FILE * f = fopen(file, "r");
+        if(! f){
+          WARNING("Couldn't open mdworkbench-file: %s\n", file);
+        }else{
+          fread(& mdtest->rate, sizeof(mdtest->rate), 1, f);
+        }
+        fclose(f);
+      }
+      MPI_Bcast(& mdtest->rate, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    }
     if( mdtest->rate <= 0.0 ){
-      WARNING("MDWorkbench uses the MDTest rates to determine suitable options but MDTest didn't run, will use a low (and sane) default instead\n");
+      if(opt.rank == 0){
+        WARNING("MDWorkbench uses the MDTest rates to determine suitable options but MDTest didn't run, will use a low (and sane) default instead\n");
+      }
       mdtest->rate = 10.0;
     }
     // run for 60s
     int time = opt.stonewall < 60 ? opt.stonewall : 60;
     precreate_per_set = (uint64_t) (mdtest->rate * time * 1000 / opt.mpi_size) / 10;
+
     files_per_proc = precreate_per_set;
   }
   // we have 10 sets

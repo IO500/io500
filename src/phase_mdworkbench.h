@@ -15,7 +15,7 @@ typedef struct{
 
 extern opt_mdworkbench mdworkbench_o;
 
-void mdworkbench_add_params(u_argv_t * argv);
+void mdworkbench_add_params(u_argv_t * argv, int is_create);
 void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out);
 
 #endif

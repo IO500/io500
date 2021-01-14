@@ -48,7 +48,7 @@ static void cleanup(void){
     unlink(filename);
   }
   if(opt.rank == 0){
-    u_purge_file("ior-rnd/file");
+    //u_purge_file("ior-rnd/file");
     u_purge_datadir("ior-rnd");
   }
 }

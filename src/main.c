@@ -334,17 +334,19 @@ int main(int argc, char ** argv){
     double score = phase->run();
     double runtime = GetTimeStamp() - start;
 
-    if(phase->group > IO500_NO_SCORE){
-      if(opt.rank == 0){
-        PRINT_PAIR("score", "%f\n", score);
+    if(opt.rank == 0){
+      PRINT_PAIR("score", "%f\n", score);
 
-        char score_str[40];
-        sprintf(score_str, "%f", score);
-        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", (score == 0.0 ||
-		  ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite)) ?
-			"-invalid" : "",
-		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
+      char score_str[40];
+      sprintf(score_str, "%f", score);
+      if(phase->group > IO500_NO_SCORE){
+        dupprintf("[RESULT%s]", (score == 0.0 || ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite)) ? "-invalid" : "");
+      }else{
+        dupprintf("[      ]");
       }
+      dupprintf(" %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
+    }
+    if(phase->group > IO500_NO_SCORE){
       u_hash_update_key_val_dbl(& score_hash, phase->name, score);
     }
     phases[i]->score = score;

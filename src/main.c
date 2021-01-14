@@ -122,6 +122,33 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 #define dupprintf(...) do{ if(opt.rank == 0) { fprintf(res_summary, __VA_ARGS__); printf(__VA_ARGS__); } }while(0);
 
+static double calc_score(double scores[IO500_SCORE_LAST], int extended){
+  double overall_score = 1;
+  for(int g=1; g < IO500_SCORE_LAST; g++){
+    char score_string[2048];
+    char *p = score_string;
+    double score = 1;
+    int numbers = 0;
+    p += sprintf(p, " %s = (", io500_phase_str[g]);
+    for(int i=0; i < IO500_PHASES; i++){
+      if(phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
+        double t = phases[i]->score;
+        score *= t;
+        if(numbers > 0)
+          p += sprintf(p, " * ");
+        numbers++;
+        p += sprintf(p, "%.8f", t);
+      }
+    }
+    DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
+    score = pow(score, 1.0/numbers);
+    scores[g] = score;
+    PRINT_PAIR(io500_phase_str[g], "%f\n", score);
+
+    overall_score *= score;
+  }
+  return sqrt(overall_score);
+}
 
 int main(int argc, char ** argv){
   int mpi_init = 0;
@@ -340,7 +367,7 @@ int main(int argc, char ** argv){
       char score_str[40];
       sprintf(score_str, "%f", score);
       if(phase->group > IO500_NO_SCORE){
-        dupprintf("[RESULT%s]", (score == 0.0 || ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite)) ? "-invalid" : "");
+        dupprintf("[RESULT%s]", (score == 0.0 || ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite && ! (phase->type & IO500_PHASE_FLAG_WRITE_ACCEPT_SHORT))) ? "-invalid" : "");
       }else{
         dupprintf("[      ]");
       }
@@ -370,44 +397,22 @@ int main(int argc, char ** argv){
   if(opt.rank == 0){
     // compute the overall score
     fprintf(file_out, "\n[SCORE]\n");
-    double overall_score = 1;
     double scores[IO500_SCORE_LAST];
-
-    for(int g=1; g < IO500_SCORE_LAST; g++){
-      char score_string[2048];
-      char *p = score_string;
-      double score = 1;
-      int numbers = 0;
-      p += sprintf(p, " %s = (", io500_phase_str[g]);
-      for(int i=0; i < IO500_PHASES; i++){
-        if(phases[i]->group == g){
-          double t = phases[i]->score;
-          score *= t;
-          if(numbers > 0)
-            p += sprintf(p, " * ");
-          numbers++;
-          p += sprintf(p, "%.8f", t);
-        }
-      }
-      DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
-      score = pow(score, 1.0/numbers);
-      scores[g] = score;
-      PRINT_PAIR(io500_phase_str[g], "%f\n", score);
-      u_hash_update_key_val_dbl(& score_hash, io500_phase_str[g], score);
-
-      overall_score *= score;
-    }
-    overall_score = sqrt(overall_score);
+    double overall_score = calc_score(scores, 0);
     PRINT_PAIR("SCORE", "%f %s\n", overall_score, opt.is_valid_run ? "" : " [INVALID]");
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
       u_hash_update_key_val(& score_hash, "valid", "NO");
     }
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
-
     dupprintf("[SCORE%s] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n",
-      opt.is_valid_run ? "" : "-invalid",
-      scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
+    opt.is_valid_run ? "" : "-invalid",
+    scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
+
+    fprintf(file_out, "\n[SCORE EXTENDED]\n");
+    double overall_extended_score = calc_score(scores, 1);
+    PRINT_PAIR("SCORE", "%f %s\n", overall_extended_score, opt.is_valid_run ? "" : " [INVALID]");
+    dupprintf("[SCORE_EXTENDED] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n", scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_extended_score);
 
     printf("\nThe result files are stored in the directory: %s\n", opt.resdir);
   }

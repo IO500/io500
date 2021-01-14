@@ -53,7 +53,7 @@ static double run(void){
 
 u_phase_t p_mdworkbench_bench = {
   "mdworkbench-bench",
-  IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL,
+  IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL | IO500_PHASE_FLAG_WRITE_ACCEPT_SHORT,
   option,
   NULL,
   run,

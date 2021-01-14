@@ -35,7 +35,8 @@ static double run(void){
   PRINT_PAIR("maxOpTime", "%f\n", o.res->result[0].max_op_time);
   PRINT_PAIR("score", "%f\n", o.res->result[0].rate / 1000.0);
 
-  return 0;
+  double rate = o.res->result[0].rate;
+  return rate / 1000.0;
 }
 
 

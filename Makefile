@@ -20,40 +20,42 @@ vpath %.h $(SEARCHPATH)
 .SUFFIXES:
 
 DEPS += io500-util.h io500-debug.h io500-opt.h
-OBJS += util.o
-OBJS += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
-OBJS += phase_find.o phase_find_easy.o phase_find_hard.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd.o phase_ior_rnd_write.o phase_ior_rnd_read.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o
+OBJSO += util.o
+OBJSO += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
+OBJSO += phase_find.o phase_find_easy.o phase_find_hard.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd.o phase_ior_rnd_write.o phase_ior_rnd_read.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o
+
+OBJS = $(patsubst %,./build/%,$(OBJSO))
 
 TESTS += ini-test
-TESTSEXE = $(patsubst %,%.exe,$(TESTS))
+TESTSEXE = $(patsubst %,./build/%.exe,$(TESTS))
 
 all: $(VERIFIER) $(PROGRAM) $(TESTSEXE)
 
-%.exe: %.o $(DEPS) io500.a
-	@echo LD $@
-	$(CC) -o $@ $< $(LDFLAGS) io500.a
-
 clean:
 	@echo CLEAN
-	@$(RM) *.o io500.a *.exe $(PROGRAM)
+	@$(RM) ./build/*.o ./build/io500.a *.exe $(PROGRAM)
 
-io500.a: $(OBJS)
+./build/io500.a: $(OBJS)
 	@echo AR $@
 	ar rcsT $@ $(OBJS)
 
-$(VERIFIER): verifier.o io500.a
+$(VERIFIER): ./build/verifier.o ./build/io500.a
 	@echo LD $@
-	$(CC) -o $@ verifier.o io500.a $(LDFLAGS)
+	$(CC) -o $@ ./build/verifier.o ./build/io500.a $(LDFLAGS)
 
-$(PROGRAM): io500.a main.o
+$(PROGRAM): ./build/io500.a ./build/main.o
 	@echo LD $@
-	$(CC) -o $@ main.o $(LDFLAGS) io500.a ./build/pfind/pfind.a ./build/ior/src/libaiori.a  $(LDFLAGS)
+	$(CC) -o $@ ./build/main.o $(LDFLAGS) ./build/io500.a ./build/pfind/pfind.a ./build/ior/src/libaiori.a  $(LDFLAGS)
 
-.PHONY: main.o
-main.o: main.c $(DEPS)
+.PHONY: ./build/main.o
+./build/main.o: main.c $(DEPS)
 	@echo CC $@
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-%.o: %.c $(DEPS)
+./build/%.o: %.c $(DEPS)
 	@echo CC $@
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+./build/%.exe: ./build/%.o $(DEPS) ./build/io500.a
+	@echo LD $@
+	$(CC) -o $@ $< $(LDFLAGS) ./build/io500.a

@@ -11,7 +11,7 @@ static ini_option_t option[] = {
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_hard_o.hintsFileName},
   {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_hard_o.segments},
   {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & ior_hard_o.collective},  
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_hard_o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_hard_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_hard_o.verbosity},
   {NULL} };
 

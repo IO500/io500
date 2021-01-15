@@ -13,7 +13,7 @@ static opt_mdtest_easy_delete o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.g.api},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & o.g.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.g.run},
   {NULL} };
 
 
@@ -29,7 +29,7 @@ static double run(void){
   opt_mdtest_easy d = mdtest_easy_o;
   mdtest_add_generic_params(argv, & d.g, & o.g);
 
-  if(opt.dry_run || o.g.no_run  == 1 || mdtest_easy_o.g.no_run == 1){
+  if(opt.dry_run || o.g.run == 0 || mdtest_easy_o.g.run == 0){
     u_argv_free(argv);
     return 0;
   }

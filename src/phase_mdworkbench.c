@@ -17,7 +17,7 @@ static ini_option_t option[] = {
   {"waitingTime", "Waiting time of an IO operation relative to runtime (1.0 is 100%%)", 0, INI_FLOAT, "0.0", & mdworkbench_o.waiting_time},
   {"precreatePerSet", "Files to precreate per set (always 10 sets), this is normally dynamically determined", 0, INI_UINT64, NULL, & mdworkbench_o.precreate_per_set},
   {"filesPerProc", "Files to run per iteration and set (always 10 sets), this is normally dynamically determined", 0, INI_UINT64, NULL, & mdworkbench_o.files_per_proc},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & mdworkbench_o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & mdworkbench_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & mdworkbench_o.verbosity},
   {NULL} };
 

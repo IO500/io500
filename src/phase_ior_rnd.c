@@ -10,7 +10,7 @@ static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_rnd_o.api},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_rnd_o.hintsFileName},
   {"blockSize", "Size of a random block, change only if explicitly allowed", 0, INI_UINT64, "1073741824", & ior_rnd_o.block_size},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_rnd_o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_rnd_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_rnd_o.verbosity},
   {"randomPrefill", "Prefill the file with this blocksize in bytes, e.g., 2097152", 0, INI_INT, "0", & ior_rnd_o.random_prefill_bytes},
   {NULL} };

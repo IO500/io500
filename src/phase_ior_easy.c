@@ -13,7 +13,7 @@ static ini_option_t option[] = {
   {"hintsFileName", "Filename for MPI hint file", 0, INI_STRING, NULL, & ior_easy_o.hintsFileName},
   {"filePerProc", "Create one file per process", 0, INI_BOOL, "TRUE", & ior_easy_o.filePerProc},
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_easy_o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_easy_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_easy_o.verbosity},
   {NULL} };
 

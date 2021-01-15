@@ -13,7 +13,7 @@ typedef struct{
   char * ext_args;
   char * ext_mpi;
   int nproc;
-  int no_run;
+  int run;
   char * command;
 
   pfind_options_t * pfind_o;
@@ -30,7 +30,7 @@ typedef struct{
 static opt_find of;
 
 static double run(void){
-  if(of.no_run == 1) return 0.0;
+  if(of.run == 0) return 0.0;
 
   int ret = 0;
 
@@ -168,14 +168,14 @@ static ini_option_t option[] = {
   {"external-mpi-args", "Startup arguments for external scripts, some MPI's may not support this!", 0, INI_STRING, "", & of.ext_mpi},
   {"external-extra-args", "Extra arguments for the external scripts", 0, INI_STRING, "", & of.ext_args},
   {"nproc", "Set the number of processes for pfind/the external script", 0, INI_UINT, NULL, & of.nproc},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & of.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & of.run},
   {"pfind-queue-length", "Pfind queue length", 0, INI_INT, "10000", & of.pfind_queue_length},
   {"pfind-steal-next", "Pfind Steal from next", 0, INI_BOOL, "FALSE", & of.pfind_steal_from_next},
   {"pfind-parallelize-single-dir-access-using-hashing", "Parallelize the readdir by using hashing. Your system must support this!", 0, INI_BOOL, "FALSE", &  of.pfind_par_single_dir_access_hash},
   {NULL} };
 
 static void validate(void){
-  if(of.no_run == 1) return;
+  if(of.run == 0) return;
   if(of.ext_find){
     struct stat sb;
     int ret = stat(of.ext_find, & sb);

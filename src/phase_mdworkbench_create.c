@@ -6,7 +6,7 @@
 #include <phase_mdworkbench.h>
 
 typedef struct{
-  int no_run;
+  int run;
   char * command;
   mdworkbench_results_t * res;
 } opt_mdworkbench_create;
@@ -14,7 +14,7 @@ typedef struct{
 static opt_mdworkbench_create o;
 
 static ini_option_t option[] = {
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.run},
   {NULL} };
 
 
@@ -27,7 +27,7 @@ static double run(void){
 
   o.command = u_flatten_argv(argv);
   PRINT_PAIR("exe", "%s\n", o.command);
-  if(opt.dry_run || d.no_run == 1){
+  if(opt.dry_run || d.run == 0){
     u_argv_free(argv);
     return 0;
   }

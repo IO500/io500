@@ -5,7 +5,7 @@
 #include <io500-util.h>
 
 typedef struct{
-  int no_run;
+  int run;
   char * api;
   int verbosity;
   float waiting_time;

@@ -5,7 +5,7 @@
 #include <io500-util.h>
 
 typedef struct{
-  int no_run;
+  int run;
   char * api;
 
   int filePerProc;
@@ -19,7 +19,7 @@ typedef struct{
 extern opt_ior_easy ior_easy_o;
 
 typedef struct{
-  int no_run;
+  int run;
   int collective;
   char * api;
   char * hintsFileName;
@@ -31,7 +31,7 @@ typedef struct{
 extern opt_ior_hard ior_hard_o;
 
 typedef struct{
-  int no_run;
+  int run;
   char * api;
   char * hintsFileName;
 

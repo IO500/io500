@@ -41,7 +41,7 @@ static double run(void){
   o.command = u_flatten_argv(argv);
 
   PRINT_PAIR("exe", "%s\n", o.command);
-  if(opt.dry_run || d.no_run == 1){
+  if(opt.dry_run || d.run == 0){
     u_argv_free(argv);
     return 0;
   }

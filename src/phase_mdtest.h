@@ -5,7 +5,7 @@
 #include <io500-util.h>
 
 typedef struct{
-  int no_run;
+  int run;
   char * api;
 
   uint64_t files_per_proc;

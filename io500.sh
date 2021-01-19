@@ -14,30 +14,31 @@
 # similar, then this is the right place to do it.
 
 # This script takes its parameters from the same .ini file as io500 binary.
-io500_ini="$1" # You can set the ini file here
+io500_ini="$1"          # You can set the ini file here
+io500_mpirun="mpiexec"
+io500_mpiargs="-np 2"
 
-function setup {
-  io500_mpirun="mpiexec"
-  io500_mpiargs="-np 2"
-
-  mkdir -p $io500_workdir $io500_resultdir
+function setup(){
+  local workdir="$1"
+  local resultdir="$2"
+  mkdir -p $workdir $resultdir
 
   # Example commands to create output directories for Lustre.  Creating
   # top-level directories is allowed, but not the whole directory tree.
-  #if (( $(lfs df $io500_workdir | grep -c MDT) > 1 )); then
-  #  lfs setdirstripe -D -c -1 $io500_workdir
+  #if (( $(lfs df $workdir | grep -c MDT) > 1 )); then
+  #  lfs setdirstripe -D -c -1 $workdir
   #fi
-  #lfs setstripe -c 1 $io500_workdir
-  #mkdir $io500_workdir/ior-easy $io500_workdir/ior-hard
-  #mkdir $io500_workdir/mdtest-easy $io500_workdir/mdtest-hard
-  #local osts=$(lfs df $io500_workdir | grep -c OST)
+  #lfs setstripe -c 1 $workdir
+  #mkdir $workdir/ior-easy $workdir/ior-hard
+  #mkdir $workdir/mdtest-easy $workdir/mdtest-hard
+  #local osts=$(lfs df $workdir | grep -c OST)
   # Try overstriping for ior-hard to improve scaling, or use wide striping
-  #lfs setstripe -C $((osts * 4)) $io500_workdir/ior-hard ||
-  #  lfs setstripe -c -1 $io500_workdir/ior-hard
+  #lfs setstripe -C $((osts * 4)) $workdir/ior-hard ||
+  #  lfs setstripe -c -1 $workdir/ior-hard
   # Try to use DoM if available, otherwise use default for small files
-  #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-easy || true #DoM?
-  #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-hard || true #DoM?
-  #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-rnd
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-easy || true #DoM?
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-hard || true #DoM?
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-rnd
 }
 
 # *****  YOU SHOULD NOT EDIT ANYTHING BELOW THIS LINE  *****
@@ -109,7 +110,7 @@ function main {
   # the directory where the output results will be kept
   export io500_resultdir=$(get_ini_global_param resultdir $PWD/results)/$ts
 
-  setup
+  setup $io500_workdir $io500_resultdir
   run_benchmarks
 
   if [[ ! -s "system-information.txt" ]]; then

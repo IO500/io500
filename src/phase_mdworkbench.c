@@ -69,6 +69,8 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
     files_per_proc = d->files_per_proc;
   }else{
     mdtest_generic_res* mdtest = mdtest_easy_write_get_result();
+    MPI_Bcast(& mdtest->rate, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
     char file[2048];
     sprintf(file, "%s/mdworkbench-size", opt.resdir);
     if (is_create && opt.rank == 0){

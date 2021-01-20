@@ -9,10 +9,6 @@
 # "system-information.txt" file, by pasting the output of the info-creator.
 # This file contains details of your system hardware for your submission.
 
-# Set directories where benchmark files are created and where the results go.
-# If you want to set up stripe tuning on your output directories or anything
-# similar, then this is the right place to do it.
-
 # This script takes its parameters from the same .ini file as io500 binary.
 io500_ini="$1"          # You can set the ini file here
 io500_mpirun="mpiexec"

@@ -50,13 +50,16 @@ void ior_hard_add_params(u_argv_t * argv){
   for(int i=0; i < ior_hard_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
+  if(opt.io_buffers_on_gpu){
+    u_argv_push(argv, "-O");
+    u_argv_push(argv, "allocateBufferOnGPU=1");
+  }
   u_argv_push(argv, "-C");
   u_argv_push(argv, "-Q");
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");
-  u_argv_push(argv, "-G");
   int hash = u_phase_unique_random_number("ior-hard");
-  u_argv_push_printf(argv, "%d", hash);
+  u_argv_push_printf(argv, "-G=%d", hash);
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");
   u_argv_push(argv, "-o");

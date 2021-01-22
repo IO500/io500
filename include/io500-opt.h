@@ -19,6 +19,7 @@ typedef struct{
 
   int rank;
   int mpi_size;
+  int io_buffers_on_gpu; /* are the I/O buffers to be allocated on a GPU */
 
   char * api;
   char * apiArgs; // for IOR and mdtest

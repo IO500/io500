@@ -60,28 +60,26 @@ void ior_rnd_add_params(u_argv_t * argv){
   for(int i=0; i < ior_rnd_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
-  u_argv_push(argv, "-Q");
-  u_argv_push(argv, "1");
+  if(opt.io_buffers_on_gpu){
+    u_argv_push(argv, "-O");
+    u_argv_push(argv, "allocateBufferOnGPU=1");
+  }
+  u_argv_push(argv, "-Q=1");
   //u_argv_push(argv, "-F");
   u_argv_push(argv, "-g");
-  u_argv_push(argv, "-G");
   int hash = u_phase_unique_random_number("ior-random");
-  u_argv_push_printf(argv, "%d", hash);
+  u_argv_push_printf(argv, "-G=%d", hash);
   u_argv_push(argv, "-z");
   u_argv_push(argv, "--random-offset-seed=11");
   u_argv_push(argv, "-e");
-  u_argv_push(argv, "-o");
-  u_argv_push_printf(argv, "%s/ior-rnd/file", opt.datadir);
+  u_argv_push_printf(argv, "-o=%s/ior-rnd/file", opt.datadir);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-rnd.stonewall", opt.resdir );
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
-  u_argv_push(argv, "-t");
-  u_argv_push(argv, "4096");
-  u_argv_push(argv, "-b");
-  u_argv_push_printf(argv, "%ld", d.block_size);
-  u_argv_push(argv, "-s");
-  u_argv_push_printf(argv, "%d", 10000000);
+  u_argv_push(argv, "-t=4096");
+  u_argv_push_printf(argv, "-b=%ld", d.block_size);
+  u_argv_push_printf(argv, "-s=%d", 10000000);
 }
 
 u_phase_t p_ior_rnd = {

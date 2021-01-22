@@ -31,6 +31,9 @@ void mdtest_easy_add_params(u_argv_t * argv){
   opt_mdtest_easy d = mdtest_easy_o;
 
   u_argv_push(argv, "./mdtest");
+  if(opt.io_buffers_on_gpu){
+    u_argv_push(argv, "--allocateBufferOnGPU");
+  }
   u_argv_push(argv, "-n");
   u_argv_push_printf(argv, "%"PRIu64, d.g.files_per_proc);
   u_argv_push(argv, "-u");

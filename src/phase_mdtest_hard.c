@@ -32,6 +32,9 @@ void mdtest_hard_add_params(u_argv_t * argv){
   opt_mdtest_hard d = mdtest_hard_o;
 
   u_argv_push(argv, "./mdtest");
+  if(opt.io_buffers_on_gpu){
+    u_argv_push(argv, "--allocateBufferOnGPU");
+  }
   u_argv_push(argv, "-n");
   u_argv_push_printf(argv, "%"PRIu64, d.g.files_per_proc);
 
@@ -45,9 +48,8 @@ void mdtest_hard_add_params(u_argv_t * argv){
   u_argv_push(argv, "-e");
   u_argv_push(argv, "3901");
   u_argv_push(argv, "-P");
-  u_argv_push(argv, "-G");
-  int hash = u_phase_unique_random_number("mdtest-easy");
-  u_argv_push_printf(argv, "%d", hash);  
+  int hash = u_phase_unique_random_number("mdtest-hard");
+  u_argv_push_printf(argv, "-G=%d", hash);
   u_argv_push(argv, "-N");
   u_argv_push(argv, "1");
   u_argv_push(argv, "-F");

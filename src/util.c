@@ -32,8 +32,13 @@ uint32_t u_hash_update(uint32_t hash, char const * str){
 uint32_t u_phase_unique_random_number(char const * phase_name){
   uint32_t hash = 0;
   hash = u_hash_update(hash, phase_name);
-  return u_hash_update(hash, opt.timestamp);
+  hash = u_hash_update(hash, opt.timestamp);
+  if(hash == 0 || hash == -1){
+    return 4711;
+  }
+  return hash;
 }
+
 
 void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val){
   uint32_t hsh = 0;

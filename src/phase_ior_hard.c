@@ -10,7 +10,7 @@ static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_hard_o.api},
   {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_hard_o.hintsFileName},
   {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_hard_o.segments},
-  {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & ior_hard_o.collective},  
+  {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & ior_hard_o.collective},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_hard_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_hard_o.verbosity},
   {NULL} };
@@ -55,7 +55,8 @@ void ior_hard_add_params(u_argv_t * argv){
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
-  u_argv_push(argv, "27");
+  int hash = ior_random_number("hard");
+  u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");
   u_argv_push(argv, "-o");

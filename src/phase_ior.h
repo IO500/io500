@@ -47,9 +47,6 @@ void ior_easy_add_params(u_argv_t * argv);
 void ior_hard_add_params(u_argv_t * argv);
 void ior_rnd_add_params(u_argv_t * argv);
 
-/* compute a unique random number based on the phase and the timestamp */
-uint32_t ior_random_number(char const * phase_name);
-
 // Generic helpers
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);
 double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);

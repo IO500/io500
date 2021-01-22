@@ -1,12 +1,6 @@
 #include <phase_ior.h>
 #include <assert.h>
 
-uint32_t ior_random_number(char const * phase_name){
-  uint32_t hash = 0;
-  hash = u_hash_update(hash, phase_name);
-  return u_hash_update(hash, opt.timestamp);
-}
-
 
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   IOR_test_t * test = ior_run(argv->size, argv->vector, MPI_COMM_WORLD, out);

@@ -55,7 +55,7 @@ void ior_hard_add_params(u_argv_t * argv){
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
-  int hash = ior_random_number("hard");
+  int hash = u_phase_unique_random_number("ior-hard");
   u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");

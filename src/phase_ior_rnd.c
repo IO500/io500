@@ -65,7 +65,7 @@ void ior_rnd_add_params(u_argv_t * argv){
   //u_argv_push(argv, "-F");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
-  int hash = ior_random_number("random");
+  int hash = u_phase_unique_random_number("ior-random");
   u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-z");
   u_argv_push(argv, "--random-offset-seed=11");

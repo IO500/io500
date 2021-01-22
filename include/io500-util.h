@@ -85,6 +85,8 @@ void * u_malloc(int size);
 FILE * u_res_file_prep(char const * name);
 void u_res_file_close(FILE * out);
 
+uint32_t u_phase_unique_random_number(char const * phase_name);
+
 /**
  * Functions to handle the argument vectors for invoking other APIs
  */

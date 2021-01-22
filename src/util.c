@@ -28,6 +28,13 @@ uint32_t u_hash_update(uint32_t hash, char const * str){
   return hash;
 }
 
+/* compute a unique random number based on the phase and the timestamp */
+uint32_t u_phase_unique_random_number(char const * phase_name){
+  uint32_t hash = 0;
+  hash = u_hash_update(hash, phase_name);
+  return u_hash_update(hash, opt.timestamp);
+}
+
 void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val){
   uint32_t hsh = 0;
   hsh = u_hash_update(hsh, key);

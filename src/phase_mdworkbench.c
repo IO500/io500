@@ -112,7 +112,8 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
   u_argv_push(argv, "-D=10");
   PRINT_PAIR("filesPerProc", "%"PRIu64"\n", files_per_proc);
   PRINT_PAIR("precreatePerSet", "%"PRIu64"\n", precreate_per_set);
-
+  int hash = u_phase_unique_random_number("md-workbench");
+  u_argv_push_printf(argv, "-G=%d", hash);
   u_argv_push_printf(argv, "-P=%"PRIu64, precreate_per_set);
   u_argv_push_printf(argv, "-I=%"PRIu64, files_per_proc);
 }

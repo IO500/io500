@@ -25,6 +25,7 @@ static double run(void){
   mdworkbench_add_params(argv, 0);
   u_argv_push(argv, "-2");
   u_argv_push(argv, "-R=2");
+  u_argv_push(argv, "-X"); /* turn read verification on */
 
   o.command = u_flatten_argv(argv);
   PRINT_PAIR("exe", "%s\n", o.command);

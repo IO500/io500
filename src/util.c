@@ -301,6 +301,7 @@ void u_verify_result_files(ini_section_t ** cfg, char const * result){
   hash = u_ini_gen_hash(cfg);
   u_ini_parse_file(result, NULL, hash_func, NULL);
 
+  printf("[run]");
   printf("config-hash     = %s\n", res_data.cfg_hash_read);
   printf("score-hash      = %s\n", res_data.score_hash_read);
 

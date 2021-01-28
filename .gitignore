@@ -9,6 +9,7 @@ io500-verify
 system-information.txt
 
 # Temporary files
+*.pyc
 *.orig
 *.tmp
 *.swo

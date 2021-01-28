@@ -10,21 +10,6 @@ import re
 #
 # You can then copy the site-io500.json template file and modify it using this tool
 
-if len(sys.argv) < 3:
-  print("synopsis: %s <FILE> {<TOKEN[=VALUE [UNIT]]>}" % sys.argv[0])
-  print("examples:")
-  print("printing current: %s site.json Site.institution" % sys.argv[0])
-  print("Token examples:")
-  print("changing: Site.StorageSystem.Lustre.OSS.count=5")
-  print("changing options: Site.StorageSystem.Lustre.features=DNE1;DNE2")
-  print("changing a numeric value \"Site.IO500.IOR.easy write = 351.2 GiB/s\"")
-  print("setting a value for a second Lustre (for multiple schemes): Site.StorageSystem.Lustre[1].OSS.count=5")
-  sys.exit(1)
-
-file = sys.argv[1]
-schemafile = "schema-io500.json"
-value = None # currently parsed value
-
 def parse_full_val(val, schema_data):
   global units
   tmp = val
@@ -159,18 +144,35 @@ def process(data, schema, tokens):
     else:
       print("Error: cannot validate path (or value): %s" % token)
 
-with open(schemafile, 'r') as f:
-  schema = json.load(f)
-  templates = schema["SCHEMES"]
-  units = schema["UNITS"]
+def edit_infos(file, tokens, schemafile = "schema-io500.json"):
+  global units, templates, schema
+  with open(schemafile, 'r') as f:
+    schema = json.load(f)
+    templates = schema["SCHEMES"]
+    units = schema["UNITS"]
 
-with open(file, 'r+') as f:
-    data = json.load(f)
-    process(data["DATA"], schema["SYSTEM"], sys.argv[2:])
+  with open(file, 'r+') as f:
+      data = json.load(f)
+      process(data["DATA"], schema["SYSTEM"], tokens)
 
-    f.seek(0)
-    json.dump(data, f, indent=2)
-    f.truncate()
+      f.seek(0)
+      json.dump(data, f, indent=2)
+      f.truncate()
 
 
-print("OK")
+value = None # currently parsed value
+
+if __name__ == "__main__":
+  if len(sys.argv) < 3:
+    print("Synopsis: %s <FILE> {<TOKEN[=VALUE [UNIT]]>}" % sys.argv[0])
+    print("Examples:")
+    print("printing current: %s site.json Site.institution" % sys.argv[0])
+    print("Token examples:")
+    print("changing: Site.StorageSystem.Lustre.OSS.count=5")
+    print("changing options: Site.StorageSystem.Lustre.features=DNE1;DNE2")
+    print("changing a numeric value \"Site.IO500.IOR.easy write = 351.2 GiB/s\"")
+    print("setting a value for a second Lustre (for multiple schemes): Site.StorageSystem.Lustre[1].OSS.count=5")
+    sys.exit(1)
+  edit_infos(sys.argv[1], sys.argv[2:])
+
+  print("OK")

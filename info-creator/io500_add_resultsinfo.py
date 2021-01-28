@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Parse the IO500 results and load them into the result JSON file
+
 import sys
 import configparser
 from io500_info_editor import edit_infos

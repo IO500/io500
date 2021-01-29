@@ -39,37 +39,42 @@ def parse_full_val(val, schema_data):
   else:
     return val
 
-def processDict(data, token, path, val):
+def processDict(data, token, path, val, replace):
   global value
   cur = token[0].strip()
 
   if len(token) == 1:
     was = ""
     old = ""
+    cval = None
     if cur in data["att"]:
       cval = data["att"][cur]
       if isinstance(cval, list):
         cval = "%s %s" % (cval[0], cval[1])
+      old = cval
       if val != None:
-        old = cval
         was = "   # was: %s" % cval
 
     if val != None:
-      data["att"][cur] = val
+      nval = val
+      if isinstance(val, list):
+        nval = "%s %s" % (val[0], val[1])
+      if cval == nval:
+        was = "   # unchanged"
+      elif not replace and cval:
+        was = "   # won't replace with " + nval
+      if replace or cur not in data["att"]:
+        data["att"][cur] = nval
+        cval = nval
 
     if cur in data["att"]:
-      cval = val
-      if isinstance(val, list):
-        cval = "%s %s" % (val[0], val[1])
-      if cval == old:
-        was = "   # unchanged"
       print("%s = %s%s" % (path, cval, was))
     else:
       print("%s = undefined" % path)
   else:
-    processSingle(data["childs"], token, path, val)
+    processSingle(data["childs"], token, path, val, replace)
 
-def processSingle(data, token, path, val):
+def processSingle(data, token, path, val, replace):
   cur = token.pop(0)
   index = 0
   m = re.search("(.*)\[([0-9]+)\]", cur)
@@ -82,16 +87,16 @@ def processSingle(data, token, path, val):
     for k in range(0, len(data)):
       if data[k]["type"] == cur:
         if index == 0:
-          processDict(data[k], token, path, val)
+          processDict(data[k], token, path, val, replace)
           return
         else:
           index = index - 1
     for k in range(0, index + 1):
       data.append({"type" : cur, "att" : {}, "childs" : [] })
-    processDict(data[len(data)-1], token, path, val)
+    processDict(data[len(data)-1], token, path, val, replace)
     return
   if data["type"] == cur:
-    processDict(data, token, path, val)
+    processDict(data, token, path, val, replace)
 
 def validate_in_template(templateNames, cur, token, val, multi = False):
   global templates
@@ -133,7 +138,7 @@ def validate_path_value(schema, token, val):
       return True;
     else:
       return validate_path_value(schema[type], token, val)
-      
+
   if "SCHEMES" in schema:
     ret = validate_in_template(schema["SCHEMES"], cur, token, val)
     if ret != None:
@@ -144,7 +149,7 @@ def validate_path_value(schema, token, val):
       return ret
   return False
 
-def process(data, schema, tokens):
+def process(data, schema, tokens, replace = True):
   global value
   for t in tokens:
     kv = t.split("=")
@@ -152,11 +157,11 @@ def process(data, schema, tokens):
     val = kv[1].strip() if len(kv) == 2 else None
     value = None
     if validate_path_value(schema, list(token), val):
-      processSingle(data, token, kv[0].strip(), value)
+      processSingle(data, token, kv[0].strip(), value, replace)
     else:
       print("Error: cannot validate path (or value): %s" % token)
 
-def edit_infos(sitefile, tokens, schemafile = "schema-io500.json"):
+def edit_infos(sitefile, tokens, replace=True, schemafile = "schema-io500.json"):
   global units, templates, schema
 
   check_requirements(sitefile, schemafile)
@@ -168,7 +173,7 @@ def edit_infos(sitefile, tokens, schemafile = "schema-io500.json"):
 
   with open(sitefile, 'r+') as f:
       data = json.load(f)
-      process(data["DATA"], schema["SYSTEM"], tokens)
+      process(data["DATA"], schema["SYSTEM"], tokens, replace)
 
       f.seek(0)
       json.dump(data, f, indent=2)

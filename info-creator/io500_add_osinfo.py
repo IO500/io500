@@ -18,16 +18,25 @@ json = sys.argv[1]
 supercomputerNumber = sys.argv[2] if len(sys.argv) > 2 else "0"
 nodeNumber = sys.argv[3] if len(sys.argv) > 3 else "0"
 cmd = []
+cmd_noReplace = []
 
-def info(key, val, unit = ""):
-  global cmd, nodeNumber
+def info_(cmd, key, val, unit = ""):
+  global nodeNumber, supercomputerNumber
   val = str(val).strip()
   unit = unit.strip()
   if val == None or val == "":
     return
   cmd.append(("Site.Supercomputer[%s].Nodes[%s]." % (supercomputerNumber, nodeNumber) + key + "=" + val + " " + unit).strip())
 
-info("name", platform.node())
+def info(key, val, unit = ""):
+  global cmd
+  info_(cmd, key, val, unit)
+
+def infoNoReplace(key, val, unit = ""):
+  global cmd_noReplace
+  info_(cmd_noReplace, key, val, unit)
+
+infoNoReplace("name", platform.node())
 info("kernel version", platform.release())
 info("Processor.architecture", platform.processor())
 
@@ -96,3 +105,4 @@ if not os.path.exists("ip.html"):
       info("nationality", m.group(1))
 
 edit_infos(json, cmd)
+edit_infos(json, cmd_noReplace, False)

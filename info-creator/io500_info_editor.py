@@ -44,11 +44,13 @@ def processDict(data, token, path, val):
 
   if len(token) == 1:
     was = ""
+    old = ""
     if cur in data["att"]:
       cval = data["att"][cur]
       if isinstance(cval, list):
         cval = "%s %s" % (cval[0], cval[1])
       if val != None:
+        old = cval
         was = "   # was: %s" % cval
 
     if val != None:
@@ -58,6 +60,8 @@ def processDict(data, token, path, val):
       cval = val
       if isinstance(val, list):
         cval = "%s %s" % (val[0], val[1])
+      if cval == old:
+        was = "   # unchanged"
       print("%s = %s%s" % (path, cval, was))
     else:
       print("%s = undefined" % path)

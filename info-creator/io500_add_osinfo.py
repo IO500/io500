@@ -5,6 +5,7 @@
 import sys
 import platform
 import subprocess
+import os
 import re
 from io500_info_editor import edit_infos
 
@@ -44,10 +45,29 @@ for line in data.split("\n"):
       model_set = True
   if line.startswith("processor"):
     cores = cores + 1
-info("Supercomputer.Nodes.Processor.cores", cores)
+
+def re_add(regex, key, data, group = 1):
+  m = re.search(regex, data)
+  if m:
+    info(key, m.group(group))
+
+try:
+  data = subprocess.check_output("LANG=C lscpu", shell=True, universal_newlines=True).strip()
+  m = re.search("Core\(s\) per socket: *([0-9]+)", data)
+  if m:
+    cores = m.group(1)
+  re_add("Thread\(s\) per core: *([0-9]+)", "Supercomputer.Nodes.Processor.threads per core", data)
+  
+  re_add("Vendor ID: *(.*)", "Supercomputer.Nodes.Processor.vendor", data)
+  re_add("L2 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L2 cache size", data)
+  re_add("L3 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L3 cache size", data)
+
+except:
+  print("Cannot execute lscpu, will continue")
+
+info("Supercomputer.Nodes.Processor.cores per socket", cores)
 
 # OS Information
-
 kv = {}
 with open("/etc/os-release") as f:
   for line in f:
@@ -63,10 +83,15 @@ if "VERSION_ID" in kv:
   info("Supercomputer.Nodes.distribution version", kv["VERSION_ID"])
 
 # Try to find country code using a reverse address
-res = subprocess.check_output("wget https://pbxbook.com/other/where_ip.html -O ip.html", shell=True, universal_newlines=True).strip()
-with open("ip.html") as f:
-  m = re.search("public IP:.*Country:</b> .* / (.*) /", f.read())
-  if m:
-    info("nationality", m.group(1))
+
+if not os.path.exists("ip.html"):
+  try:
+    res = subprocess.check_output("wget https://pbxbook.com/other/where_ip.html -O ip.html", shell=True, universal_newlines=True).strip()
+    with open("ip.html") as f:
+      m = re.search("public IP:.*Country:</b> .* / (.*) /", f.read())
+      if m:
+        info("nationality", m.group(1))
+  except:
+    print("Cannot execute wget, will continue")
 
 edit_infos(json, cmd)

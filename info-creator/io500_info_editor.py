@@ -96,10 +96,10 @@ def processSingle(data, token, path, val):
 def validate_in_template(templateNames, cur, token, val, multi = False):
   global templates
   index = 0
-  m = re.search("(.*)(\[[0-9]+\])", cur)
+  m = re.search("(.*)\[([0-9]+)\]", cur)
   if m:
     cur = m.group(1)
-    index = m.group(2)
+    index = int(m.group(2))
 
   for t in templateNames:
     name = t
@@ -117,7 +117,13 @@ def validate_in_template(templateNames, cur, token, val, multi = False):
 def validate_path_value(schema, token, val):
   global value
   cur = token.pop(0).strip()
-  if cur in schema:
+  type = cur
+
+  m = re.search("(.*)\[([0-9]+)\]", cur)
+  if m:
+    type = m.group(1)
+
+  if type in schema:
     if len(token) == 0:
       # Validate the correctness of the value
       if val:
@@ -126,7 +132,8 @@ def validate_path_value(schema, token, val):
         return value != None
       return True;
     else:
-      return validate_path_value(schema[cur], token, val)
+      return validate_path_value(schema[type], token, val)
+      
   if "SCHEMES" in schema:
     ret = validate_in_template(schema["SCHEMES"], cur, token, val)
     if ret != None:

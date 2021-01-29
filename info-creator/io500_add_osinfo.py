@@ -11,23 +11,25 @@ import subprocess
 from io500_info_editor import edit_infos, execute_download
 
 if len(sys.argv) < 2:
-  print("Synopsis: %s <SYSTEM-JSON>" % sys.argv[0])
+  print("Synopsis: %s <SYSTEM-JSON> [<SupercomputerTypeNumber>] [<NodeTypeNumber>]" % sys.argv[0])
   sys.exit(1)
 
 json = sys.argv[1]
+supercomputerNumber = sys.argv[2] if len(sys.argv) > 2 else "0"
+nodeNumber = sys.argv[3] if len(sys.argv) > 3 else "0"
 cmd = []
 
 def info(key, val, unit = ""):
-  global cmd
+  global cmd, nodeNumber
   val = str(val).strip()
   unit = unit.strip()
   if val == None or val == "":
     return
-  cmd.append(("Site." + key + "=" + val + " " + unit).strip())
+  cmd.append(("Site.Supercomputer[%s].Nodes[%s]." % (supercomputerNumber, nodeNumber) + key + "=" + val + " " + unit).strip())
 
-info("Supercomputer.Nodes.name", platform.node())
-info("Supercomputer.Nodes.kernel version", platform.release())
-info("Supercomputer.Nodes.Processor.architecture", platform.processor())
+info("name", platform.node())
+info("kernel version", platform.release())
+info("Processor.architecture", platform.processor())
 
 # CPU Information
 data = open("/proc/cpuinfo", "r").read()
@@ -41,8 +43,8 @@ for line in data.split("\n"):
       if cpu.find("CPU") > -1:
         cpu = cpu.replace("CPU", "")
       cpu = re.sub("\([^)]*\)", "", cpu)
-      info("Supercomputer.Nodes.Processor.model", cpu)
-      info("Supercomputer.Nodes.Processor.frequency", m.group(3), "GHz")
+      info("Processor.model", cpu)
+      info("Processor.frequency", m.group(3), "GHz")
       model_set = True
   if line.startswith("processor"):
     cores = cores + 1
@@ -57,17 +59,17 @@ try:
   m = re.search("Core\(s\) per socket: *([0-9]+)", data)
   if m:
     cores = m.group(1)
-  re_add("Thread\(s\) per core: *([0-9]+)", "Supercomputer.Nodes.Processor.threads per core", data)
+  re_add("Thread\(s\) per core: *([0-9]+)", "Processor.threads per core", data)
 
-  re_add("Vendor ID: *(.*)", "Supercomputer.Nodes.Processor.vendor", data)
-  re_add("L2 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L2 cache size", data)
-  re_add("L3 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L3 cache size", data)
+  re_add("Vendor ID: *(.*)", "Processor.vendor", data)
+  re_add("L2 cache: *([0-9]+.*)", "Processor.L2 cache size", data)
+  re_add("L3 cache: *([0-9]+.*)", "Processor.L3 cache size", data)
 
 except:
   traceback.print_exc()
   print("Cannot execute lscpu, will continue")
 
-info("Supercomputer.Nodes.Processor.cores per socket", cores)
+info("Processor.cores per socket", cores)
 
 # OS Information
 kv = {}
@@ -80,9 +82,9 @@ if "ID" in kv:
   val = kv["ID"]
   if val == "ubuntu":
     val = "Ubuntu"
-  info("Supercomputer.Nodes.distribution", val)
+  info("distribution", val)
 if "VERSION_ID" in kv:
-  info("Supercomputer.Nodes.distribution version", kv["VERSION_ID"])
+  info("distribution version", kv["VERSION_ID"])
 
 # Try to find country code using a reverse address
 

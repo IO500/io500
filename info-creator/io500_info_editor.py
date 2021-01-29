@@ -167,14 +167,24 @@ def edit_infos(sitefile, tokens, schemafile = "schema-io500.json"):
       json.dump(data, f, indent=2)
       f.truncate()
 
+def execute_download(url, outfile):
+  import subprocess
+  try:
+    subprocess.check_output("wget " + url + " -O " + outfile, shell=True)
+  except:
+    try:
+      subprocess.check_output("curl " + url + " -o " + outfile, shell=True)
+    except:
+      print("Neither wget or curl are working to download! Will abort now.")
+      sys.exit(1)
+
+
 def check_requirements(site, schema = "schema-io500.json"):
   if not os.path.exists(site):
-    import subprocess
     print("Downloading new site specification")
-    subprocess.check_output("wget https://www.vi4io.org/lib/plugins/newcdcl/scripts/site-io500.json -O " + site, shell=True)
+    execute_download("https://www.vi4io.org/lib/plugins/newcdcl/scripts/site-io500.json", site)
   if not os.path.exists(schema):
-    import subprocess
-    subprocess.check_output("wget https://www.vi4io.org/lib/plugins/newcdcl/scripts/schema-io500.json -O " + schema, shell=True)
+    execute_download("https://www.vi4io.org/lib/plugins/newcdcl/scripts/schema-io500.json", schema)
 
 
 value = None # currently parsed value

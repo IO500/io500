@@ -4,10 +4,11 @@
 
 import sys
 import platform
-import subprocess
 import os
 import re
-from io500_info_editor import edit_infos
+import traceback
+import subprocess
+from io500_info_editor import edit_infos, execute_download
 
 if len(sys.argv) < 2:
   print("Synopsis: %s <SYSTEM-JSON>" % sys.argv[0])
@@ -57,12 +58,13 @@ try:
   if m:
     cores = m.group(1)
   re_add("Thread\(s\) per core: *([0-9]+)", "Supercomputer.Nodes.Processor.threads per core", data)
-  
+
   re_add("Vendor ID: *(.*)", "Supercomputer.Nodes.Processor.vendor", data)
   re_add("L2 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L2 cache size", data)
   re_add("L3 cache: *([0-9]+.*)", "Supercomputer.Nodes.Processor.L3 cache size", data)
 
 except:
+  traceback.print_exc()
   print("Cannot execute lscpu, will continue")
 
 info("Supercomputer.Nodes.Processor.cores per socket", cores)
@@ -85,13 +87,10 @@ if "VERSION_ID" in kv:
 # Try to find country code using a reverse address
 
 if not os.path.exists("ip.html"):
-  try:
-    res = subprocess.check_output("wget https://pbxbook.com/other/where_ip.html -O ip.html", shell=True, universal_newlines=True).strip()
-    with open("ip.html") as f:
-      m = re.search("public IP:.*Country:</b> .* / (.*) /", f.read())
-      if m:
-        info("nationality", m.group(1))
-  except:
-    print("Cannot execute wget, will continue")
+  execute_download("https://pbxbook.com/other/where_ip.html", "ip.html")
+  with open("ip.html") as f:
+    m = re.search("public IP:.*Country:</b> .* / (.*) /", f.read())
+    if m:
+      info("nationality", m.group(1))
 
 edit_infos(json, cmd)

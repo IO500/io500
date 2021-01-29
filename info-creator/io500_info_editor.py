@@ -2,6 +2,7 @@
 import sys
 import json
 import re
+import os
 
 # This tool allows to view and edit the options in an existing schema file.
 # In order to get started download the two files:
@@ -148,20 +149,32 @@ def process(data, schema, tokens):
     else:
       print("Error: cannot validate path (or value): %s" % token)
 
-def edit_infos(file, tokens, schemafile = "schema-io500.json"):
+def edit_infos(sitefile, tokens, schemafile = "schema-io500.json"):
   global units, templates, schema
+
+  check_requirements(sitefile, schemafile)
+
   with open(schemafile, 'r') as f:
     schema = json.load(f)
     templates = schema["SCHEMES"]
     units = schema["UNITS"]
 
-  with open(file, 'r+') as f:
+  with open(sitefile, 'r+') as f:
       data = json.load(f)
       process(data["DATA"], schema["SYSTEM"], tokens)
 
       f.seek(0)
       json.dump(data, f, indent=2)
       f.truncate()
+
+def check_requirements(site, schema = "schema-io500.json"):
+  if not os.path.exists(site):
+    import subprocess
+    print("Downloading new site specification")
+    subprocess.check_output("wget https://www.vi4io.org/lib/plugins/newcdcl/scripts/site-io500.json -O " + site, shell=True)
+  if not os.path.exists(schema):
+    import subprocess
+    subprocess.check_output("wget https://www.vi4io.org/lib/plugins/newcdcl/scripts/schema-io500.json -O " + schema, shell=True)
 
 
 value = None # currently parsed value

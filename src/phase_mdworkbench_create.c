@@ -34,7 +34,6 @@ static double run(void){
   FILE * out = u_res_file_prep(p_mdworkbench_create.name);
   mdworkbench_process(argv, out, & o.res);
   PRINT_PAIR("maxOpTime", "%f\n", o.res->result[0].max_op_time);
-  PRINT_PAIR("score", "%f\n", o.res->result[0].rate / 1000.0);
 
   double rate = o.res->result[0].rate;
   return rate / 1000.0;

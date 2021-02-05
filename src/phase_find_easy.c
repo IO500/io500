@@ -238,6 +238,7 @@ static void validate(void){
     of.pfind_com = com;
     if(com != MPI_COMM_NULL) {
       of.pfind_o = pfind_parse_args(argv->size, argv->vector, 0, com);
+      MPI_Comm_size(of.pfind_com, & of.nproc);
     }
 
     u_argv_free(argv);

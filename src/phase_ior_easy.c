@@ -85,7 +85,6 @@ void ior_easy_add_params(u_argv_t * argv){
   if(ior_easy_o.filePerProc){
     u_argv_push(argv, "-F");
   }
-
 }
 
 u_phase_t p_ior_easy = {

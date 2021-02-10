@@ -13,6 +13,8 @@
 
 #include <phase-definitions.h>
 
+#define INVALID_RUN(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s:%d) ", __FILE__, __LINE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_run = 0; } }while(0);
+
 FILE* file_out = NULL;
 
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
@@ -181,6 +183,7 @@ int main(int argc, char ** argv){
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
 
   opt.is_valid_run = 1;
+  opt.is_valid_extended_run = 1;
 
   int verbosity_override = -1;
   int print_help = 0;
@@ -305,7 +308,7 @@ int main(int argc, char ** argv){
   }
 
   if(opt.dry_run){
-    INVALID("DRY RUN MODE ACTIVATED\n");
+    INVALID_RUN("DRY RUN MODE ACTIVATED\n");
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -326,6 +329,7 @@ int main(int argc, char ** argv){
 
   // manage a hash for the scores
   uint32_t score_hash = 0;
+  uint32_t score_extended_hash = 0;
   u_hash_update_key_val(& score_hash, "version", VERSION);
 
   dupprintf("IO500 version %s\n", VERSION);
@@ -355,32 +359,48 @@ int main(int argc, char ** argv){
     }
 
     double start = GetTimeStamp();
+    opt.is_valid_phase = 1;
     double score = phase->run();
     double runtime = GetTimeStamp() - start;
 
     if(opt.rank == 0){
+      // This is an additional sanity check
+      if(! opt.dry_run){
+        if( phases[i]->verify_stonewall && runtime < opt.stonewall ){
+          INVALID("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
+        }else if(score == 0.0 && ! (phase->type & IO500_PHASE_DUMMY)){
+          INVALID("Resulting score shouldn't be 0.0\n");
+        }
+      }
+      if(runtime < opt.minwrite && phases[i]->verify_stonewall){
+        INVALID("Runtime is smaller than expected minimum runtime\n");
+      }
+      if(! opt.is_valid_phase){
+        opt.is_valid_extended_run = 0;
+        if(! (phase->type & IO500_PHASE_FLAG_OPTIONAL)){
+          opt.is_valid_run = 0;
+        }
+      }
       PRINT_PAIR("score", "%f\n", score);
-
+      char * valid_str = opt.is_valid_phase ? "" : " [INVALID]";
       char score_str[40];
       sprintf(score_str, "%f", score);
       if(phase->group > IO500_NO_SCORE){
-        dupprintf("[RESULT%s]", (score == 0.0 || ((phase->type & IO500_PHASE_WRITE) && runtime < opt.minwrite && ! (phase->type & IO500_PHASE_FLAG_WRITE_ACCEPT_SHORT))) ? "-invalid" : "");
+        dupprintf("[RESULT]");
       }else{
         dupprintf("[      ]");
       }
-      dupprintf(" %20s %15s %s : time %.3f seconds\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
+      dupprintf(" %20s %15s %s : time %.3f seconds%s\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime, valid_str);
     }
     if(phase->group > IO500_NO_SCORE){
-      u_hash_update_key_val_dbl(& score_hash, phase->name, score);
+      if(phase->type & IO500_PHASE_FLAG_OPTIONAL){
+        u_hash_update_key_val_dbl(& score_extended_hash, phase->name, score);
+      }else{
+        u_hash_update_key_val_dbl(& score_hash, phase->name, score);
+      }
     }
     phases[i]->score = score;
 
-    // This is an additional sanity check
-    if( phases[i]->verify_stonewall && opt.rank == 0){
-      if(runtime < opt.stonewall && ! opt.dry_run){
-        INVALID("Runtime of phase (%f) is below stonewall time. This shouldn't happen!\n", runtime);
-      }
-    }
 
     if(opt.verbosity > 0 && opt.rank == 0){
       PRINT_PAIR("t_delta", "%.4f\n", runtime);
@@ -392,24 +412,31 @@ int main(int argc, char ** argv){
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.rank == 0){
+    char * valid_str = opt.is_valid_run ? "" : " [INVALID]";
     // compute the overall score
     fprintf(file_out, "\n[SCORE]\n");
     double scores[IO500_SCORE_LAST];
     double overall_score = calc_score(scores, 0);
-    PRINT_PAIR("SCORE", "%f %s\n", overall_score, opt.is_valid_run ? "" : " [INVALID]");
+    PRINT_PAIR("SCORE", "%f%s\n", overall_score, valid_str);
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
       u_hash_update_key_val(& score_hash, "valid", "NO");
     }
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
-    dupprintf("[SCORE%s] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n",
-    opt.is_valid_run ? "" : "-invalid",
-    scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
+    dupprintf("[SCORE ] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f%s\n",
+    scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score, valid_str);
 
-    fprintf(file_out, "\n[SCORE EXTENDED]\n");
+    // extended run
+    valid_str = opt.is_valid_extended_run ? "" : " [INVALID]";
+    fprintf(file_out, "\n[SCOREX]\n");
     double overall_extended_score = calc_score(scores, 1);
-    PRINT_PAIR("SCORE", "%f %s\n", overall_extended_score, opt.is_valid_run ? "" : " [INVALID]");
-    dupprintf("[SCORE_EXTENDED] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n", scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_extended_score);
+    u_hash_update_key_val_dbl(& score_extended_hash, "SCORE", overall_extended_score);
+    if( ! opt.is_valid_extended_run ){
+      u_hash_update_key_val(& score_extended_hash, "valid", "NO");
+    }
+    PRINT_PAIR("SCORE", "%f%s\n", overall_extended_score, valid_str);
+    PRINT_PAIR("hash", "%X\n", (int) score_extended_hash);
+    dupprintf("[SCOREX] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f%s\n", scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_extended_score, valid_str);
 
     printf("\nThe result files are stored in the directory: %s\n", opt.resdir);
   }

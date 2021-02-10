@@ -15,7 +15,9 @@ typedef struct{
 
   int dry_run;
   int verbosity;
-  int is_valid_run;
+  int is_valid_phase;    /* set to 0 during a phase, if invalid */
+  int is_valid_run;      /* set to 0 the first occurence it is invalid */
+  int is_valid_extended_run;
 
   int rank;
   int mpi_size;

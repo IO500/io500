@@ -28,6 +28,7 @@ static double run(void){
   u_argv_push(argv, "-Y");
   u_argv_push(argv, "-W");
   u_argv_push_printf(argv, "%d", opt.stonewall);
+  u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-hard-write.csv", opt.resdir);
 
   opt_mdtest_hard d = mdtest_hard_o;
   mdtest_add_generic_params(argv, & d.g, & o.g);

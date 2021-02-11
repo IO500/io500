@@ -32,6 +32,7 @@ static double run(void){
   u_argv_push(argv, "-Y");
   u_argv_push(argv, "-W");
   u_argv_push_printf(argv, "%d", opt.stonewall);
+  u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-easy-write.csv", opt.resdir);
 
   opt_mdtest_easy d = mdtest_easy_o;
   mdtest_add_generic_params(argv, & d.g, & o.g);

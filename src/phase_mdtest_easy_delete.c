@@ -25,6 +25,7 @@ static double run(void){
   u_argv_t * argv = u_argv_create();
   mdtest_easy_add_params(argv);
   u_argv_push(argv, "-r");
+  u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-easy-delete.csv", opt.resdir);
 
   opt_mdtest_easy d = mdtest_easy_o;
   mdtest_add_generic_params(argv, & d.g, & o.g);

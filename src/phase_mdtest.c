@@ -9,6 +9,7 @@ void p_mdtest_run(u_argv_t * argv, FILE * out, mdtest_generic_res * d, mdtest_te
   d->rate_stonewall = res->stonewall_item_sum[test] / res->stonewall_time[test] / 1000;
   u_res_file_close(out);
   u_argv_free(argv);
+  free(res);
 }
 
 void mdtest_add_generic_params(u_argv_t * argv, opt_mdtest_generic * dflt, opt_mdtest_generic * generic){

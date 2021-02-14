@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include <aiori.h>
 
+typedef enum{
+  IO500_MODE_STANDARD = 1,
+  IO500_MODE_EXTENDED,
+} io500_mode;
+
 typedef struct{
   int drop_caches;
   char * drop_caches_cmd;
@@ -31,6 +36,7 @@ typedef struct{
 
   int scc;
   int minwrite;
+  io500_mode mode;
 
   aiori_xfer_hint_t backend_hints;
   aiori_mod_opt_t * backend_opt;

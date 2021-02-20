@@ -10,7 +10,6 @@ static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_easy_o.api},
   {"transferSize", "Transfer size", 0, INI_STRING, "2m", & ior_easy_o.transferSize},
   {"blockSize", "Block size; must be a multiple of transferSize", 0, INI_STRING, "9920000m", & ior_easy_o.blockSize},
-  {"hintsFileName", "Filename for MPI hint file", 0, INI_STRING, NULL, & ior_easy_o.hintsFileName},
   {"filePerProc", "Create one file per process", 0, INI_BOOL, "TRUE", & ior_easy_o.filePerProc},
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_easy_o.run},
@@ -18,16 +17,6 @@ static ini_option_t option[] = {
   {NULL} };
 
 static void validate(void){
-  if(ior_easy_o.hintsFileName){
-    struct stat sb;
-    int ret = stat(ior_easy_o.hintsFileName, & sb);
-    if(ret != 0){
-      FATAL("Cannot check hintsFileName %s\n", ior_easy_o.hintsFileName);
-    }
-    if(! (sb.st_mode & S_IRUSR) ){
-      FATAL("The hintsFileName must be a readable file %s\n", ior_easy_o.hintsFileName);
-    }
-  }
   u_create_datadir("ior-easy");
 }
 

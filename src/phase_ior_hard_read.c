@@ -7,7 +7,6 @@
 
 typedef struct{
   char * api;
-  char * hintsFileName;
 
   char * command;
   IOR_point_t * res;
@@ -19,7 +18,6 @@ static opt_ior_hard_read o;
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
   {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & o.collective},
-  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
 
@@ -36,7 +34,6 @@ static double run(void){
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-R");
   u_argv_push_default_if_set_bool(argv, "-c", d.collective, o.collective);
-  u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-hard-read.csv", opt.resdir);

@@ -8,7 +8,6 @@ opt_ior_hard ior_hard_o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_hard_o.api},
-  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_hard_o.hintsFileName},
   {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_hard_o.segments},
   {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & ior_hard_o.collective},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_hard_o.run},
@@ -18,16 +17,6 @@ static ini_option_t option[] = {
 
 
 static void validate(void){
-  if(ior_hard_o.hintsFileName){
-    struct stat sb;
-    int ret = stat(ior_hard_o.hintsFileName, & sb);
-    if(ret != 0){
-      FATAL("Cannot check hintsFileName %s\n", ior_hard_o.hintsFileName);
-    }
-    if(! (sb.st_mode & S_IRUSR) ){
-      FATAL("The hintsFileName must be a readable file %s\n", ior_hard_o.hintsFileName);
-    }
-  }
   u_create_datadir("ior-hard");
 }
 

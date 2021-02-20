@@ -12,7 +12,6 @@ typedef struct{
   int uniqueDir;
   char * transferSize;
   char * blockSize;
-  char * hintsFileName;
   int verbosity;
 } opt_ior_easy;
 
@@ -22,7 +21,6 @@ typedef struct{
   int run;
   int collective;
   char * api;
-  char * hintsFileName;
 
   int segments;
   int verbosity;
@@ -33,7 +31,6 @@ extern opt_ior_hard ior_hard_o;
 typedef struct{
   int run;
   char * api;
-  char * hintsFileName;
 
   int random_prefill_bytes;
   uint64_t block_size;

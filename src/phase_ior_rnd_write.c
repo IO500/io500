@@ -8,7 +8,6 @@
 
 typedef struct{
   char * api;
-  char * hintsFileName;
 
   char * command;
   IOR_point_t * res;
@@ -18,7 +17,6 @@ static opt_ior_rnd_write o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
-  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & o.hintsFileName},
   {NULL} };
 
 static void validate(void){
@@ -33,7 +31,6 @@ static double run(void){
   u_argv_push(argv, "-w");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
-  u_argv_push_default_if_set(argv, "-U", d.hintsFileName, o.hintsFileName);
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-k");
   if(d.random_prefill_bytes > 0){

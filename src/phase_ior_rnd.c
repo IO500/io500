@@ -8,7 +8,6 @@ opt_ior_rnd ior_rnd_o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_rnd_o.api},
-  {"hintsFileName", "Filename for hints file", 0, INI_STRING, NULL, & ior_rnd_o.hintsFileName},
   {"blockSize", "Size of a random block, change only if explicitly allowed", 0, INI_UINT64, "1073741824", & ior_rnd_o.block_size},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_rnd_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_rnd_o.verbosity},
@@ -18,16 +17,6 @@ static ini_option_t option[] = {
 
 
 static void validate(void){
-  if(ior_rnd_o.hintsFileName){
-    struct stat sb;
-    int ret = stat(ior_rnd_o.hintsFileName, & sb);
-    if(ret != 0){
-      FATAL("Cannot check hintsFileName %s\n", ior_rnd_o.hintsFileName);
-    }
-    if(! (sb.st_mode & S_IRUSR) ){
-      FATAL("The hintsFileName must be a readable file %s\n", ior_rnd_o.hintsFileName);
-    }
-  }
   opt_ior_rnd d = ior_rnd_o;
   if(d.block_size < 1024){
     FATAL("Random blocksize must be larger than 1024\n");

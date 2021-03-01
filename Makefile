@@ -1,10 +1,17 @@
-CC = clang -I/usr/lib/x86_64-linux-gnu/openmpi/include/
-CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Warray-bounds
-
+CC = mpicc
+CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Werror=maybe-uninitialized -Warray-bounds
+ 
+CFLAGS += -g3 -lefence -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
 IORCFLAGS = $(shell grep CFLAGS ./build/ior/Makefile | cut -d "=" -f 2-)
-CFLAGS += -g3 -I./include/ -I./src/ -I./build/pfind/src/ -I./build/ior/src/
 IORLIBS = $(shell grep LIBS ./build/ior/Makefile | cut -d "=" -f 2-)
-LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS)  -L/usr/lib/x86_64-linux-gnu/openmpi/lib/ -lmpi  # -lgpfs # may need some additional flags as provided to IOR
+LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS) # -lgpfs # may need some additional flags as provided to IOR
+
+# To build with clang, for example, you may have to change
+#CC = clang -I/usr/lib/x86_64-linux-gnu/openmpi/include/
+#CFLAGS += -std=gnu99 -Wall -Wempty-body -Werror -Wstrict-prototypes -Warray-bounds
+#LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS)  -L/usr/lib/x86_64-linux-gnu/openmpi/lib/ -lmpi  # -lgpfs # may need some additional flags as provided to IOR
+
+# There shouldn't be any change necessary below this point 
 
 VERSION_GIT=$(shell git describe --always --abbrev=12)
 VERSION_TREE=$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")

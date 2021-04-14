@@ -37,7 +37,9 @@ static double run(void){
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-hard-write.csv", opt.resdir);
-
+  u_argv_push(argv, "-O");
+  u_argv_push(argv, "stoneWallingWearOut=1");
+  
   o.command = u_flatten_argv(argv);
 
   PRINT_PAIR("exe", "%s\n", o.command);

@@ -1,11 +1,6 @@
 # io500
 
-This is not the *official* IO500 benchmark.
-This repository demonstrates how to use an extended IOR benchmark suite within the IO500 benchmark.
-The purpose is to evaluate the impact of extended functiony in order to incorporate it into the IO500 benchmark for most accurate measurements of the diverse features of storage systems.
-These modifications are of academic nature and good ones may lead to the preparation of a change requests (according to the IO500 rules).
-This strategy follows the example of the MPI forum where working examples need to be presented.
-
+This is the C version of the IO500 benchmark.
 
 ## Preparation
 

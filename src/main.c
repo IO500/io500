@@ -123,7 +123,7 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 static double calc_score(double scores[IO500_SCORE_LAST], int extended){
   double overall_score = 1;
-  for(int g=1; g < IO500_SCORE_LAST; g++){
+  for(io500_phase_score_group g=1; g < IO500_SCORE_LAST; g++){
     char score_string[2048];
     char *p = score_string;
     double score = 1;
@@ -162,7 +162,7 @@ int main(int argc, char ** argv){
   int mpi_init = 0;
   file_out = stdout;
   opt = (io500_opt_t) {
-    .mode = IO500_MODE_EXTENDED,
+    .mode = IO500_MODE_STANDARD,
     .is_valid_run = 1,
     .is_valid_extended_run = 1
   };

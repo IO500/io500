@@ -139,8 +139,12 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended){
         p += sprintf(p, "%.8f", t);
       }
     }
-    DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
-    score = pow(score, 1.0/numbers);
+    if(numbers == 0){
+      score = 0;
+    }else{      
+      DEBUG_INFO("%s)^%f\n", score_string, 1.0/numbers);
+      score = pow(score, 1.0/numbers);
+    }
     scores[g] = score;
     PRINT_PAIR(io500_phase_str[g], "%f\n", score);
 

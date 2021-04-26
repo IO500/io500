@@ -37,7 +37,7 @@ static void cleanup(void){
     unlink(filename);
   }
   if(opt.rank == 0){
-    //u_purge_file("ior-rnd/file");
+    u_purge_file("ior-rnd/file");
     u_purge_datadir("ior-rnd");
   }
 }
@@ -66,6 +66,7 @@ void ior_rnd_add_params(u_argv_t * argv){
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-rnd.stonewall", opt.resdir );
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
+  u_argv_push(argv, "-k");
   u_argv_push(argv, "-t=4096");
   u_argv_push_printf(argv, "-b=%ld", d.block_size);
   u_argv_push_printf(argv, "-s=%d", 10000000);

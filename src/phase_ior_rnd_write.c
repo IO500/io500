@@ -32,7 +32,6 @@ static double run(void){
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
-  u_argv_push(argv, "-k");
   if(d.random_prefill_bytes > 0){
     u_argv_push_printf(argv, "--randomPrefill=%u", d.random_prefill_bytes);
   }

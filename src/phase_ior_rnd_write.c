@@ -23,6 +23,18 @@ static void validate(void){
 
 }
 
+static void cleanup(void){
+  if( ! opt.dry_run && opt.rank == 0){
+    char filename[PATH_MAX];
+    sprintf(filename, "%s/ior-rnd.stonewall", opt.resdir);
+    unlink(filename);
+  }
+  if(opt.rank == 0){
+    u_purge_file("ior-rnd/file");
+    u_purge_datadir("ior-rnd");
+  }
+}
+
 static double run(void){
   opt_ior_rnd d = ior_rnd_o;
 
@@ -56,4 +68,5 @@ u_phase_t p_ior_rnd_write = {
   run,
   .verify_stonewall = 1,
   .group = IO500_SCORE_BW,
+  .cleanup = cleanup,
 };

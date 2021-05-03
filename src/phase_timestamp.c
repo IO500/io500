@@ -2,7 +2,6 @@
 #include <unistd.h>
 
 #include <io500-phase.h>
-#include <phase_mdtest.h>
 
 static ini_option_t option[] = {
   {NULL} };
@@ -28,7 +27,7 @@ static double run(void){
 
 u_phase_t p_timestamp = {
   "timestamp",
-  IO500_PHASE_WRITE,
+  IO500_PHASE_DUMMY,
   option,
   validate,
   run,

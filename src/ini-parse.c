@@ -59,7 +59,7 @@ void u_ini_parse_file(char const * file, ini_section_t** cfg, ini_call_back_f fu
 int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb_func){
   int reti;
   // prepare regexes
-  regex_t r_section, r_int, r_uint, r_str, r_empty;
+  regex_t r_section, r_int, r_uint, r_str, r_float, r_empty;
   reti = regcomp(& r_section, "^[[:space:]]*\\[[[:space:]]*([0-9a-zA-Z_-]+)[[:space:]]*\\][[:space:]]*([[:space:]][#;].*)?$", REG_EXTENDED);
   if (reti){
     FATAL("Could not compile regex\n");
@@ -77,6 +77,10 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
     FATAL("Could not compile regex\n");
   }
   reti = regcomp(& r_empty, "^[[:space:]]*([#;].*)?$", REG_EXTENDED);
+  if (reti){
+    FATAL("Could not compile regex\n");
+  }
+  reti = regcomp(& r_float, "^([0-9e.+-]+)$", REG_EXTENDED);
   if (reti){
     FATAL("Could not compile regex\n");
   }
@@ -199,6 +203,12 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
           ERROR("Parsing error in section %s line %d, option %s expects bool (true|false), received \"%s\"\n", section->name, line, var, val);
           return 1;
         }
+      }else if(option->type == INI_FLOAT){
+        reti = regexec(& r_float, val, 0, NULL, 0);
+        if(reti != 0){
+          ERROR("Parsing error in section %s line %d, option %s expects float, received \"%s\"\n", section->name, line, var, val);
+          return 1;
+        }
       }
       // assign new value
       option->default_val = strdup(val);
@@ -249,6 +259,9 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
           }case(INI_STRING):{
             *(char**) o->var = o->default_val;
             break;
+          }case(INI_FLOAT):{
+            *(float*) o->var = atof(o->default_val);
+            break;
           }
           }
         }else{
@@ -267,6 +280,9 @@ int u_parse_ini(char const * data, ini_section_t ** sections, ini_call_back_f cb
             break;
           }case(INI_STRING):{
             *(char**) o->var = INI_UNSET_STRING;
+            break;
+          }case(INI_FLOAT):{
+            *(float*) o->var = INI_UNSET_FLOAT;
             break;
           }
           }

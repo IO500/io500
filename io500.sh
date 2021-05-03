@@ -1,60 +1,45 @@
 #!/bin/bash
-#
+#SBATCH --nodes=10 --ntasks-per-node=6 -p compute -A ku0598
+
 # INSTRUCTIONS:
-# This script takes its parameters from the same .ini file as io500 binary.
 #
 # The only parts of the script that may need to be modified are:
-#  - setup_paths() to configure the binary locations and MPI parameters
-#  - setup_directories() to create/tune the IOR/mdtest output directories
-#
+#  - setup() to configure the binary locations and MPI parameters
 # Please visit https://vi4io.org/io500-info-creator/ to help generate the
 # "system-information.txt" file, by pasting the output of the info-creator.
 # This file contains details of your system hardware for your submission.
 
-# Set the paths to the binaries and how to launch MPI jobs.
-# If you ran ./prepare.sh successfully, then binaries are in ./bin/
+# This script takes its parameters from the same .ini file as io500 binary.
+io500_ini="$1"          # You can set the ini file here
+io500_mpirun="mpiexec"
+io500_mpiargs="-np 2"
 
-function setup_paths {
-  io500_ior_cmd=$PWD/bin/ior
-  io500_mdtest_cmd=$PWD/bin/mdtest
-  io500_mpirun="mpiexec"
-  io500_mpiargs="-np 2"
-}
-
-# Set directories where benchmark files are created and where the results go.
-# If you want to set up stripe tuning on your output directories or anything
-# similar, then this is the right place to do it.
-function setup_directories {
-  local workdir
-  local resultdir
-  local ts
-
-  mkdir -p $io500_workdir $io500_resultdir
+function setup(){
+  local workdir="$1"
+  local resultdir="$2"
+  mkdir -p $workdir $resultdir
 
   # Example commands to create output directories for Lustre.  Creating
   # top-level directories is allowed, but not the whole directory tree.
-  #if (( $(lfs df $io500_workdir | grep -c MDT) > 1 )); then
-  #  lfs setdirstripe -D -c -1 $io500_workdir
+  #if (( $(lfs df $workdir | grep -c MDT) > 1 )); then
+  #  lfs setdirstripe -D -c -1 $workdir
   #fi
-  #lfs setstripe -c 1 $io500_workdir
-  #mkdir $io500_workdir/ior-easy $io500_workdir/ior-hard
-  #mkdir $io500_workdir/mdtest-easy $io500_workdir/mdtest-hard
-  #local osts=$(lfs df $io500_workdir | grep -c OST)
+  #lfs setstripe -c 1 $workdir
+  #mkdir $workdir/ior-easy $workdir/ior-hard
+  #mkdir $workdir/mdtest-easy $workdir/mdtest-hard
+  #local osts=$(lfs df $workdir | grep -c OST)
   # Try overstriping for ior-hard to improve scaling, or use wide striping
-  #lfs setstripe -C $((osts * 4)) $io500_workdir/ior-hard || lfs setstripe -c -1 $io500_workdir/ior-hard
+  #lfs setstripe -C $((osts * 4)) $workdir/ior-hard ||
+  #  lfs setstripe -c -1 $workdir/ior-hard
   # Try to use DoM if available, otherwise use default for small files
-  #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-easy || true #DoM?
-  #lfs setstripe -E 64k -L mdt $io500_workdir/mdtest-hard || true #DoM?
-  # Output Lustre options (for manual checking)
-  #lfs df $io500_workdir
-  #lfs getstripe $io500_workdir/ior-easy
-  #lfs getstripe $io500_workdir/ior-hard
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-easy || true #DoM?
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-hard || true #DoM?
+  #lfs setstripe -E 64k -L mdt $workdir/mdtest-rnd
 }
 
 # *****  YOU SHOULD NOT EDIT ANYTHING BELOW THIS LINE  *****
 set -eo pipefail  # better error handling
 
-io500_ini="${1:-""}"
 if [[ -z "$io500_ini" ]]; then
   echo "error: ini file must be specified.  usage: $0 <config.ini>"
   exit 1
@@ -121,8 +106,7 @@ function main {
   # the directory where the output results will be kept
   export io500_resultdir=$(get_ini_global_param resultdir $PWD/results)/$ts
 
-  setup_directories
-  setup_paths
+  setup $io500_workdir $io500_resultdir
   run_benchmarks
 
   if [[ ! -s "system-information.txt" ]]; then

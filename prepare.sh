@@ -7,8 +7,8 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=bd76b45ef9db
-PFIND_HASH=9d77056adce6
+IOR_HASH=0410a38e985e0862a9fd9abec017abffc4c5fc43
+PFIND_HASH=62c3a7e31
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
@@ -66,6 +66,7 @@ function get_pfind {
 function build_ior {
   pushd $BUILD/ior
   ./bootstrap
+  # Add here extra flags
   ./configure --prefix=$INSTALL_DIR
   cd src
   $MAKE clean

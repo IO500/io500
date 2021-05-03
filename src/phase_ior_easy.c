@@ -8,27 +8,15 @@ opt_ior_easy ior_easy_o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & ior_easy_o.api},
-  {"posix.odirect", "Use ODirect", 0, INI_BOOL, NULL, & ior_easy_o.odirect},
   {"transferSize", "Transfer size", 0, INI_STRING, "2m", & ior_easy_o.transferSize},
   {"blockSize", "Block size; must be a multiple of transferSize", 0, INI_STRING, "9920000m", & ior_easy_o.blockSize},
-  {"hintsFileName", "Filename for MPI hint file", 0, INI_STRING, NULL, & ior_easy_o.hintsFileName},
   {"filePerProc", "Create one file per process", 0, INI_BOOL, "TRUE", & ior_easy_o.filePerProc},
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
-  {"noRun", "Disable running of this phase", 0, INI_BOOL, NULL, & ior_easy_o.no_run},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_easy_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_easy_o.verbosity},
   {NULL} };
 
 static void validate(void){
-  if(ior_easy_o.hintsFileName){
-    struct stat sb;
-    int ret = stat(ior_easy_o.hintsFileName, & sb);
-    if(ret != 0){
-      FATAL("Cannot check hintsFileName %s\n", ior_easy_o.hintsFileName);
-    }
-    if(! (sb.st_mode & S_IRUSR) ){
-      FATAL("The hintsFileName must be a readable file %s\n", ior_easy_o.hintsFileName);
-    }
-  }
   u_create_datadir("ior-easy");
 }
 
@@ -57,12 +45,17 @@ void ior_easy_add_params(u_argv_t * argv){
   for(int i=0; i < ior_easy_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
+  if(opt.io_buffers_on_gpu){
+    u_argv_push(argv, "-O");
+    u_argv_push(argv, "allocateBufferOnGPU=1");
+  }
   u_argv_push(argv, "-C");
   u_argv_push(argv, "-Q");
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");
   u_argv_push(argv, "-G");
-  u_argv_push(argv, "271");
+  int hash = u_phase_unique_random_number("ior-easy");
+  u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-e");
   u_argv_push(argv, "-o");
@@ -81,7 +74,6 @@ void ior_easy_add_params(u_argv_t * argv){
   if(ior_easy_o.filePerProc){
     u_argv_push(argv, "-F");
   }
-
 }
 
 u_phase_t p_ior_easy = {

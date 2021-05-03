@@ -19,6 +19,7 @@ function main {
   # listed here, easier to spot and run if something fails
   setup
 
+  get_schema_tools
   get_ior
   get_pfind
 
@@ -45,7 +46,6 @@ function git_co {
   pushd $BUILD
   [ -d "$dir" ] || git clone $repo $dir
   cd $dir
-  # turning off the hash thing for now because too many changes happening too quickly
   git fetch
   git checkout $tag
   popd
@@ -60,6 +60,12 @@ function get_ior {
 function get_pfind {
   echo "Preparing parallel find"
   git_co https://github.com/VI4IO/pfind.git pfind $PFIND_HASH
+}
+
+function get_schema_tools {
+  echo "Downloading supplementary schema tools"
+  git_co https://github.com/VI4IO/cdcl-schema-tools.git cdcl-schema-tools
+  [ -d "$dir" ] || ln -sf $PWD/build/cdcl-schema-tools  schema-tools
 }
 
 ###### BUILD FUNCTIONS

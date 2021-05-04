@@ -53,8 +53,6 @@ void ior_rnd_add_params(u_argv_t * argv){
   u_argv_push_printf(argv, "-o=%s/ior-rnd/file", opt.datadir);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-rnd.stonewall", opt.resdir );
-  u_argv_push(argv, "-O");
-  u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-t=4096");
   u_argv_push_printf(argv, "-b=%ld", d.block_size);

@@ -48,6 +48,8 @@ static double run(void){
     u_argv_push_printf(argv, "--randomPrefill=%u", d.random_prefill_bytes);
   }
   u_argv_push(argv, "-O");
+  u_argv_push(argv, "stoneWallingWearOut=1");
+  u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd-write.csv", opt.resdir);
   o.command = u_flatten_argv(argv);
 

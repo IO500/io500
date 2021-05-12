@@ -19,7 +19,7 @@ extern FILE* file_out;
 #define ERROR(...) do{ fprintf(file_out, "; ERROR "__VA_ARGS__); printf("ERROR "__VA_ARGS__); fflush(file_out); }while(0);
 #define WARNING(...) do{ fprintf(file_out, "; WARNING "__VA_ARGS__); printf("WARNING "__VA_ARGS__); fflush(file_out); }while(0);
 
-#define INVALID(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s)", __FILE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_run = 0; } }while(0);
+#define INVALID(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s:%d) ", __FILE__, __LINE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_phase = 0; } }while(0);
 
 
 #define r0printf(...) do{ if(opt.rank == 0){ printf(__VA_ARGS__); fflush(stdout); }  }while(0);

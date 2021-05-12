@@ -14,13 +14,15 @@
 #define INI_UNSET_UINT (unsigned)(-1)
 #define INI_UNSET_UINT64 (uint64_t)(-1)
 #define INI_UNSET_BOOL 2
+#define INI_UNSET_FLOAT 1e307
 
 typedef enum{
   INI_STRING,
   INI_INT,
   INI_UINT,
   INI_UINT64,
-  INI_BOOL
+  INI_BOOL,
+  INI_FLOAT
 } ini_var_type_e;
 
 typedef struct {
@@ -71,7 +73,7 @@ void u_create_datadir(char const * dir);
 void u_purge_datadir(char const * dir);
 void u_purge_file(char const * file);
 
-void u_create_dir_recursive(char const * dir, ior_aiori_t const * api);
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * module_options);
 
 // invoke an external shell command
 void u_call_cmd(char const * command);
@@ -82,6 +84,8 @@ void * u_malloc(int size);
 
 FILE * u_res_file_prep(char const * name);
 void u_res_file_close(FILE * out);
+
+uint32_t u_phase_unique_random_number(char const * phase_name);
 
 /**
  * Functions to handle the argument vectors for invoking other APIs

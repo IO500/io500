@@ -28,6 +28,18 @@ uint32_t u_hash_update(uint32_t hash, char const * str){
   return hash;
 }
 
+/* compute a unique random number based on the phase and the timestamp */
+uint32_t u_phase_unique_random_number(char const * phase_name){
+  uint32_t hash = 0;
+  hash = u_hash_update(hash, phase_name);
+  hash = u_hash_update(hash, opt.timestamp);
+  if(hash == 0 || hash == -1){
+    return 4711;
+  }
+  return hash;
+}
+
+
 void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val){
   uint32_t hsh = 0;
   hsh = u_hash_update(hsh, key);
@@ -74,10 +86,10 @@ void u_create_datadir(char const * dir){
   }
   char d[2048];
   sprintf(d, "%s/%s", opt.datadir, dir);
-  u_create_dir_recursive(d, opt.aiori);
+  u_create_dir_recursive(d, opt.aiori, opt.backend_opt);
 }
 
-void u_create_dir_recursive(char const * dir, ior_aiori_t const * api){
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * module_options){
   char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
@@ -91,10 +103,10 @@ void u_create_dir_recursive(char const * dir, ior_aiori_t const * api){
     wp += sprintf(wp, "%s/", next);
 
     struct stat sb;
-    int ret = stat(outdir, & sb);
+    int ret = api->stat(outdir, & sb, module_options);
     if(ret != 0){
       DEBUG_INFO("Creating dir %s\n", outdir);
-      ret = api->mkdir(outdir, S_IRWXU, NULL);
+      ret = api->mkdir(outdir, S_IRWXU, module_options);
       if(ret != 0){
         FATAL("Couldn't create directory %s (Error: %s)\n", outdir, strerror(errno));
       }
@@ -242,6 +254,7 @@ FILE * u_res_file_prep(char const * name){
 void u_res_file_close(FILE * out){
   if(opt.rank == 0){
     fclose(out);
+    out_logfile = stdout;
   }
 }
 
@@ -301,6 +314,7 @@ void u_verify_result_files(ini_section_t ** cfg, char const * result){
   hash = u_ini_gen_hash(cfg);
   u_ini_parse_file(result, NULL, hash_func, NULL);
 
+  printf("[run]");
   printf("config-hash     = %s\n", res_data.cfg_hash_read);
   printf("score-hash      = %s\n", res_data.score_hash_read);
 

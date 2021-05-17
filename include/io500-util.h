@@ -14,7 +14,7 @@
 #define INI_UNSET_UINT (unsigned)(-1)
 #define INI_UNSET_UINT64 (uint64_t)(-1)
 #define INI_UNSET_BOOL 2
-#define INI_UNSET_FLOAT 1e307
+#define INI_UNSET_FLOAT 1e38
 
 typedef enum{
   INI_STRING,

@@ -20,7 +20,9 @@ static ini_option_t option[] = {
   {NULL} };
 
 static void validate(void){
-
+  if( ! opt.dry_run && opt.rank == 0){
+    u_create_datadir("ior-rnd");
+  }
 }
 
 static void cleanup(void){

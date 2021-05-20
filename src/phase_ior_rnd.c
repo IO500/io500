@@ -27,7 +27,6 @@ static void validate(void){
   if(d.random_prefill_bytes > 0 && d.block_size < d.random_prefill_bytes){
     FATAL("Random prefill bytes must be < blocksize\n");
   }
-  u_create_datadir("ior-rnd");
 }
 
 

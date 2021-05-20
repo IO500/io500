@@ -467,8 +467,12 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(phases[i]->cleanup)
+    if(phases[i]->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD){
+      continue;
+    }
+    if(phases[i]->cleanup){
       phases[i]->cleanup();
+    }
   }
 
   if(opt.rank == 0){

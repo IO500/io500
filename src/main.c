@@ -339,6 +339,9 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
+    if(phase->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD){
+      continue;
+    }
     if(phases[i]->validate){
       phases[i]->validate();
     }

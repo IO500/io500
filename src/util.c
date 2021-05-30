@@ -45,8 +45,7 @@ void u_hash_update_key_val(uint32_t * hash, char const * key, char const * val){
   hsh = u_hash_update(hsh, key);
   hsh = u_hash_update(hsh, val);
   *hash = *hash ^ hsh;
-  // DEBUG_ALL
-  //printf("\nhash current: %X update with (%s,%s)\n", (int)*hash, key, val);
+  DEBUG_INFO("hash current: %X updated with (%s=%s)\n", (int)*hash, key, val);
 }
 
 void u_hash_update_key_val_dbl(uint32_t * hash, char const * key, double val){
@@ -314,7 +313,7 @@ void u_verify_result_files(ini_section_t ** cfg, char const * result){
   hash = u_ini_gen_hash(cfg);
   u_ini_parse_file(result, NULL, hash_func, NULL);
 
-  printf("[run]");
+  printf("[run]\n");
   printf("config-hash     = %s\n", res_data.cfg_hash_read);
   printf("score-hash      = %s\n", res_data.score_hash_read);
 

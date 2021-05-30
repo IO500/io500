@@ -121,7 +121,7 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 #define dupprintf(...) do{ if(opt.rank == 0) { fprintf(res_summary, __VA_ARGS__); printf(__VA_ARGS__); } }while(0);
 
-static double calc_score(double scores[IO500_SCORE_LAST], int extended){
+static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t * hash){
   double overall_score = 1;
   for(io500_phase_score_group g=1; g < IO500_SCORE_LAST; g++){
     char score_string[2048];
@@ -147,6 +147,7 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended){
     }
     scores[g] = score;
     PRINT_PAIR(io500_phase_str[g], "%f\n", score);
+    u_hash_update_key_val_dbl(hash, io500_phase_str[g], score);
 
     overall_score *= score;
   }
@@ -404,7 +405,9 @@ int main(int argc, char ** argv){
           opt.is_valid_run = 0;
         }
       }
-      PRINT_PAIR("score", "%f\n", score);
+      if(! (phase->type & IO500_PHASE_DUMMY)){
+        PRINT_PAIR("score", "%f\n", score);
+      }
       char * valid_str = opt.is_valid_phase ? "" : " [INVALID]";
       char score_str[40];
       sprintf(score_str, "%f", score);
@@ -439,7 +442,7 @@ int main(int argc, char ** argv){
     // compute the overall score
     fprintf(file_out, "\n[SCORE]\n");
     double scores[IO500_SCORE_LAST];
-    double overall_score = calc_score(scores, 0);
+    double overall_score = calc_score(scores, 0, & score_hash);
     PRINT_PAIR("SCORE", "%f%s\n", overall_score, valid_str);
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
@@ -453,7 +456,7 @@ int main(int argc, char ** argv){
     if(opt.mode == IO500_MODE_EXTENDED){
       valid_str = opt.is_valid_extended_run ? "" : " [INVALID]";
       fprintf(file_out, "\n[SCOREX]\n");
-      double overall_extended_score = calc_score(scores, 1);
+      double overall_extended_score = calc_score(scores, 1, & score_extended_hash);
       u_hash_update_key_val_dbl(& score_extended_hash, "SCORE", overall_extended_score);
       if( ! opt.is_valid_extended_run ){
         u_hash_update_key_val(& score_extended_hash, "valid", "NO");

@@ -21,13 +21,13 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run && opt.rank == 0){
+  if (opt.dry_run) return;
+  
+  if( opt.rank == 0){
     char filename[PATH_MAX];
     sprintf(filename, "%s/ior-hard.stonewall", opt.resdir);
     unlink(filename);
     u_purge_file("ior-hard/file");
-  }
-  if(opt.rank == 0){
     u_purge_datadir("ior-hard");
   }
 }

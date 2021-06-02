@@ -26,12 +26,12 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run && opt.rank == 0){
+  if (opt.dry_run) return;
+
+  if(opt.rank == 0){
     char filename[PATH_MAX];
     sprintf(filename, "%s/ior-rnd.stonewall", opt.resdir);
     unlink(filename);
-  }
-  if(opt.rank == 0){
     u_purge_file("ior-rnd/file");
     u_purge_datadir("ior-rnd");
   }

@@ -21,7 +21,9 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if( ! opt.dry_run && opt.rank == 0){
+  if (opt.dry_run) return;
+  
+  if(opt.rank == 0){
     char filename[PATH_MAX];
     sprintf(filename, "%s/ior-easy.stonewall", opt.resdir);
     unlink(filename);
@@ -30,12 +32,14 @@ static void cleanup(void){
       u_purge_file("ior-easy/ior_file_easy");
     }
   }
-  if( ! opt.dry_run && ior_easy_o.filePerProc){
+  if(ior_easy_o.filePerProc){
       char filename[2048];
       sprintf(filename, "ior-easy/ior_file_easy.%08d", opt.rank);
       u_purge_file(filename);
-    }
-  u_purge_datadir("ior-easy");
+  }
+  if(opt.rank == 0){
+    u_purge_datadir("ior-easy");
+  }
 }
 
 void ior_easy_add_params(u_argv_t * argv){

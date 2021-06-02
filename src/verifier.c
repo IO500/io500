@@ -26,14 +26,18 @@ int main(int argc, char ** argv){
   ini_section_t ** cfg = u_options();
 
   if (argc < 3){
-    printf("Synopsis: %s <INI file> <RESULT file>\n\n", argv[0]);
+    printf("Synopsis: %s <INI file> <RESULT file> [VerbosityLevel]\n\n", argv[0]);
     exit(0);
   }
-  u_ini_parse_file(argv[1], cfg, NULL, NULL);
   opt.verbosity = 0;
+  u_ini_parse_file(argv[1], cfg, NULL, NULL);
+  if(argc == 4){    
+    opt.verbosity = atoi(argv[3]);
+    printf("Verbosity: %d\n", opt.verbosity);
+  }
 
   PRINT_PAIR("version", "%s\n", VERSION);
 
-  u_verify_result_files(cfg, argv[argc-1]);
+  u_verify_result_files(cfg, argv[2]);
   return 0;
 }

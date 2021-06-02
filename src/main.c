@@ -15,6 +15,8 @@
 
 #define INVALID_RUN(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s:%d) ", __FILE__, __LINE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_run = 0; } }while(0);
 
+#define RUN_PHASE(phase) ( ! (phase->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD) )
+
 FILE* file_out = NULL;
 
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
@@ -340,7 +342,7 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(phases[i]->validate){
+    if(RUN_PHASE(phases[i]) && phases[i]->validate){
       phases[i]->validate();
     }
   }
@@ -359,7 +361,7 @@ int main(int argc, char ** argv){
     u_phase_t * phase = phases[i];
     if(! phase->run) continue;
     if( cleanup_only && ! (phase->type & IO500_PHASE_REMOVE) ) continue;
-    if(phase->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD){
+    if(! RUN_PHASE(phase)){
       continue;
     }
 
@@ -470,8 +472,9 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(phases[i]->cleanup)
+    if(RUN_PHASE(phases[i]) && phases[i]->cleanup){
       phases[i]->cleanup();
+    }
   }
 
   if(opt.rank == 0){

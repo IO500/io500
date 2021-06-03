@@ -28,9 +28,9 @@ static void validate(void){
 static double run(void){
   u_argv_t * argv = u_argv_create();
   mdtest_easy_add_params(argv);
-  u_argv_push(argv, "-C");
-  u_argv_push(argv, "-Y");
-  u_argv_push(argv, "-W");
+  u_argv_push(argv, "-C");	/* only create files */
+  u_argv_push(argv, "-Y");	/* call sync command after each phase */
+  u_argv_push(argv, "-W");	/* deadline for stonewall in seconds */
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-easy-write.csv", opt.resdir);
 

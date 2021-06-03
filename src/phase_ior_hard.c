@@ -37,29 +37,32 @@ void ior_hard_add_params(u_argv_t * argv){
 
   u_argv_push(argv, "./ior");
   for(int i=0; i < ior_hard_o.verbosity; i++){
-    u_argv_push(argv, "-v");
+    u_argv_push(argv, "-v");	/* verbose */
   }
   if(opt.io_buffers_on_gpu){
     u_argv_push(argv, "-O");
     u_argv_push(argv, "allocateBufferOnGPU=1");
   }
-  u_argv_push(argv, "-C");
-  u_argv_push(argv, "-Q");
-  u_argv_push(argv, "1");
-  u_argv_push(argv, "-g");
   int hash = u_phase_unique_random_number("ior-hard");
   u_argv_push_printf(argv, "-G=%d", hash);
-  u_argv_push(argv, "-k");
-  u_argv_push(argv, "-e");
-  u_argv_push(argv, "-o");
+  u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
+  u_argv_push(argv, "-Q");	/* task per node offset */
+  u_argv_push(argv, "1");
+  u_argv_push(argv, "-g");	/* barriers between open, read, write, close */
+  u_argv_push(argv, "-G");	/* use fixed timestamp signature */
+  u_argv_push(argv, "27");
+  u_argv_push(argv, "-k");	/* keep file after program exit */
+  u_argv_push(argv, "-e");	/* fsync upon write close */
+  u_argv_push(argv, "-o");	/* filename for output file */
   u_argv_push_printf(argv, "%s/ior-hard/file", opt.datadir);
-  u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-hard.stonewall", opt.resdir );
-  u_argv_push(argv, "-t");
+  u_argv_push(argv, "-O");	/* additional IOR directives */
+  u_argv_push(argv, "stoneWallingWearOut=1");
+  u_argv_push(argv, "-t");	/* transfer size */
   u_argv_push(argv, "47008");
-  u_argv_push(argv, "-b");
+  u_argv_push(argv, "-b");	/* blocksize in bytes */
   u_argv_push(argv, "47008");
-  u_argv_push(argv, "-s");
+  u_argv_push(argv, "-s");	/* number of segments */
   u_argv_push_printf(argv, "%d", d.segments);
 }
 

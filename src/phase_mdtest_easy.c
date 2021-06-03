@@ -34,16 +34,15 @@ void mdtest_easy_add_params(u_argv_t * argv){
   if(opt.io_buffers_on_gpu){
     u_argv_push(argv, "--allocateBufferOnGPU");
   }
-  u_argv_push_printf(argv, "%"PRIu64, d.g.files_per_proc);
-  u_argv_push(argv, "-G");
-  int hash = u_phase_unique_random_number("mdtest-easy");
-  u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-n");	/* number of files per process */
   u_argv_push_printf(argv, "%"PRIu64, d.g.files_per_proc);
   u_argv_push(argv, "-u");	/* unique output directory per process */
   u_argv_push(argv, "-L");	/* create files only at leaf of tree */
   u_argv_push(argv, "-F");	/* create only files, not directories */
   u_argv_push(argv, "-P");	/* print both creation rate and elapsed time */
+  u_argv_push(argv, "-G");
+  int hash = u_phase_unique_random_number("mdtest-easy");
+  u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-N");	/* number of ranks between neighbours */
   u_argv_push(argv, "1");
   u_argv_push(argv, "-d");	/* output directory */

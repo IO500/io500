@@ -53,14 +53,14 @@ void ior_easy_add_params(u_argv_t * argv){
     u_argv_push(argv, "-O");
     u_argv_push(argv, "allocateBufferOnGPU=1");
   }
-  int hash = u_phase_unique_random_number("ior-easy");
-  u_argv_push_printf(argv, "%d", hash);
   u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
   u_argv_push(argv, "-Q");	/* task per node offset */
   u_argv_push(argv, "1");
   u_argv_push(argv, "-g");	/* barriers between open, read, write, close */
   u_argv_push(argv, "-G");	/* use fixed timestamp signature */
-  u_argv_push(argv, "271");
+  int hash = u_phase_unique_random_number("ior-easy");
+  u_argv_push_printf(argv, "%d", hash);
+//  u_argv_push(argv, "271");
   u_argv_push(argv, "-k");	/* keep file after program exit */
   u_argv_push(argv, "-e");	/* fsync upon write close */
   u_argv_push(argv, "-o");	/* filename for output file */

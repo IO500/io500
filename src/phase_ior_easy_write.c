@@ -33,17 +33,14 @@ static double run(void){
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push(argv, "-O");	/* additional IOR options */
   u_argv_push(argv, "stoneWallingWearOut=1");
-<<<<<<< HEAD
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-easy-write.csv", opt.resdir);
-=======
-  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
-			     d.hintsFileName, o.hintsFileName);
-  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
-					 d.api, o.api);
-  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
->>>>>>> e3560e646224dc510c0287625be7929680bc810a
+//  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
+//			     d.hintsFileName, o.hintsFileName);
+//  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
+//					 d.api, o.api);
+//  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);
 

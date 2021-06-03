@@ -30,18 +30,18 @@ static double run(void){
 
   u_argv_t * argv = u_argv_create();
   ior_hard_add_params(argv);
+  u_argv_push(argv, "-w");	/* write file */
   u_argv_push_default_if_set_bool(argv, "-c", d.collective, o.collective);
+  u_argv_push(argv, "-D");	/* deadline for stonewall in seconds */
+  u_argv_push_printf(argv, "%d", opt.stonewall);
+  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
+					 d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-hard-write.csv", opt.resdir);
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
-  u_argv_push(argv, "-w");	/* write file */
-  u_argv_push(argv, "-D");	/* deadline for stonewall in seconds */
-  u_argv_push_printf(argv, "%d", opt.stonewall);
-  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
-			     d.hintsFileName, o.hintsFileName);
-  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
-					 d.api, o.api);
+//  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
+//			     d.hintsFileName, o.hintsFileName);
 
   o.command = u_flatten_argv(argv);
 

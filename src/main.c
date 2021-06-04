@@ -312,7 +312,7 @@ int main(int argc, char ** argv){
     fwrite(ini_data, strlen(ini_data), 1, fd);
     fclose(fd);
   }
-
+  fprintf(file_out, "[run]\n");
   PRINT_PAIR("version", "%s\n", VERSION);
   print_cfg_hash(file_out, cfg);
   PRINT_PAIR("result-dir", "%s\n", opt.resdir);

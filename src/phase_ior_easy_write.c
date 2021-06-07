@@ -8,6 +8,7 @@
 
 typedef struct{
   char * api;
+  char * dataPacketType;
 
   char * command;
   IOR_point_t * res;
@@ -17,6 +18,7 @@ static opt_ior_easy_write o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
+  {"dataPacketType", "Type of packet that will be created [offset|incompressible|timestamp]", 0, INI_STRING, NULL, & o.dataPacketType},
   {NULL} };
 
 static void validate(void){
@@ -34,6 +36,7 @@ static double run(void){
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
+  u_argv_push_default_if_set_dataPacketType(argv, "-l", d.dataPacketType, o.dataPacketType);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-easy-write.csv", opt.resdir);
 

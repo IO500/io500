@@ -8,6 +8,7 @@
 
 typedef struct{
   char * api;
+  char * dataPacketType;
 
   char * command;
   IOR_point_t * res;
@@ -18,6 +19,7 @@ static opt_ior_hard_write o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
+  {"dataPacketType", "Type of packet that will be created [offset|incompressible|timestamp]", 0, INI_STRING, NULL, & o.dataPacketType},
   {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & o.collective},
   {NULL} };
 
@@ -37,6 +39,7 @@ static double run(void){
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-hard-write.csv", opt.resdir);
+  u_argv_push_default_if_set_dataPacketType(argv, "-l", d.dataPacketType, o.dataPacketType);
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
   

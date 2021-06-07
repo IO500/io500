@@ -14,6 +14,7 @@ static ini_option_t option[] = {
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_easy_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_easy_o.verbosity},
+  {"dataPacketType", "Type of packet that will be created [offset|incompressible|timestamp]", 0, INI_STRING, NULL, & ior_easy_o.dataPacketType},
   {NULL} };
 
 static void validate(void){

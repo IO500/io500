@@ -13,6 +13,7 @@ typedef struct{
   char * transferSize;
   char * blockSize;
   int verbosity;
+  char * dataPacketType;
 } opt_ior_easy;
 
 extern opt_ior_easy ior_easy_o;
@@ -24,6 +25,7 @@ typedef struct{
 
   int segments;
   int verbosity;
+  char * dataPacketType;
 } opt_ior_hard;
 
 extern opt_ior_hard ior_hard_o;

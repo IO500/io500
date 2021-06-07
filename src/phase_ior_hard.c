@@ -12,6 +12,7 @@ static ini_option_t option[] = {
   {"collective", "Collective operation (for supported backends)", 0, INI_BOOL, NULL, & ior_hard_o.collective},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_hard_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_hard_o.verbosity},
+  {"dataPacketType", "Type of packet that will be created [offset|incompressible|timestamp]", 0, INI_STRING, NULL, & ior_hard_o.dataPacketType},
   {NULL} };
 
 

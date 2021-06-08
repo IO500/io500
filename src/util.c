@@ -168,6 +168,30 @@ static void push_api_args(u_argv_t * argv, char const * var){
   free(str);
 }
 
+static void push_dpt_args(u_argv_t * argv, char const * var){
+  char * str = strdup(var);
+  char * saveptr;
+  char * t = strtok_r(str, " ", & saveptr);
+  u_argv_push(argv, str); // this is the dataPacketType
+  if(t){
+    int len = strlen(str) + 3;
+    char buff[len + 1];
+    sprintf(buff, "--%s.", str);
+    while(true){
+      t = strtok_r(NULL, " ", & saveptr);
+      if(! t){
+        break;
+      }
+      if(strncasecmp(buff, t, len) == 0){
+        u_argv_push(argv, t);
+      }else{
+        FATAL("Provided dataPacketType option %s is invalid\n", t);
+      }
+    }
+  }
+  free(str);
+}
+
 void u_argv_push_default_if_set_api_options(u_argv_t * argv, char * const arg, char const * dflt, char const * var){
   if(var != INI_UNSET_STRING){
     u_argv_push(argv, arg);
@@ -183,6 +207,19 @@ void u_argv_push_default_if_set_api_options(u_argv_t * argv, char * const arg, c
     }else{
       u_argv_push(argv, opt.api);
     }
+  }
+}
+
+void u_argv_push_default_if_set_dataPacketType(u_argv_t * argv, char * const arg, char const * dflt, char const * var){
+  if(var != INI_UNSET_STRING){
+    u_argv_push(argv, arg);
+    push_dpt_args(argv, var);
+  }else if(dflt != INI_UNSET_STRING){
+    u_argv_push(argv, arg);
+    push_dpt_args(argv, dflt);
+  }else{
+    // add generic args
+    u_argv_push(argv, arg);
   }
 }
 

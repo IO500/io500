@@ -24,8 +24,8 @@ static void validate(void){
 static double run(void){
   u_argv_t * argv = u_argv_create();
   mdtest_hard_add_params(argv);
-  u_argv_push(argv, "-E");
-  u_argv_push(argv, "-X");
+  u_argv_push(argv, "-E");	/* only read files */
+  u_argv_push(argv, "-X");	/* verify data read */
   u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-hard-read.csv", opt.resdir);
 
   opt_mdtest_hard d = mdtest_hard_o;

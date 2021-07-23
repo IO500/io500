@@ -28,11 +28,12 @@ static double run(void){
   u_argv_push(argv, "-Y");
   
   opt_mdtest_hard d = mdtest_hard_o;
-  if(! (d.g.files_per_dir != INI_UNSET_UINT64 && d.g.files_per_dir > 0)){
+  if((d.g.files_per_dir != INI_UNSET_UINT64 && d.g.files_per_dir > 0)){
     // Must disable stonewalling for supporting this option -- for now!
+    WARNING("stonewalling disabled in order to support -I option. Make sure your number of elements is big enough to meet the runtime limits!");
+  }else{
     u_argv_push(argv, "-W");
     u_argv_push_printf(argv, "%d", opt.stonewall);
-    WARNING("stonewalling disabled in order to support -I option. Make sure your number of elements is big enough to meet the runtime limits!");
   }
   
   u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-hard-write.csv", opt.resdir);

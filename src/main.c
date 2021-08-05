@@ -134,9 +134,11 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
     for(int i=0; i < IO500_PHASES; i++){
       if(phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
         double t = phases[i]->score;
+        if(t <= 0){
+          continue;
+        }
         score *= t;
-        if(numbers > 0)
-          p += sprintf(p, " * ");
+        p += sprintf(p, " * ");
         numbers++;
         p += sprintf(p, "%.8f", t);
       }

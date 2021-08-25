@@ -31,11 +31,16 @@ static double run(void){
 
   u_argv_t * argv = u_argv_create();
   ior_easy_add_params(argv);
-  u_argv_push(argv, "-r");
-  u_argv_push(argv, "-R");
+  u_argv_push(argv, "-r");	/* read existing file */
+  u_argv_push(argv, "-R");	/* verify data read */
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-easy-read.csv", opt.resdir);
+//  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
+//			     d.hintsFileName, o.hintsFileName);
+//  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
+//					 d.api, o.api);
+//  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);
 

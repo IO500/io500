@@ -6,6 +6,7 @@
 #include <phase_ior.h>
 
 typedef struct{
+  int run;
   char * api;
 
   char * command;
@@ -16,6 +17,7 @@ static opt_ior_rnd_read o;
 
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
+  {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.run},  
   {NULL} };
 
 
@@ -38,7 +40,7 @@ static double run(void){
   o.command = u_flatten_argv(argv);
 
   PRINT_PAIR("exe", "%s\n", o.command);
-  if(opt.dry_run || d.run == 0){
+  if(opt.dry_run || d.run == 0 || o.run == 0){
     u_argv_free(argv);
     return 0;
   }

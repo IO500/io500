@@ -13,7 +13,7 @@ static ini_option_t option[] = {
   {"io-buffers-on-gpu", "Allocate the I/O buffers on the GPU", 0, INI_BOOL, "FALSE", & opt.io_buffers_on_gpu},
   {"verbosity", "The verbosity level between 1 and 10", 0, INI_UINT, "1", & opt.verbosity},
   {"scc", "Use the rules for the Student Cluster Competition", 0, INI_BOOL, "FALSE", & opt.scc},
-  {"dataPacketType", "Type of packet that will be created [offset|incompressible|timestamp]", 0, INI_STRING, "timestamp", & opt.dataPacketType},
+  {"dataPacketType", "Type of packet that will be created [timestamp|offset|incompressible|random]", 0, INI_STRING, "timestamp", & opt.dataPacketType},
   {NULL} };
 
 static void validate(void){

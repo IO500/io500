@@ -49,6 +49,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
   opt_mdworkbench * d = & mdworkbench_o;
 
   u_argv_push(argv, "./md-workbench");
+  u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
   for(int i=0; i < mdworkbench_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }

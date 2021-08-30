@@ -33,6 +33,7 @@ void ior_rnd4K_add_params(u_argv_t * argv){
   opt_ior_rnd d = ior_rnd4K_o;
 
   u_argv_push(argv, "./ior");
+  u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
   for(int i=0; i < ior_rnd4K_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }

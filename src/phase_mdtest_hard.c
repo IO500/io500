@@ -11,12 +11,14 @@ opt_mdtest_hard mdtest_hard_o;
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & mdtest_hard_o.g.api},
   {"n", "Files per proc", 0, INI_UINT64, "1000000", & mdtest_hard_o.g.files_per_proc},
-  {"files-per-dir", "File limit per directory (MDTest -I flag) to overcome file system limitations ", 0, INI_UINT64, NULL, & mdtest_hard_o.g.files_per_dir},
+  {"files-per-dir", "File limit per directory (MDTest -I flag) to overcome file system limitations "DEBUG_OPTION, 0, INI_UINT64, NULL, & mdtest_hard_o.g.files_per_dir},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & mdtest_hard_o.g.run},
   {NULL} };
 
 static void validate(void){
-
+  if(mdtest_hard_o.g.files_per_dir != INI_UNSET_UINT64 && mdtest_hard_o.g.files_per_dir > 0 && opt.rank == 0){
+      INVALID("files-per-dir is set\n");
+  }
 }
 
 static void cleanup(void){

@@ -5,6 +5,8 @@
 
 #include <io500-util.h>
 
+#define DEBUG_OPTION "INVALIDATES RUN; FOR DEBUGGING."
+
 typedef enum {
   IO500_NO_SCORE,
   IO500_SCORE_MD,

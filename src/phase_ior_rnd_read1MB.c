@@ -27,15 +27,15 @@ static void validate(void){
 
 
 static double run(void){
-  opt_ior_rnd d = ior_rnd_o;
+  opt_ior_rnd d = ior_rnd1MB_o;
 
   u_argv_t * argv = u_argv_create();
-  ior_rnd_add_params(argv);
+  ior_rnd1MB_add_params(argv);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-R");
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
-  u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd-read.csv", opt.resdir);
+  u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd1MB-read.csv", opt.resdir);
   
   o.command = u_flatten_argv(argv);
 
@@ -44,13 +44,13 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd_read.name);
+  FILE * out = u_res_file_prep(p_ior_rnd1MB_read.name);
   return ior_process_read(argv, out, & o.res);
 }
 
 
-u_phase_t p_ior_rnd_read = {
-  "ior-rnd-read",
+u_phase_t p_ior_rnd1MB_read = {
+  "ior-rnd1MB-read",
   IO500_PHASE_READ | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,

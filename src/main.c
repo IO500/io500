@@ -343,6 +343,13 @@ int main(int argc, char ** argv){
     fprintf(file_out, "\n");
   }
 
+  // manage a hash for the scores
+  uint32_t score_hash = 0;
+  uint32_t score_extended_hash = 0;
+  u_hash_update_key_val(& score_hash, "version", VERSION);
+
+  dupprintf("IO500 version %s (%s)\n", VERSION, io500_mode_str(opt.mode));
+
   for(int i=0; i < IO500_PHASES; i++){
     if(RUN_PHASE(phases[i]) && phases[i]->validate){
       phases[i]->validate();
@@ -351,13 +358,6 @@ int main(int argc, char ** argv){
   if(opt.rank == 0){
     fprintf(file_out, "\n");
   }
-
-  // manage a hash for the scores
-  uint32_t score_hash = 0;
-  uint32_t score_extended_hash = 0;
-  u_hash_update_key_val(& score_hash, "version", VERSION);
-
-  dupprintf("IO500 version %s (%s)\n", VERSION, io500_mode_str(opt.mode));
 
   for(int i=0; i < IO500_PHASES; i++){
     u_phase_t * phase = phases[i];

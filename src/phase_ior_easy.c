@@ -46,6 +46,7 @@ void ior_easy_add_params(u_argv_t * argv){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
+  u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
   for(int i=0; i < ior_easy_o.verbosity; i++){
     u_argv_push(argv, "-v");	/* verbose */
   }

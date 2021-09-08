@@ -23,7 +23,7 @@ static ini_option_t option[] = {
 
 static void validate(void){
   if( ! opt.dry_run && opt.rank == 0){
-    u_create_datadir("ior-rnd");
+    u_create_datadir("ior-rnd4K");
   }
 }
 
@@ -32,18 +32,18 @@ static void cleanup(void){
 
   if(opt.rank == 0){
     char filename[PATH_MAX];
-    sprintf(filename, "%s/ior-rnd.stonewall", opt.resdir);
+    sprintf(filename, "%s/ior-rnd4K.stonewall", opt.resdir);
     unlink(filename);
-    u_purge_file("ior-rnd/file");
-    u_purge_datadir("ior-rnd");
+    u_purge_file("ior-rnd4K/file");
+    u_purge_datadir("ior-rnd4K");
   }
 }
 
 static double run(void){
-  opt_ior_rnd d = ior_rnd_o;
+  opt_ior_rnd d = ior_rnd4K_o;
 
   u_argv_t * argv = u_argv_create();
-  ior_rnd_add_params(argv);
+  ior_rnd4K_add_params(argv);
   u_argv_push(argv, "-w");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
@@ -54,7 +54,7 @@ static double run(void){
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
   u_argv_push(argv, "-O");
-  u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd-write.csv", opt.resdir);
+  u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd4K-write.csv", opt.resdir);
   o.command = u_flatten_argv(argv);
 
   PRINT_PAIR("exe", "%s\n", o.command);
@@ -62,12 +62,12 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd_write.name);
+  FILE * out = u_res_file_prep(p_ior_rnd4K_write.name);
   return ior_process_write(argv, out, & o.res);
 }
 
-u_phase_t p_ior_rnd_write = {
-  "ior-rnd-write",
+u_phase_t p_ior_rnd4K_write = {
+  "ior-rnd4K-write",
   IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,

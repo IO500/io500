@@ -30,6 +30,7 @@ typedef struct{
 
   char * api;
   char * apiArgs; // for IOR and mdtest
+  char * dataPacketType; /* how test data is created */
   char * timestamp;
   int timestamp_resdir;
   int timestamp_datadir;

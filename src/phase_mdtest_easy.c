@@ -31,6 +31,7 @@ void mdtest_easy_add_params(u_argv_t * argv){
   opt_mdtest_easy d = mdtest_easy_o;
 
   u_argv_push(argv, "./mdtest");
+  u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
   if(opt.io_buffers_on_gpu){
     u_argv_push(argv, "--allocateBufferOnGPU");
   }

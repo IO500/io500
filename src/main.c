@@ -235,6 +235,10 @@ int main(int argc, char ** argv){
           opt.timestamp = strdup(argv[++i]);
         else
           FATAL("Missing timestamp argument\n");
+      }else if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--list") == 0){
+        r0printf("# Supported and current values of the ini file:\n");
+        u_ini_print_values(stdout, cfg, TRUE);
+        exit(1);
       }else if(strcmp(argv[i], "--verify") == 0 ){
         verify_only = 1;
         break;

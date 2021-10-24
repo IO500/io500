@@ -312,13 +312,14 @@ int main(int argc, char ** argv){
     if(! file_out){
       FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
     }
+    fprintf(file_out, "[run]\n");    
 
     sprintf(file, "%s/config-orig.ini", opt.resdir);
     FILE * fd = fopen(file, "w");
     fwrite(ini_data, strlen(ini_data), 1, fd);
     fclose(fd);
   }
-  fprintf(file_out, "[run]\n");
+  
   PRINT_PAIR("version", "%s\n", VERSION);
   print_cfg_hash(file_out, cfg);
   PRINT_PAIR("result-dir", "%s\n", opt.resdir);

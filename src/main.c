@@ -313,7 +313,7 @@ int main(int argc, char ** argv){
       FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
     }
     fprintf(file_out, "[run]\n");    
-
+    PRINT_PAIR("procs", "%d\n", opt.mpi_size);
     sprintf(file, "%s/config-orig.ini", opt.resdir);
     FILE * fd = fopen(file, "w");
     fwrite(ini_data, strlen(ini_data), 1, fd);

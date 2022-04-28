@@ -23,8 +23,9 @@ function main {
   # Prerequistics
   echo "Please make sure that you have the required packages: curl libxml2 openssl libiconv gcc automake autoconf openmpi(or another mpi implementation) cmake"
   # module load curl libxml2 openssl libiconv gcc automake autoconf $MPILib cmake
-  #	apt install gcc cmake autoconf openssl libssl-dev libcurl4-openssl-dev libxml2-dev openmpi-bin libopenmpi-dev
-
+  echo "Tested on Ubuntu: apt install -y gcc cmake autoconf openssl libssl-dev libcurl4-openssl-dev libxml2-dev openmpi-bin libopenmpi-dev"
+  echo "Tested on Centos/Fedora: dnf install -y git gcc cmake automake autoconf openssl libxml2 libxml2-devel libcurl-devel openssl-devel openmpi"
+  sleep 1
   get_libs3
   get_ior
   get_pfind

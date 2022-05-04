@@ -18,7 +18,7 @@ The libS3 library should be dynamically linked before launching the benchmark.
 A sample config-s3.ini is provided, please replace the variables with the corresponding S3 storage access info.
 
 ```console
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/$PWD/build/libs3/build/lib
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/build/libs3/build/lib
 ./io500 ./contrib/s3/config-s3.ini
 ```
 

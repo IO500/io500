@@ -13,7 +13,7 @@ PFIND_HASH=62c3a7e31
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
 BUILD=$PWD/build
-MAKE="make -j4"
+MAKE="make -j$(nproc)"
 
 function main {
   # listed here, easier to spot and run if something fails
@@ -29,12 +29,12 @@ function main {
 
   echo
   echo "OK: All required software packages are now prepared"
-  ls $BIN
+  ls "$BIN"
 }
 
 function setup {
   #rm -rf $BUILD $BIN
-  mkdir -p $BUILD $BIN
+  mkdir -p "$BUILD" "$BIN"
   #cp utilities/find/mmfind.sh $BIN
 }
 
@@ -43,11 +43,11 @@ function git_co {
   local dir=$2
   local tag=$3
 
-  pushd $BUILD
-  [ -d "$dir" ] || git clone $repo $dir
-  cd $dir
+  pushd "$BUILD"
+  [ -d "$dir" ] || git clone "$repo" "$dir"
+  cd "$dir"
   git fetch
-  git checkout $tag
+  if [ -n "$tag" ]; then git checkout "$tag"; fi
   popd
 }
 
@@ -65,15 +65,15 @@ function get_pfind {
 function get_schema_tools {
   echo "Downloading supplementary schema tools"
   git_co https://github.com/VI4IO/cdcl-schema-tools.git cdcl-schema-tools
-  [ -d "$dir" ] || ln -sf $PWD/build/cdcl-schema-tools  schema-tools
+  [ -d "$dir" ] || ln -sf "$PWD"/build/cdcl-schema-tools schema-tools
 }
 
 ###### BUILD FUNCTIONS
 function build_ior {
-  pushd $BUILD/ior
+  pushd "$BUILD"/ior
   ./bootstrap
   # Add here extra flags
-  ./configure --prefix=$INSTALL_DIR
+  ./configure --prefix="$INSTALL_DIR"
   cd src
   $MAKE clean
   $MAKE install
@@ -83,17 +83,17 @@ function build_ior {
 }
 
 function build_pfind {
-  pushd $BUILD/pfind
+  pushd "$BUILD"/pfind
   ./prepare.sh
   ./compile.sh
-  ln -sf $BUILD/pfind/pfind $BIN/pfind
+  ln -sf "$BUILD"/pfind/pfind "$BIN"/pfind
   echo "Pfind: OK"
   echo
   popd
 }
 
 function build_io500 {
-  make
+  $MAKE
   echo "io500: OK"
   echo
 }

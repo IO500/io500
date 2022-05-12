@@ -14,6 +14,7 @@ typedef struct{
   char * drop_caches_cmd;
 
   int stonewall;
+  char * pause_dir; // if set check for files of the phase
 
   char * datadir;
   char * resdir;

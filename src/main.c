@@ -340,6 +340,9 @@ int main(int argc, char ** argv){
   if(opt.dry_run){
     INVALID_RUN("DRY RUN MODE ACTIVATED\n");
   }
+  if(opt.pause_dir){
+    INVALID_RUN("PAUSING BETWEEN RUNS ACTIVATED\n");
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){

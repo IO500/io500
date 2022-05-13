@@ -161,7 +161,7 @@ static ini_option_t option[] = {
 static void validate(void){
   if(of.run == 0) return;
   if(of.ext_find){
-    char args[2048];
+    char args[PATH_MAX];
     sprintf(args, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
     external_find_prepare_arguments(args, & of);
   }else{
@@ -198,7 +198,7 @@ void external_find_prepare_arguments(char * args, opt_find * of){
   if(! (sb.st_mode & S_IXUSR) ){
     FATAL("The external-script must be a executable file %s\n", of->ext_find);
   }
-  char command[2048];
+  char command[PATH_MAX];
   sprintf(command, "%s %s %s %s", of->ext_mpi, of->ext_find, of->ext_args, args);
   of->command = strdup(command);
 

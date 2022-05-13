@@ -301,7 +301,7 @@ int main(int argc, char ** argv){
 
   FILE * res_summary = NULL;
   if(opt.rank == 0){
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/result_summary.txt", opt.resdir);
     res_summary = fopen(file, "w");
     if(! res_summary){
@@ -327,7 +327,7 @@ int main(int argc, char ** argv){
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/config.ini", opt.resdir);
     FILE * fd = fopen(file, "w");
     if(! fd){
@@ -387,7 +387,7 @@ int main(int argc, char ** argv){
       
       if(opt.pause_dir){
         // if the file exists
-        char path[2048];
+        char path[PATH_MAX];
         int ret; 
         struct stat statbuf;
         if(opt.verbosity > 0){

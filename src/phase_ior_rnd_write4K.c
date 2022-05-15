@@ -28,7 +28,7 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if (opt.dry_run) return;
+  if (opt.dry_run || ! ior_rnd4K_o.run) return;
 
   if(opt.rank == 0){
     char filename[PATH_MAX];

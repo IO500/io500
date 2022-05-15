@@ -127,12 +127,16 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t * hash){
   double overall_score = 1;
-  for(io500_phase_score_group g=1; g < IO500_SCORE_LAST; g++){
+  int groups = IO500_SCORE_BW;
+  if(extended){
+    groups = IO500_SCORE_CONCURRENT;
+  }
+  for(io500_phase_score_group g=1; g <= groups; g++){
     char score_string[2048];
     char *p = score_string;
     double score = 1;
     int numbers = 0;
-    p += sprintf(p, " %s = (", io500_phase_str[g]);
+    p += sprintf(p, " %s = (1.0", io500_phase_str[g]);
     for(int i=0; i < IO500_PHASES; i++){
       if( phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
         double t = phases[i]->score;
@@ -157,7 +161,7 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
 
     overall_score *= score;
   }
-  return sqrt(overall_score);
+  return pow(overall_score, 1.0 / groups);
 }
 
 static const char * io500_mode_str(io500_mode mode){

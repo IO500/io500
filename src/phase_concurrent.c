@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <mpi.h>
+#include <math.h>
 
 #include <io500-phase.h>
 #include <phase_concurrent.h>
@@ -86,8 +87,8 @@ static double run(void){
   u_argv_push(argv[2], "-R=1"); /* 1 repetition */
   u_argv_push(argv[2], "-X"); /* turn read verification on */
   u_argv_push_printf(argv[2], "-w=%d", opt.stonewall);
-  u_argv_push_printf(argv, "-o=%s/concurrent-mdworkbench", opt.datadir);
-  u_argv_push_printf(argv, "--run-info-file=%s/concurrent-mdworkbench.status", opt.resdir );  
+  u_argv_push_printf(argv[2], "-o=%s/mdworkbench", opt.datadir);
+  u_argv_push_printf(argv[2], "--run-info-file=%s/mdworkbench.status", opt.resdir );  
   u_argv_push(argv[2], "-2"); /* run pre-create or benchmarking phase */
   o.command[2] = u_flatten_argv(argv[2]);  
   PRINT_PAIR("exe-md-workbench", "%s\n", o.command[2]);
@@ -124,21 +125,21 @@ static double run(void){
   }
   
   if(crank == 0){    
-    // exchange scores, calculate arithmetic mean score
+    // exchange scores, calculate geometric mean score
     double scores[CBENCHS];
     if(opt.rank == 0){
+      scores[0] = score;
       double aggregated_score = score * workloads[0];
       //printf("%f - %f - count: %d\n", score, aggregated_score, workloads[0]);      
       for(int i=1; i < CBENCHS; i++){
         UMPI_CHECK(MPI_Recv(& scores[i], 1, MPI_DOUBLE, workloads[i-1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE));
-        aggregated_score += scores[i] * (workloads[i] - workloads[i-1]);
+        aggregated_score = aggregated_score * (scores[i] * (workloads[i] - workloads[i-1]));
         //printf("%f - %f - count: %d\n", scores[i], aggregated_score, (workloads[i] - workloads[i-1]));
       }
       PRINT_PAIR("score-ior-easy-write", "%f\n", scores[0]);
       PRINT_PAIR("score-ior-rnd1MB-read", "%f\n", scores[1]);
       PRINT_PAIR("score-ior-md-workbench", "%f\n", scores[2]);
-      score = aggregated_score / opt.mpi_size;
-      //printf("average: %f\n", score);
+      score = pow(aggregated_score / opt.mpi_size, 1.0/CBENCHS);
     }else{
       UMPI_CHECK(MPI_Send(& score, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD));
     }

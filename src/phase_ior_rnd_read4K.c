@@ -45,7 +45,7 @@ static double run(void){
     return 0;
   }
   FILE * out = u_res_file_prep(p_ior_rnd4K_read.name, opt.rank);
-  return ior_process_read(argv, out, & o.res);
+  return ior_process_read(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 

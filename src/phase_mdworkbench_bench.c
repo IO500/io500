@@ -33,7 +33,7 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_mdworkbench_bench.name);
+  FILE * out = u_res_file_prep(p_mdworkbench_bench.name, opt.rank);
   mdworkbench_process(argv, out, & o.res);
   if(o.res->count != 2){
     INVALID("During the md-workbench phase not two iterations are performed but %d This invalidates your run.\n", o.res->count);

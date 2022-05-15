@@ -22,7 +22,9 @@ FILE* file_out = NULL;
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "NO SCORE",
   "MD",
-  "BW"};
+  "BW", 
+  "CONCURRENT"
+  };
 
 static void prepare_aiori(void){
   // check selected API, might be followed by API options
@@ -132,7 +134,7 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
     int numbers = 0;
     p += sprintf(p, " %s = (", io500_phase_str[g]);
     for(int i=0; i < IO500_PHASES; i++){
-      if(phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
+      if( phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
         double t = phases[i]->score;
         if(t <= 0){
           continue;

@@ -30,7 +30,7 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_mdworkbench_delete.name);
+  FILE * out = u_res_file_prep(p_mdworkbench_delete.name, opt.rank);
   mdworkbench_process(argv, out, & o.res);
   PRINT_PAIR("maxOpTime", "%f\n", o.res->result[0].max_op_time);
 

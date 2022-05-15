@@ -51,7 +51,7 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_hard_read.name);
+  FILE * out = u_res_file_prep(p_ior_hard_read.name, opt.rank);
   return ior_process_read(argv, out, & o.res);
 }
 

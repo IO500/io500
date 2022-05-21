@@ -22,7 +22,7 @@ vpath %.h $(SEARCHPATH)
 DEPS += io500-util.h io500-debug.h io500-opt.h
 OBJSO += util.o
 OBJSO += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
-OBJSO += phase_find.o phase_find_easy.o phase_find_hard.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd1MB.o phase_ior_rnd4K.o phase_ior_rnd_write4K.o phase_ior_rnd_read4K.o phase_ior_rnd_write1MB.o phase_ior_rnd_read1MB.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o
+OBJSO += phase_find.o phase_find_easy.o phase_find_hard.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd1MB.o phase_ior_rnd4K.o phase_ior_rnd_write4K.o phase_ior_rnd_read4K.o phase_ior_rnd_write1MB.o phase_ior_rnd_read1MB.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o phase_concurrent.o
 
 OBJS = $(patsubst %,./build/%,$(OBJSO))
 

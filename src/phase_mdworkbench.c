@@ -32,8 +32,8 @@ static void validate(void){
 }
 
 
-void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out){
-  mdworkbench_results_t * res = md_workbench_run(argv->size, argv->vector, MPI_COMM_WORLD, out);
+void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out, MPI_Comm com){
+  mdworkbench_results_t * res = md_workbench_run(argv->size, argv->vector, com, out);
   u_res_file_close(out);
   u_argv_free(argv);
 

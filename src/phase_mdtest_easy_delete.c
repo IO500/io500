@@ -35,7 +35,7 @@ static double run(void){
     return 0;
   }
 
-  FILE * out = u_res_file_prep(p_mdtest_easy_delete.name);
+  FILE * out = u_res_file_prep(p_mdtest_easy_delete.name, opt.rank);
   p_mdtest_run(argv, out, & o.res, MDTEST_FILE_REMOVE_NUM);
 
   return o.res.rate;

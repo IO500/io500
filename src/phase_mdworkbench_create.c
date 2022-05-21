@@ -31,8 +31,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_mdworkbench_create.name);
-  mdworkbench_process(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_mdworkbench_create.name, opt.rank);
+  mdworkbench_process(argv, out, & o.res, MPI_COMM_WORLD);
   PRINT_PAIR("maxOpTime", "%f\n", o.res->result[0].max_op_time);
 
   double rate = o.res->result[0].rate;

@@ -35,7 +35,7 @@ static double run(void){
     return 0;
   }
 
-  FILE * out = u_res_file_prep(p_mdtest_hard_stat.name);
+  FILE * out = u_res_file_prep(p_mdtest_hard_stat.name, opt.rank);
   p_mdtest_run(argv, out, & o.res, MDTEST_FILE_STAT_NUM);
   return o.res.rate;
 }

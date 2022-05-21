@@ -34,6 +34,7 @@ typedef struct{
 
   int random_prefill_bytes;
   uint64_t block_size;
+  int segments;
   int verbosity;
 } opt_ior_rnd;
 

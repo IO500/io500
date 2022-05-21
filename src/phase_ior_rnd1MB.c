@@ -12,6 +12,7 @@ static ini_option_t option[] = {
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_rnd1MB_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_rnd1MB_o.verbosity},
   {"randomPrefill", "Prefill the file with this blocksize in bytes, e.g., 2097152", 0, INI_INT, "0", & ior_rnd1MB_o.random_prefill_bytes},
+  {"segmentCount", "Number of segments", 0, INI_INT, "10000000", & ior_rnd1MB_o.segments},
   {NULL} };
 
 
@@ -55,7 +56,7 @@ void ior_rnd1MB_add_params(u_argv_t * argv){
   u_argv_push(argv, "-k");
   u_argv_push(argv, "-t=1048576");
   u_argv_push_printf(argv, "-b=%ld", d.block_size);
-  u_argv_push_printf(argv, "-s=%d", 10000000);
+  u_argv_push_printf(argv, "-s=%d", d.segments); /* number of segments */
 }
 
 u_phase_t p_ior_rnd1MB = {

@@ -301,7 +301,7 @@ int main(int argc, char ** argv){
 
   FILE * res_summary = NULL;
   if(opt.rank == 0){
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/result_summary.txt", opt.resdir);
     res_summary = fopen(file, "w");
     if(! res_summary){
@@ -327,7 +327,7 @@ int main(int argc, char ** argv){
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/config.ini", opt.resdir);
     FILE * fd = fopen(file, "w");
     if(! fd){
@@ -339,6 +339,9 @@ int main(int argc, char ** argv){
 
   if(opt.dry_run){
     INVALID_RUN("DRY RUN MODE ACTIVATED\n");
+  }
+  if(opt.pause_dir){
+    INVALID_RUN("PAUSING BETWEEN RUNS ACTIVATED\n");
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -380,15 +383,43 @@ int main(int argc, char ** argv){
       if(opt.rank == 0)
         u_call_cmd("LANG=C free -m");
     }
-
+  
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){
       fprintf(file_out, "\n[%s]\n", phase->name);
+      
+      if(opt.pause_dir){
+        // if the file exists
+        char path[PATH_MAX];
+        int ret; 
+        struct stat statbuf;
+        if(opt.verbosity > 0){
+          PRINT_PAIR_HEADER("t_pause");
+          u_print_timestamp(file_out);
+          fprintf(file_out, "\n");
+        }
+        sprintf(path, "%s/%s", opt.pause_dir, phase->name);
+        fprintf(file_out, "; Checking for pause file %s\n", path);
+        fflush(file_out);
+        while(1){
+          ret = stat(path, & statbuf);
+          if(ret != 0){
+            break;
+          }
+          sleep(1);
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+      }
+      
       if(opt.verbosity > 0){
         PRINT_PAIR_HEADER("t_start");
         u_print_timestamp(file_out);
         fprintf(file_out, "\n");
       }
+    }
+
+    if(opt.pause_dir && opt.rank != 0){
+      MPI_Barrier(MPI_COMM_WORLD);
     }
 
     double start = GetTimeStamp();

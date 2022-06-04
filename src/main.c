@@ -27,10 +27,10 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
   };
 
 static char const * io500_unit_str[IO500_SCORE_LAST] = {
-  "",
+  "     ",
   "kIOPS",
   "GiB/s",
-  ""
+  "score"
 };
 
 static void prepare_aiori(void){
@@ -436,7 +436,7 @@ int main(int argc, char ** argv){
       }else{
         dupprintf("[      ]");
       }
-      dupprintf(" %20s %15s %s : time %.3f seconds%s\n", phase->name, score_str, io500_unit_str[phase->type], runtime, valid_str);
+      dupprintf(" %20s %15s %s : time %.3f seconds%s\n", phase->name, score_str, io500_unit_str[phase->group], runtime, valid_str);
       
       PRINT_PAIR("t_delta", "%.4f\n", runtime);
       PRINT_PAIR_HEADER("t_end");

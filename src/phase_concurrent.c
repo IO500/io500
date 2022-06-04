@@ -185,7 +185,7 @@ static double run(void){
       PRINT_PAIR("time-ior-easy-write", "%f\n", times[0]);
       PRINT_PAIR("time-ior-rnd1MB-read", "%f\n", times[1]);
       PRINT_PAIR("time-ior-md-workbench", "%f\n", times[2]);
-      score = pow(aggregated_score * opt.mpi_size, 1.0/benchmarks);
+      score = pow(aggregated_score, 1.0/benchmarks) * opt.mpi_size;
     }else{
       UMPI_CHECK(MPI_Send(& score, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD));
       UMPI_CHECK(MPI_Send(& time, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD));

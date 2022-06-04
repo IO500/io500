@@ -29,7 +29,7 @@ static ini_option_t option[] = {
 static void validate(void){
   if(of.run == 0) return;
   if(of.ext_find){
-    char args[1024];
+    char args[PATH_MAX];
     sprintf(args, "%s/mdtest-easy/ -name \"*01*\"", opt.datadir);
     external_find_prepare_arguments(args, & of);
   }else{

@@ -98,7 +98,7 @@ double run_find(const char * phase_name, opt_find * of){
       ERROR("Failed to run find command: \"%s\" error: %s\n", of->command, strerror(errno));
       return -1;
     }
-    char line[1024];
+    char line[PATH_MAX];
     uint64_t hits = 0;
     *line = '\0';
     while (fgets(line, sizeof(line), fp) != NULL) {
@@ -161,7 +161,7 @@ static ini_option_t option[] = {
 static void validate(void){
   if(of.run == 0) return;
   if(of.ext_find){
-    char args[2048];
+    char args[PATH_MAX];
     sprintf(args, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
     external_find_prepare_arguments(args, & of);
   }else{
@@ -198,7 +198,7 @@ void external_find_prepare_arguments(char * args, opt_find * of){
   if(! (sb.st_mode & S_IXUSR) ){
     FATAL("The external-script must be a executable file %s\n", of->ext_find);
   }
-  char command[2048];
+  char command[PATH_MAX];
   sprintf(command, "%s %s %s %s", of->ext_mpi, of->ext_find, of->ext_args, args);
   of->command = strdup(command);
 

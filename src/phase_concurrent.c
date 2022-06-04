@@ -15,23 +15,21 @@ typedef struct{
   IOR_point_t * iorr;
   IOR_point_t * iorw;
   int color; // benchmark that is run
+  float ratio_write;
+  float ratio_read;
 } opt_concurrent_bench;
 
 static opt_concurrent_bench o;
 
 static ini_option_t option[] = {
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.run},
-  //{"", "XX", 0, INI_UINT, NULL, & o.XX},
+  {"ratio-write", "The ratio of processes that perform write - this ratio has the highest priority", 0, INI_FLOAT, "0.2", & o.ratio_write},
+  {"ratio-read", "The ratio of processes that perform random read - remaining processes will do metadata", 0, INI_FLOAT, "0.4", & o.ratio_read},  
   {NULL} };
 
 static double run(void){
   opt_concurrent_bench d = o;
-  
-  if(opt.mpi_size < 5){
-    INVALID("The concurrent phase needs at least 5 processes\n");
-    return 0;
-  }
-  
+    
   MPI_Comm ccom;
   /*
     Split processes into 3 groups and benchmarks:
@@ -39,7 +37,22 @@ static double run(void){
     benchmark 1 - 40% parallel read 1 MB - rnd1MB read
     benchmark 2 - 40% md-workbench for concurrent usage
   */
-  int workloads[] = {opt.mpi_size * 0.2, opt.mpi_size * 0.6, opt.mpi_size};
+  /* Sanity check of parameters */
+  if(d.ratio_write > 1){
+    d.ratio_write = 0;
+  }
+  if(d.ratio_read > 1){
+    d.ratio_read = 0;
+  }
+
+  int workloads[] = {opt.mpi_size * d.ratio_write, opt.mpi_size * (d.ratio_write+d.ratio_read), opt.mpi_size};
+  int procs[] = {workloads[0], workloads[1] - workloads[0], workloads[2] - workloads[1]};
+  
+  if(procs[0] + procs[1] == 0 || procs[0] + procs[2] == 0 || procs[1] + procs[2] == 0){
+    INVALID("The concurrent phase doesn't make sense with two benchmarks using 0 processes\n");
+    return 0;
+  }
+  
   int color = (opt.rank < workloads[0]) ? 0 : (opt.rank < workloads[1] ? 1 : 2);
   o.color = color;
   UMPI_CHECK(MPI_Comm_split(MPI_COMM_WORLD, color, opt.rank, & ccom));
@@ -47,7 +60,11 @@ static double run(void){
   int crank;
   MPI_Comm_rank(ccom, & crank);
   /* printf("%d - %d - rank %d\n", opt.rank, color, crank); */
-  PRINT_PAIR("benchmark", "%d\n", color);
+  if(opt.rank == 0){
+    PRINT_PAIR("ranks-write", "%d\n", procs[0]);
+    PRINT_PAIR("ranks-read", "%d\n", procs[1]);
+    PRINT_PAIR("ranks-md", "%d\n", procs[2]);
+  }
     
   u_argv_t * argv[CBENCHS];
   for(int i=0; i < CBENCHS; i++){
@@ -112,12 +129,16 @@ static double run(void){
     }    
     FILE * out = u_res_file_prep("concurrent-ior-easy-write", crank);
     score = ior_process_write(argv[0], out, & o.iorw, ccom);
-    time = o.iorw->time;
+    if(o.iorw){
+      time = o.iorw->time;
+    }
   }else if(color == 1){
     // run ior rnd 1MB read
     FILE * out = u_res_file_prep("concurrent-rnd1MB-read", crank);
     score = ior_process_read(argv[1], out, & o.iorr, ccom);
-    time = o.iorr->time;
+    if(o.iorr){
+      time = o.iorr->time;
+    }
   }else if(color == 2){
     // run md_workbench
     FILE * out = u_res_file_prep("concurrent-md-workbench", crank);
@@ -126,23 +147,37 @@ static double run(void){
     double rate = o.mdw->result[0].rate;
     PRINT_PAIR("maxOpTime", "%f\n", o.mdw->result[0].max_op_time);
     score = rate / 1000.0;
-    time = o.mdw->result[0].runtime;
+    if(o.mdw){
+      time = o.mdw->result[0].runtime;
+    }
   }
   
   if(crank == 0){    
     // exchange scores, calculate geometric mean score
-    double scores[CBENCHS];
-    double times[CBENCHS];
+    double scores[CBENCHS] = {0};
+    double times[CBENCHS] = {0};
     if(opt.rank == 0){
-      scores[0] = score;
-      times[0] = time;
-      double aggregated_score = score / workloads[0];
-      //printf("%f - %f - count: %d\n", score, aggregated_score, workloads[0]);      
+      MPI_Request req_score, req_time;
+      UMPI_CHECK(MPI_Isend(& score, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, & req_score));
+      UMPI_CHECK(MPI_Isend(& time, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, & req_time));
+      
+      double aggregated_score = 1;
+      int benchmarks = 0;
+      if (procs[0] != 0){
+        scores[0] = score;
+        times[0] = time;
+        benchmarks++;
+      }
       for(int i=1; i < CBENCHS; i++){
+        if (procs[i] == 0){
+          scores[i] = 0;
+          times[i] = 0;
+          continue;
+        }
+        benchmarks++;
         UMPI_CHECK(MPI_Recv(& scores[i], 1, MPI_DOUBLE, workloads[i-1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE));
         UMPI_CHECK(MPI_Recv(& times[i], 1, MPI_DOUBLE, workloads[i-1], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE));
-        aggregated_score = aggregated_score * (scores[i] / (workloads[i] - workloads[i-1]));
-        //printf("%f - %f - count: %d\n", scores[i], aggregated_score, (workloads[i] - workloads[i-1]));
+        aggregated_score = aggregated_score * (scores[i] / procs[i]);
       }
       PRINT_PAIR("score-ior-easy-write", "%f\n", scores[0]);
       PRINT_PAIR("score-ior-rnd1MB-read", "%f\n", scores[1]);
@@ -150,7 +185,7 @@ static double run(void){
       PRINT_PAIR("time-ior-easy-write", "%f\n", times[0]);
       PRINT_PAIR("time-ior-rnd1MB-read", "%f\n", times[1]);
       PRINT_PAIR("time-ior-md-workbench", "%f\n", times[2]);
-      score = pow(aggregated_score * opt.mpi_size, 1.0/CBENCHS);
+      score = pow(aggregated_score * opt.mpi_size, 1.0/benchmarks);
     }else{
       UMPI_CHECK(MPI_Send(& score, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD));
       UMPI_CHECK(MPI_Send(& time, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD));

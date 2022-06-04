@@ -422,6 +422,7 @@ int main(int argc, char ** argv){
       }
       if(! (phase->type & IO500_PHASE_DUMMY)){
         PRINT_PAIR("score", "%f\n", score);
+        PRINT_PAIR("runtime", "%f\n", runtime);
       }
       char * valid_str = opt.is_valid_phase ? "" : " [INVALID]";
       char score_str[40];

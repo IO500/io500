@@ -76,8 +76,7 @@ static double run(void){
   opt_ior_easy d = ior_easy_o;
   ior_easy_add_params(argv[0], 0);
   u_argv_push(argv[0], "-w");	/* write file */
-  u_argv_push(argv[0], "-D");	/* deadline for stonewall in seconds */
-  u_argv_push_printf(argv[0], "%d", opt.stonewall);
+  u_argv_push_printf(argv[0], "-D=%d", opt.stonewall); /* deadline for stonewall in seconds */
   //u_argv_push_default_if_set_api_options(argv[0], "-a", d.api, o.api);
   u_argv_push_default_if_set_api_options(argv[0], "-a", d.api, d.api); // TODO USE RND WRITE OPTION
   u_argv_push(argv[0], "-O");
@@ -94,8 +93,8 @@ static double run(void){
   u_argv_push_default_if_set_api_options(argv[1], "-a", d.api, d.api); // TODO USE RND WRITE OPTION
   u_argv_push(argv[1], "-O");
   u_argv_push_printf(argv[1], "saveRankPerformanceDetailsCSV=%s/concurrent-ior-rnd1MB-read.csv", opt.resdir);
-  u_argv_push(argv[0], "-D");	/* deadline for stonewall in seconds */
-  u_argv_push_printf(argv[0], "%d", opt.stonewall);
+  u_argv_push_printf(argv[1], "-D=%d", opt.stonewall); /* deadline for stonewall in seconds */
+  u_argv_push_printf(argv[1], "-O=minTimeDuration=%d", opt.stonewall); /* minimum runtime */
   o.command[1] = u_flatten_argv(argv[1]);
   PRINT_PAIR("exe-rnd1MB-read", "%s\n", o.command[1]);
   }

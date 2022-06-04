@@ -77,6 +77,7 @@ static double run(void){
   ior_easy_add_params(argv[0], 0);
   u_argv_push(argv[0], "-w");	/* write file */
   u_argv_push_printf(argv[0], "-D=%d", opt.stonewall); /* deadline for stonewall in seconds */
+  u_argv_push_printf(argv[0], "-O=minTimeDuration=%d", opt.stonewall); /* minimum runtime */
   //u_argv_push_default_if_set_api_options(argv[0], "-a", d.api, o.api);
   u_argv_push_default_if_set_api_options(argv[0], "-a", d.api, d.api); // TODO USE RND WRITE OPTION
   u_argv_push(argv[0], "-O");

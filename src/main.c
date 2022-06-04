@@ -26,6 +26,13 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "CONCURRENT"
   };
 
+static char const * io500_unit_str[IO500_SCORE_LAST] = {
+  "",
+  "kIOPS",
+  "GiB/s",
+  ""
+};
+
 static void prepare_aiori(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
@@ -390,11 +397,9 @@ int main(int argc, char ** argv){
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){
       fprintf(file_out, "\n[%s]\n", phase->name);
-      if(opt.verbosity > 0){
-        PRINT_PAIR_HEADER("t_start");
-        u_print_timestamp(file_out);
-        fprintf(file_out, "\n");
-      }
+      PRINT_PAIR_HEADER("t_start");
+      u_print_timestamp(file_out);
+      fprintf(file_out, "\n");
     }
 
     double start = GetTimeStamp();
@@ -422,7 +427,6 @@ int main(int argc, char ** argv){
       }
       if(! (phase->type & IO500_PHASE_DUMMY)){
         PRINT_PAIR("score", "%f\n", score);
-        PRINT_PAIR("runtime", "%f\n", runtime);
       }
       char * valid_str = opt.is_valid_phase ? "" : " [INVALID]";
       char score_str[40];
@@ -432,7 +436,12 @@ int main(int argc, char ** argv){
       }else{
         dupprintf("[      ]");
       }
-      dupprintf(" %20s %15s %s : time %.3f seconds%s\n", phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime, valid_str);
+      dupprintf(" %20s %15s %s : time %.3f seconds%s\n", phase->name, score_str, io500_unit_str[phase->type], runtime, valid_str);
+      
+      PRINT_PAIR("t_delta", "%.4f\n", runtime);
+      PRINT_PAIR_HEADER("t_end");
+      u_print_timestamp(file_out);
+      fprintf(file_out, "\n");
     }
     if(phase->group > IO500_NO_SCORE){
       if(phase->type & IO500_PHASE_FLAG_OPTIONAL){
@@ -442,14 +451,6 @@ int main(int argc, char ** argv){
       }
     }
     phases[i]->score = score;
-
-
-    if(opt.verbosity > 0 && opt.rank == 0){
-      PRINT_PAIR("t_delta", "%.4f\n", runtime);
-      PRINT_PAIR_HEADER("t_end");
-      u_print_timestamp(file_out);
-      fprintf(file_out, "\n");
-    }
   }
 
   MPI_Barrier(MPI_COMM_WORLD);

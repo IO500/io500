@@ -36,8 +36,11 @@ static double run(void){
   FILE * out = u_res_file_prep(p_mdworkbench_bench.name, opt.rank);
   mdworkbench_process(argv, out, & o.res, MPI_COMM_WORLD);
   if(o.res->count != 2){
-    INVALID("During the md-workbench phase not two iterations are performed but %d This invalidates your run.\n", o.res->count);
+    INVALID("During the md-workbench phase not two iterations are performed but %d. This invalidates your run.\n", o.res->count);
     return 0.0;
+  }
+  if(o.res->errors){
+    INVALID("md-workbench reported %lld errors\n", (long long int) o.res->errors);
   }
 
   double rate = o.res->result[1].rate;

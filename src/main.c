@@ -138,6 +138,7 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
   if(extended){
     groups = IO500_SCORE_CONCURRENT;
   }
+  memset(scores, 0, sizeof(double) * IO500_SCORE_LAST);
   for(io500_phase_score_group g=1; g <= groups; g++){
     char score_string[2048];
     char *p = score_string;
@@ -180,6 +181,92 @@ static const char * io500_mode_str(io500_mode mode){
   }
 }
 
+typedef struct {
+  int run;
+  int valid;
+  double score;
+  double time;
+} io500_phase_result_t;
+
+typedef struct{
+  double score[IO500_SCORE_LAST];
+  double scoreX[IO500_SCORE_LAST];
+  double runtime;
+} io500_overall_results_t;
+
+static io500_phase_result_t io500_results[IO500_PHASES];
+static io500_overall_results_t io500_overall_results;
+
+static void dump_io500_phase(FILE * o, int i){
+  io500_phase_result_t * r = & io500_results[i];
+  if(! r->run) return;
+  u_phase_t * phase = phases[i];
+  char score_str[40];
+  sprintf(score_str, "%f", r->score);
+  fprintf(o, "%25s\t%15s\t%s\t%.3fs\t%s\n", phase->name, score_str, io500_unit_str[phase->group], r->time, r->valid ? "" : "INVALID");
+}
+
+static void dump_io500_results(void){
+    FILE * res;
+    char file[PATH_MAX];
+    sprintf(file, "%s/result_pretty.txt", opt.resdir);
+    res = fopen(file, "w");
+    if(! res){
+      FATAL("Could not open \"%s\" for writing (%s)\n", file, strerror(errno));
+    } 
+    
+    fprintf(res, "%25s\t%fs\n", "RUNTIME", io500_overall_results.runtime);
+    fprintf(res, "%25s", "SCORE");
+    for(int i=0; i < IO500_SCORE_LAST; i++){
+      fprintf(res, "\t%f\t%s\t", io500_overall_results.score[i], io500_unit_str[i]);
+    }
+    fprintf(res, "\n");
+    
+    if(opt.mode == IO500_MODE_EXTENDED){
+      fprintf(res, "%25s", "SCOREX");
+      for(int i=0; i < IO500_SCORE_LAST; i++){
+        fprintf(res, "\t%f\t%s\t", io500_overall_results.scoreX[i], io500_unit_str[i]);
+      }
+      fprintf(res, "\n");
+    }
+    
+    // ior easy
+    dump_io500_phase(res, 3);
+    dump_io500_phase(res, 24);
+    // ior hard
+    dump_io500_phase(res, 15);
+    dump_io500_phase(res, 26);
+    // rand4k
+    dump_io500_phase(res, 5);
+    dump_io500_phase(res, 19);
+    // rand1M
+    dump_io500_phase(res, 8);
+    dump_io500_phase(res, 20);
+    // concurrent
+    dump_io500_phase(res, 23);
+    
+    // MD easy
+    dump_io500_phase(res, 7);
+    dump_io500_phase(res, 25);
+    dump_io500_phase(res, 29);
+    // MD hard
+    dump_io500_phase(res, 17);
+    dump_io500_phase(res, 27);
+    dump_io500_phase(res, 30);
+    dump_io500_phase(res, 31);
+    // MDW
+    dump_io500_phase(res, 22);
+    dump_io500_phase(res, 28);
+    // find
+    dump_io500_phase(res, 18);
+    // find easy
+    dump_io500_phase(res, 13);    
+    // find hard
+    dump_io500_phase(res, 21);
+    
+    fclose(res);
+}
+
 int main(int argc, char ** argv){
   int mpi_init = 0;
   file_out = stdout;
@@ -212,6 +299,9 @@ int main(int argc, char ** argv){
     }
     goto out;
   }
+  
+  memset(io500_results, 0, sizeof(io500_results));
+  double t_io500_start = GetTimeStamp();
 
   mpi_init = 1;
   MPI_Init(& argc, & argv);
@@ -314,7 +404,7 @@ int main(int argc, char ** argv){
 
   FILE * res_summary = NULL;
   if(opt.rank == 0){
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/result_summary.txt", opt.resdir);
     res_summary = fopen(file, "w");
     if(! res_summary){
@@ -340,7 +430,7 @@ int main(int argc, char ** argv){
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/config.ini", opt.resdir);
     FILE * fd = fopen(file, "w");
     if(! fd){
@@ -379,11 +469,12 @@ int main(int argc, char ** argv){
 
   for(int i=0; i < IO500_PHASES; i++){
     u_phase_t * phase = phases[i];
-    if(! phase->run) continue;
+    if(! phase->run) continue;        
     if( cleanup_only && ! (phase->type & IO500_PHASE_REMOVE) ) continue;
     if(! RUN_PHASE(phase)){
       continue;
     }
+    io500_results[i].run = 1;
 
     if(opt.drop_caches && ! (phase->type & IO500_PHASE_DUMMY) ){
       DEBUG_INFO("Dropping cache\n");
@@ -425,6 +516,11 @@ int main(int argc, char ** argv){
           opt.is_valid_run = 0;
         }
       }
+    
+      io500_results[i].score = score;
+      io500_results[i].time = runtime;
+      io500_results[i].valid = opt.is_valid_phase;
+      
       if(! (phase->type & IO500_PHASE_DUMMY)){
         PRINT_PAIR("score", "%f\n", score);
       }
@@ -468,7 +564,10 @@ int main(int argc, char ** argv){
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
     dupprintf("[SCORE ] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f%s\n",
     scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score, valid_str);
-
+    
+    scores[IO500_NO_SCORE] = overall_score;
+    memcpy(io500_overall_results.score, scores, sizeof(scores));
+    
     // extended run
     if(opt.mode == IO500_MODE_EXTENDED){
       valid_str = opt.is_valid_extended_run ? "" : " [INVALID]";
@@ -481,8 +580,13 @@ int main(int argc, char ** argv){
       PRINT_PAIR("SCORE", "%f%s\n", overall_extended_score, valid_str);
       PRINT_PAIR("hash", "%X\n", (int) score_extended_hash);
       dupprintf("[SCOREX] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f%s\n", scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_extended_score, valid_str);
+      
+      scores[IO500_NO_SCORE] = overall_score;
+      memcpy(io500_overall_results.scoreX, scores, sizeof(scores));
     }
-
+    
+    io500_overall_results.runtime = GetTimeStamp() - t_io500_start;
+    dump_io500_results();
     printf("\nThe result files are stored in the directory: %s\n", opt.resdir);
   }
 

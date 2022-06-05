@@ -7,6 +7,10 @@ void p_mdtest_run(u_argv_t * argv, FILE * out, mdtest_generic_res * d, mdtest_te
   d->items = res->items[test];
   d->rate = res->rate[test] / 1000;
   d->rate_stonewall = res->stonewall_item_sum[test] / res->stonewall_time[test] / 1000;
+  INFO_PAIR("errors", "%.0f\n", (float) res->total_errors);
+  if(res->total_errors){
+    INVALID("Verification errors %.0f \n", (float) res->total_errors);
+  }
   u_res_file_close(out);
   u_argv_free(argv);
   free(res);

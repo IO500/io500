@@ -60,7 +60,7 @@ double run_find(const char * phase_name, opt_find * of){
         fprintf(fd, "runtime: %f rate: %f\n", of->pfind_res->runtime, of->pfind_res->rate);
         fprintf(fd, "rank, errors, unknown, found, total, checked, job steal msgs received, work items send, job steal msgs send, work items stolen, time spend in job stealing in s, number of completion tokens send\n");
         fprintf(fd, "0, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64, res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);
-        fprintf(fd, ", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %.3fs, %"PRIu64"\n", res->monitor.job_steal_inbound, res->monitor.work_send, res->monitor.job_steal_tries, res->monitor.work_stolen, res->monitor.job_steal_mpitime_us / 1000000.0, res->monitor.completion_tokens_send);
+        fprintf(fd, ", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %.3f, %"PRIu64"\n", res->monitor.job_steal_inbound, res->monitor.work_send, res->monitor.job_steal_tries, res->monitor.work_stolen, res->monitor.job_steal_mpitime_us / 1000000.0, res->monitor.completion_tokens_send);
         for(int i=1; i < of->nproc; i++){
           MPI_Recv(& res->errors, 5, MPI_LONG_LONG_INT, i, 4712, of->pfind_com, MPI_STATUS_IGNORE);
           fprintf(fd, "%d, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64, i, res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);

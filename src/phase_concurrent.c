@@ -90,7 +90,6 @@ static double run(void){
   opt_ior_rnd d = ior_rnd1MB_o;
   ior_rnd1MB_add_params(argv[1]);
   u_argv_push(argv[1], "-r");
-  u_argv_push(argv[1], "-R");
   u_argv_push_default_if_set_api_options(argv[1], "-a", d.api, d.api); // TODO USE RND WRITE OPTION
   u_argv_push(argv[1], "-O");
   u_argv_push_printf(argv[1], "saveRankPerformanceDetailsCSV=%s/concurrent-ior-rnd1MB-read.csv", opt.resdir);

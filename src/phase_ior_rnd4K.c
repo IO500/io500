@@ -38,9 +38,12 @@ void ior_rnd4K_add_params(u_argv_t * argv){
   for(int i=0; i < ior_rnd4K_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
-  if(opt.io_buffers_on_gpu){
+  if(opt.allocateBufferDevice){
     u_argv_push(argv, "-O");
-    u_argv_push(argv, "allocateBufferOnGPU=1");
+    u_argv_push_printf(argv, "allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
   }
   u_argv_push(argv, "-Q=1");
   //u_argv_push(argv, "-F");

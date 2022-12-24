@@ -53,9 +53,12 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
   for(int i=0; i < mdworkbench_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
-  if(opt.io_buffers_on_gpu){
-    u_argv_push(argv, "--allocateBufferOnGPU");
-  }  
+  if(opt.allocateBufferDevice){
+    u_argv_push_printf(argv, "--allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
+  }
   u_argv_push(argv, "--process-reports");
   u_argv_push_default_if_set_api_options(argv, "-a", d->api, d->api);
   u_argv_push_printf(argv, "-o=%s/mdworkbench", opt.datadir);

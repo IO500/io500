@@ -50,9 +50,12 @@ void ior_easy_add_params(u_argv_t * argv, int useStatusFile){
   for(int i=0; i < ior_easy_o.verbosity; i++){
     u_argv_push(argv, "-v");	/* verbose */
   }
-  if(opt.io_buffers_on_gpu){
+  if(opt.allocateBufferDevice){
     u_argv_push(argv, "-O");
-    u_argv_push(argv, "allocateBufferOnGPU=1");
+    u_argv_push_printf(argv, "allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
   }
   u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
   u_argv_push(argv, "-Q");	/* task per node offset */

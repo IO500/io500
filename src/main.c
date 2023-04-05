@@ -24,6 +24,8 @@ static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "MD",
   "BW"};
 
+extern int rank;
+
 static void prepare_aiori(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
@@ -204,6 +206,7 @@ int main(int argc, char ** argv){
   MPI_Init(& argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
+  rank = opt.rank;
 
   int verbosity_override = -1;
   int print_help = 0;

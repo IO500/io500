@@ -8,7 +8,7 @@ echo It will output OK at the end if builds succeed
 echo
 
 IOR_HASH=06fc08e147600f4e5896a5b9b2bf8f1c4a79121f
-PFIND_HASH=62c3a7e31
+PFIND_HASH=778dca8
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin

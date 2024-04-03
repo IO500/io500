@@ -76,7 +76,7 @@ void u_purge_file(char const * file){
   char f[PATH_MAX];
   sprintf(f, "%s/%s", opt.datadir, file);
   DEBUG_INFO("Removing file %s\n", f);
-  opt.aiori->delete(f, opt.backend_opt);
+  opt.aiori->remove(f, opt.backend_opt);
 }
 
 void u_create_datadir(char const * dir){

@@ -13,7 +13,7 @@ PFIND_HASH=778dca8
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
 BUILD=$PWD/build
-MAKE="make -j$(nproc)"
+MAKE="make -j${NPROC:-$(nproc 2> /dev/null || echo 4)}"	# handle missing nproc
 
 function main {
   # listed here, easier to spot and run if something fails

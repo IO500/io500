@@ -46,7 +46,8 @@ static u_phase_t * phases[IO500_PHASES] = {
 
   & p_mdtest_easy_delete,
   & p_mdtest_hard_read,
-  & p_mdtest_hard_delete
+  & p_mdtest_hard_delete,
+  & p_ior_rnd4K_read_easywrite
 };
 
 static ini_section_t ** u_options(void){

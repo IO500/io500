@@ -71,6 +71,7 @@ extern u_phase_t p_concurrent;
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;
 extern u_phase_t p_ior_easy_read;
+extern u_phase_t p_ior_rnd4K_read_easywrite;
 
 extern u_phase_t p_mdtest_easy;
 extern u_phase_t p_mdtest_easy_write;

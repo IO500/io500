@@ -78,7 +78,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
     mdtest_generic_res* mdtest = mdtest_easy_write_get_result();
     MPI_Bcast(& mdtest->rate, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    char file[2048];
+    char file[PATH_MAX];
     sprintf(file, "%s/mdworkbench-size", opt.resdir);
     if (is_create && opt.rank == 0){
       // store the actual processed size, allows easy deletion

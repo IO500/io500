@@ -33,6 +33,8 @@ static char const * io500_unit_str[IO500_SCORE_LAST] = {
   "score"
 };
 
+extern int rank;
+
 static void prepare_aiori(void){
   // check selected API, might be followed by API options
   char * api = strdup(opt.api);
@@ -307,6 +309,7 @@ int main(int argc, char ** argv){
   MPI_Init(& argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
+  rank = opt.rank;
 
   int verbosity_override = -1;
   int print_help = 0;
@@ -443,6 +446,9 @@ int main(int argc, char ** argv){
   if(opt.dry_run){
     INVALID_RUN("DRY RUN MODE ACTIVATED\n");
   }
+  if(opt.pause_dir){
+    INVALID_RUN("PAUSING BETWEEN RUNS ACTIVATED\n");
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
   if(opt.verbosity > 0 && opt.rank == 0){
@@ -484,13 +490,43 @@ int main(int argc, char ** argv){
       if(opt.rank == 0)
         u_call_cmd("LANG=C free -m");
     }
-
+  
     MPI_Barrier(MPI_COMM_WORLD);
     if(opt.rank == 0){
       fprintf(file_out, "\n[%s]\n", phase->name);
-      PRINT_PAIR_HEADER("t_start");
-      u_print_timestamp(file_out);
-      fprintf(file_out, "\n");
+      
+      if(opt.pause_dir){
+        // if the file exists
+        char path[PATH_MAX];
+        int ret; 
+        struct stat statbuf;
+        if(opt.verbosity > 0){
+          PRINT_PAIR_HEADER("t_pause");
+          u_print_timestamp(file_out);
+          fprintf(file_out, "\n");
+        }
+        sprintf(path, "%s/%s", opt.pause_dir, phase->name);
+        fprintf(file_out, "; Checking for pause file %s\n", path);
+        fflush(file_out);
+        while(1){
+          ret = stat(path, & statbuf);
+          if(ret != 0){
+            break;
+          }
+          sleep(1);
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+      }
+      
+      if(opt.verbosity > 0){
+        PRINT_PAIR_HEADER("t_start");
+        u_print_timestamp(file_out);
+        fprintf(file_out, "\n");
+      }
+    }
+
+    if(opt.pause_dir && opt.rank != 0){
+      MPI_Barrier(MPI_COMM_WORLD);
     }
 
     double start = GetTimeStamp();

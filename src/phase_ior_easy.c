@@ -33,7 +33,7 @@ static void cleanup(void){
     }
   }
   if(ior_easy_o.filePerProc){
-      char filename[2048];
+      char filename[PATH_MAX];
       sprintf(filename, "ior-easy/ior_file_easy.%08d", opt.rank);
       u_purge_file(filename);
   }

@@ -7,8 +7,8 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=07e2feb6e0e9a2
-PFIND_HASH=d97bcb944f4
+IOR_HASH=03985eeec485b59a9422d48a1b660d72feae72a8
+PFIND_HASH=778dca8
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
@@ -53,19 +53,35 @@ function git_co {
 
 ###### GET FUNCTIONS
 function get_ior {
-  echo "Getting IOR and mdtest"
-  git_co https://github.com/hpc/ior.git ior $IOR_HASH
+  local ior_dir="build/ior"
+  if [ -d "$ior_dir" ]; then
+    echo "IOR already exists. Skipping download."
+  else
+    echo "Getting IOR and mdtest"
+    git_co https://github.com/hpc/ior.git "$ior_dir" $IOR_HASH
+  fi
 }
 
 function get_pfind {
-  echo "Preparing parallel find"
-  git_co https://github.com/VI4IO/pfind.git pfind $PFIND_HASH
+  local pfind_dir="build/pfind"
+  if [ -d "$pfind_dir" ]; then
+    echo "Parallel find already exists. Skipping download."
+  else
+    echo "Preparing parallel find"
+    git_co https://github.com/VI4IO/pfind.git "$pfind_dir" $PFIND_HASH
+  fi
 }
 
 function get_schema_tools {
-  echo "Downloading supplementary schema tools"
-  git_co https://github.com/VI4IO/cdcl-schema-tools.git cdcl-schema-tools
-  [ -d "$dir" ] || ln -sf "$PWD"/build/cdcl-schema-tools schema-tools
+  local schema_build_dir="build/cdcl-schema-tools"
+  local schema_dir="schema-tools"
+  if [ -d "$schema_build_dir" ] && [ -d "$schema_dir" ]; then
+    echo "Schema tools already exist. Skipping download."
+  else
+    echo "Downloading supplementary schema tools"
+    git_co https://github.com/VI4IO/cdcl-schema-tools.git cdcl-schema-tools
+    [ -d "$dir" ] || ln -sf "$PWD"/build/cdcl-schema-tools schema-tools
+  fi
 }
 
 ###### BUILD FUNCTIONS

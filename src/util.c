@@ -65,7 +65,7 @@ void u_call_cmd(char const * str){
   }
 }
 void u_purge_datadir(char const * dir){
-  char d[2048];
+  char d[PATH_MAX];
   sprintf(d, "%s/%s", opt.datadir, dir);
   DEBUG_INFO("Removing dir %s\n", d);
 
@@ -73,24 +73,24 @@ void u_purge_datadir(char const * dir){
 }
 
 void u_purge_file(char const * file){
-  char f[2048];
+  char f[PATH_MAX];
   sprintf(f, "%s/%s", opt.datadir, file);
   DEBUG_INFO("Removing file %s\n", f);
-  opt.aiori->delete(f, opt.backend_opt);
+  opt.aiori->remove(f, opt.backend_opt);
 }
 
 void u_create_datadir(char const * dir){
   if(opt.rank != 0){
     return;
   }
-  char d[2048];
+  char d[PATH_MAX];
   sprintf(d, "%s/%s", opt.datadir, dir);
   u_create_dir_recursive(d, opt.aiori, opt.backend_opt);
 }
 
 void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * module_options){
   char * d = strdup(dir);
-  char outdir[2048];
+  char outdir[PATH_MAX];
   char * wp = outdir;
   if (dir[0] == '/'){
     wp += sprintf(wp, "/");
@@ -198,7 +198,7 @@ void u_argv_push_default_if_set(u_argv_t * argv, char * const arg, char const * 
 
 
 void u_argv_push_printf(u_argv_t * argv, char const * format, ...){
-  char buff[2048];
+  char buff[PATH_MAX];
   va_list args;
   va_start(args, format);
   vsprintf(buff, format, args);
@@ -207,7 +207,7 @@ void u_argv_push_printf(u_argv_t * argv, char const * format, ...){
 }
 
 char * u_flatten_argv(u_argv_t * argv){
-  char command[2048];
+  char command[PATH_MAX];
   char * p = command;
   *p = '\0';
   for(int i = 0; i < argv->size; i++){
@@ -238,8 +238,8 @@ void u_print_timestamp(FILE * out){
 
 FILE * u_res_file_prep(char const * name, int rank){
   FILE * out = stdout;
-  if(rank == 0){
-    char fname[2048];
+  if(opt.rank == 0){
+    char fname[PATH_MAX];
     sprintf(fname, "%s/%s.txt", opt.resdir, name);
     INFO_PAIR("result-file", "%s\n", fname);
     out = fopen(fname, "w");

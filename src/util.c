@@ -236,7 +236,7 @@ void u_print_timestamp(FILE * out){
   fprintf(out, "%s", buffer);
 }
 
-FILE * u_res_file_prep(char const * name){
+FILE * u_res_file_prep(char const * name, int rank){
   FILE * out = stdout;
   if(opt.rank == 0){
     char fname[PATH_MAX];

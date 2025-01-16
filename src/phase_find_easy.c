@@ -29,7 +29,7 @@ static ini_option_t option[] = {
 static void validate(void){
   if(of.run == 0) return;
   if(of.ext_find){
-    char args[1024];
+    char args[PATH_MAX];
     sprintf(args, "%s/mdtest-easy/ -name \"*01*\"", opt.datadir);
     external_find_prepare_arguments(args, & of);
   }else{
@@ -39,15 +39,6 @@ static void validate(void){
     u_argv_push(argv, "-name");
     u_argv_push(argv, "*01*");
     u_argv_push(argv, "-C");
-    if(of.pfind_steal_from_next){
-      u_argv_push(argv, "-N");
-    }
-    if(of.pfind_par_single_dir_access_hash){
-      u_argv_push(argv, "-H");
-      u_argv_push(argv, "1");
-    }
-    u_argv_push(argv, "-q");
-    u_argv_push_printf(argv, "%d", of.pfind_queue_length);
 
     pfind_prepare_arguments(argv, & of);
   }

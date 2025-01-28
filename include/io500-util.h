@@ -82,7 +82,7 @@ void u_print_timestamp(FILE * out);
 void * u_malloc(int size);
 
 
-FILE * u_res_file_prep(char const * name);
+FILE * u_res_file_prep(char const * name, int rank);
 void u_res_file_close(FILE * out);
 
 uint32_t u_phase_unique_random_number(char const * phase_name);

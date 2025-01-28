@@ -60,7 +60,7 @@ double run_find(const char * phase_name, opt_find * of){
         fprintf(fd, "runtime: %f rate: %f\n", of->pfind_res->runtime, of->pfind_res->rate);
         fprintf(fd, "rank, errors, unknown, found, total, checked, job steal msgs received, work items send, job steal msgs send, work items stolen, time spend in job stealing in s, number of completion tokens send\n");
         fprintf(fd, "0, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64, res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);
-        fprintf(fd, ", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %.3fs, %"PRIu64"\n", res->monitor.job_steal_inbound, res->monitor.work_send, res->monitor.job_steal_tries, res->monitor.work_stolen, res->monitor.job_steal_mpitime_us / 1000000.0, res->monitor.completion_tokens_send);
+        fprintf(fd, ", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %.3f, %"PRIu64"\n", res->monitor.job_steal_inbound, res->monitor.work_send, res->monitor.job_steal_tries, res->monitor.work_stolen, res->monitor.job_steal_mpitime_us / 1000000.0, res->monitor.completion_tokens_send);
         for(int i=1; i < of->nproc; i++){
           MPI_Recv(& res->errors, 5, MPI_LONG_LONG_INT, i, 4712, of->pfind_com, MPI_STATUS_IGNORE);
           fprintf(fd, "%d, %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64", %"PRIu64, i, res->errors, res->unknown_file, res->found_files, res->total_files, res->checked_dirents);
@@ -98,7 +98,7 @@ double run_find(const char * phase_name, opt_find * of){
       ERROR("Failed to run find command: \"%s\" error: %s\n", of->command, strerror(errno));
       return -1;
     }
-    char line[1024];
+    char line[PATH_MAX];
     uint64_t hits = 0;
     *line = '\0';
     while (fgets(line, sizeof(line), fp) != NULL) {
@@ -175,16 +175,7 @@ static void validate(void){
     u_argv_push(argv, "-name");
     u_argv_push(argv, "*01*");
     u_argv_push(argv, "-C");
-    if(of.pfind_steal_from_next){
-      u_argv_push(argv, "-N");
-    }
-    if(of.pfind_par_single_dir_access_hash){
-      u_argv_push(argv, "-H");
-      u_argv_push(argv, "1");
-    }
-    u_argv_push(argv, "-q");
-    u_argv_push_printf(argv, "%d", of.pfind_queue_length);
-
+    
     pfind_prepare_arguments(argv, & of);
   }
 }
@@ -226,6 +217,16 @@ void pfind_prepare_arguments(u_argv_t * argv, opt_find * of){
         com = MPI_COMM_NULL;
       }
     }
+    
+    if(of->pfind_steal_from_next){
+      u_argv_push(argv, "-N");
+    }
+    if(of->pfind_par_single_dir_access_hash){
+      u_argv_push(argv, "-H");
+      u_argv_push(argv, "1");
+    }
+    u_argv_push(argv, "-q");
+    u_argv_push_printf(argv, "%d", of->pfind_queue_length);
 
     of->command = u_flatten_argv(argv);
     of->pfind_com = com;

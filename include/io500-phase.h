@@ -8,9 +8,10 @@
 #define DEBUG_OPTION "INVALIDATES RUN; FOR DEBUGGING."
 
 typedef enum {
-  IO500_NO_SCORE,
+  IO500_NO_SCORE = 0,
   IO500_SCORE_MD,
   IO500_SCORE_BW,
+  IO500_SCORE_CONCURRENT,
   IO500_SCORE_LAST
 } io500_phase_score_group;
 
@@ -64,6 +65,8 @@ extern u_phase_t p_mdworkbench;
 extern u_phase_t p_mdworkbench_create;
 extern u_phase_t p_mdworkbench_bench;
 extern u_phase_t p_mdworkbench_delete;
+
+extern u_phase_t p_concurrent;
 
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;

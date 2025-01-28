@@ -53,7 +53,7 @@ function git_co {
 
 ###### GET FUNCTIONS
 function get_ior {
-  local ior_dir="build/ior"
+  local ior_dir="ior"
   if [ -d "$ior_dir" ]; then
     echo "IOR already exists. Skipping download."
   else
@@ -63,7 +63,7 @@ function get_ior {
 }
 
 function get_pfind {
-  local pfind_dir="build/pfind"
+  local pfind_dir="pfind"
   if [ -d "$pfind_dir" ]; then
     echo "Parallel find already exists. Skipping download."
   else

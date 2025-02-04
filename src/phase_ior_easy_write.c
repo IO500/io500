@@ -29,7 +29,7 @@ static double run(void){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv);
+  ior_easy_add_params(argv, 1);
   u_argv_push(argv, "-w");	/* write file */
   u_argv_push(argv, "-D");	/* deadline for stonewall in seconds */
   u_argv_push_printf(argv, "%d", opt.stonewall);
@@ -51,8 +51,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_easy_write.name);
-  return ior_process_write(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_ior_easy_write.name, opt.rank);
+  return ior_process_write(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 u_phase_t p_ior_easy_write = {

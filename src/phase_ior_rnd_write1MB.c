@@ -28,7 +28,7 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if (opt.dry_run) return;
+  if (opt.dry_run || ! ior_rnd1MB_o.run) return;
 
   if(opt.rank == 0){
     char filename[PATH_MAX];
@@ -62,8 +62,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd1MB_write.name);
-  return ior_process_write(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_ior_rnd1MB_write.name, opt.rank);
+  return ior_process_write(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 u_phase_t p_ior_rnd1MB_write = {

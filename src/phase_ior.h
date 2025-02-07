@@ -41,7 +41,7 @@ extern opt_ior_rnd ior_rnd4K_o;
 extern opt_ior_rnd ior_rnd1MB_o;
 
 
-void ior_easy_add_params(u_argv_t * argv);
+void ior_easy_add_params(u_argv_t * argv, int addStdFlags);
 void ior_hard_add_params(u_argv_t * argv);
 void ior_rnd4K_add_params(u_argv_t * argv);
 void ior_rnd1MB_add_params(u_argv_t * argv);

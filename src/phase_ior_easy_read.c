@@ -30,7 +30,7 @@ static double run(void){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv);
+  ior_easy_add_params(argv, 1);
   u_argv_push(argv, "-r");	/* read existing file */
   u_argv_push(argv, "-R");	/* verify data read */
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);

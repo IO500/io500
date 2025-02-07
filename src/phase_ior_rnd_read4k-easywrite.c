@@ -30,7 +30,7 @@ static double run(void){
   opt_ior_rnd_read d = o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv);
+  ior_easy_add_params(argv, 0);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);

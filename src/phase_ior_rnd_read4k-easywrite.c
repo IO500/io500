@@ -62,5 +62,5 @@ u_phase_t p_ior_rnd4K_read_easywrite = {
   validate,
   run,
   0,
-  .group = IO500_SCORE_BW,
+  .group = IO500_NO_SCORE,
 };

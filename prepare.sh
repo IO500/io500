@@ -7,7 +7,7 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=03985eeec485b59a9422d48a1b660d72feae72a8
+IOR_HASH=14bdbfb
 PFIND_HASH=778dca8
 
 INSTALL_DIR=$PWD

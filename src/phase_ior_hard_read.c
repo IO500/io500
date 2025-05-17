@@ -62,6 +62,6 @@ u_phase_t p_ior_hard_read = {
   option,
   validate,
   run,
-  0,
+  .verify_stonewall = 1,
   .group = IO500_SCORE_BW,
 };

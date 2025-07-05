@@ -74,7 +74,7 @@ static double run(void){
   /* prepare benchmark settings */ 
   {
   opt_ior_easy d = ior_easy_o;
-  ior_easy_add_params(argv[0], 0);
+  ior_easy_add_params(argv[0], 0, 1);
   u_argv_push(argv[0], "-w");	/* write file */
   u_argv_push_printf(argv[0], "-D=%d", opt.stonewall); /* deadline for stonewall in seconds */
   u_argv_push_printf(argv[0], "-O=minTimeDuration=%d", opt.stonewall); /* minimum runtime */

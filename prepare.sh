@@ -7,13 +7,13 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=03985eeec485b59a9422d48a1b660d72feae72a8
-PFIND_HASH=778dca8
+IOR_HASH=14bdbfb
+PFIND_HASH=aaba722a178
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
 BUILD=$PWD/build
-MAKE="make -j$(nproc)"
+MAKE="make -j${NPROC:-$(nproc 2> /dev/null || echo 4)}"	# handle missing nproc
 
 function main {
   # listed here, easier to spot and run if something fails
@@ -53,7 +53,7 @@ function git_co {
 
 ###### GET FUNCTIONS
 function get_ior {
-  local ior_dir="build/ior"
+  local ior_dir="ior"
   if [ -d "$ior_dir" ]; then
     echo "IOR already exists. Skipping download."
   else
@@ -63,7 +63,7 @@ function get_ior {
 }
 
 function get_pfind {
-  local pfind_dir="build/pfind"
+  local pfind_dir="pfind"
   if [ -d "$pfind_dir" ]; then
     echo "Parallel find already exists. Skipping download."
   else

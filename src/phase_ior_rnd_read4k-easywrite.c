@@ -30,7 +30,7 @@ static double run(void){
   opt_ior_rnd_read d = o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv);
+  ior_easy_add_params(argv, 0, 0);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
@@ -50,8 +50,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd4K_read.name);
-  return ior_process_read(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_ior_rnd4K_read.name, opt.rank);
+  return ior_process_read(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 
@@ -62,5 +62,5 @@ u_phase_t p_ior_rnd4K_read_easywrite = {
   validate,
   run,
   0,
-  .group = IO500_SCORE_BW,
+  .group = IO500_NO_SCORE,
 };

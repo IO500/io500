@@ -42,7 +42,7 @@ static void cleanup(void){
   }
 }
 
-void ior_easy_add_params(u_argv_t * argv, int useStatusFile){
+void ior_easy_add_params(u_argv_t * argv, int useStatusFile, int addStdFlags){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
@@ -69,14 +69,18 @@ void ior_easy_add_params(u_argv_t * argv, int useStatusFile){
   u_argv_push(argv, "-e");	/* fsync upon write close */
   u_argv_push(argv, "-o");	/* filename for output file */
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
+
   if(useStatusFile){
     u_argv_push(argv, "-O");	/* additional IOR options */
     u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
   }
-  u_argv_push(argv, "-t");	/* transfer size */
-  u_argv_push(argv, d.transferSize);
-  u_argv_push(argv, "-b");	/* blocksize in bytes */
-  u_argv_push(argv, d.blockSize);
+
+  if(addStdFlags){
+    u_argv_push(argv, "-t");	/* transfer size */
+    u_argv_push(argv, d.transferSize);
+    u_argv_push(argv, "-b");	/* blocksize in bytes */
+    u_argv_push(argv, d.blockSize);
+  }
 
   if(ior_easy_o.uniqueDir){
     u_argv_push(argv, "-u");	/* unique directory for each output file */

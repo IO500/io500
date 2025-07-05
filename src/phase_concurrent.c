@@ -17,6 +17,7 @@ typedef struct{
   int color; // benchmark that is run
   float ratio_write;
   float ratio_read;
+  int procs[3];
 } opt_concurrent_bench;
 
 static opt_concurrent_bench o;
@@ -47,10 +48,11 @@ static double run(void){
 
   int workloads[] = {opt.mpi_size * d.ratio_write, opt.mpi_size * (d.ratio_write+d.ratio_read), opt.mpi_size};
   int procs[] = {workloads[0], workloads[1] - workloads[0], workloads[2] - workloads[1]};
+  memcpy(o.procs, procs, sizeof(int)*3);
   
   if(procs[0] + procs[1] == 0 || procs[0] + procs[2] == 0 || procs[1] + procs[2] == 0){
     INVALID("The concurrent phase doesn't make sense with two benchmarks using 0 processes\n");
-    return 0;
+    //return 0;
   }
   
   int color = (opt.rank < workloads[0]) ? 0 : (opt.rank < workloads[1] ? 1 : 2);
@@ -75,6 +77,8 @@ static double run(void){
   {
   opt_ior_easy d = ior_easy_o;
   ior_easy_add_params(argv[0], 0, 1);
+  u_argv_push(argv[0], "-o");	/* filename for output file */
+  u_argv_push_printf(argv[0], "%s/ior-easy-concurrent/ior_file_easy", opt.datadir);
   u_argv_push(argv[0], "-w");	/* write file */
   u_argv_push_printf(argv[0], "-D=%d", opt.stonewall); /* deadline for stonewall in seconds */
   u_argv_push_printf(argv[0], "-O=minTimeDuration=%d", opt.stonewall); /* minimum runtime */
@@ -121,11 +125,6 @@ static double run(void){
   double time = 0;
   if(color == 0){    
     // run ior easy write
-    if(ior_easy_o.filePerProc){
-        char filename[2048];
-        sprintf(filename, "ior-easy/ior_file_easy.%08d", opt.rank);
-        u_purge_file(filename);
-    }    
     FILE * out = u_res_file_prep("concurrent-ior-easy-write", crank);
     score = ior_process_write(argv[0], out, & o.iorw, ccom);
     if(o.iorw){
@@ -196,12 +195,40 @@ static double run(void){
 }
 
 
+static void validate(void){
+  u_create_datadir("ior-easy-concurrent");
+}
+
+static void cleanup(void){
+  opt_concurrent_bench d = o;
+    
+  if (opt.dry_run || ! d.run) return;
+  
+  if(opt.rank == 0){
+    if(! ior_easy_o.filePerProc){
+      u_purge_file("ior-easy-concurrent/ior_file_easy");
+    }
+  }
+  if(ior_easy_o.filePerProc){
+      char filename[PATH_MAX];
+      if(opt.rank < d.procs[0]){
+        sprintf(filename, "ior-easy-concurrent/ior_file_easy.%08d", opt.rank);
+        u_purge_file(filename);
+      }
+  }
+  if(opt.rank == 0){
+    u_purge_datadir("ior-easy-concurrent");
+  }
+}
+
+
 u_phase_t p_concurrent = {
   "concurrent",
   IO500_PHASE_WRITE | IO500_PHASE_FLAG_OPTIONAL,
   option,
-  NULL,
+  validate,
   run,
   0,
+  .cleanup = cleanup,
   .group = IO500_SCORE_CONCURRENT,
 };

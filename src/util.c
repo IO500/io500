@@ -237,7 +237,7 @@ void u_print_timestamp(FILE * out){
 
 FILE * u_res_file_prep(char const * name, int rank){
   FILE * out = stdout;
-  if(opt.rank == 0){
+  if(rank == 0){
     char fname[PATH_MAX];
     sprintf(fname, "%s/%s.txt", opt.resdir, name);
     INFO_PAIR("result-file", "%s\n", fname);

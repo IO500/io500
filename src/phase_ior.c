@@ -40,7 +40,7 @@ double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out, MPI
   *res_out = p;
 
   if(res->errors){
-    INVALID("Errors (%d) occured during phase in IOR. This invalidates your run.\n", res->errors);
+    INVALID("Errors (%d) occurred during phase in IOR. This invalidates your run.\n", res->errors);
   }
   double tp = p->aggFileSizeForBW / p->time / GIBIBYTE;
   return tp;

@@ -36,6 +36,8 @@ static u_phase_t * phases[IO500_PHASES] = {
 
   & p_mdworkbench_bench,
 
+  & p_concurrent,
+
   & p_ior_easy_read,
   & p_mdtest_easy_stat,
 

@@ -32,8 +32,8 @@ static void validate(void){
 }
 
 
-void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out){
-  mdworkbench_results_t * res = md_workbench_run(argv->size, argv->vector, MPI_COMM_WORLD, out);
+void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** res_out, MPI_Comm com){
+  mdworkbench_results_t * res = md_workbench_run(argv->size, argv->vector, com, out);
   u_res_file_close(out);
   u_argv_free(argv);
 
@@ -43,19 +43,22 @@ void mdworkbench_process(u_argv_t * argv, FILE * out, mdworkbench_results_t ** r
   *res_out = res;
 }
 
-
-
-void mdworkbench_add_params(u_argv_t * argv, int is_create){
+void mdworkbench_add_params(u_argv_t * argv, int is_create, MPI_Comm com){
   opt_mdworkbench * d = & mdworkbench_o;
+  int rank;
+  MPI_Comm_rank(com, & rank);
 
   u_argv_push(argv, "./md-workbench");
   u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
   for(int i=0; i < mdworkbench_o.verbosity; i++){
     u_argv_push(argv, "-v");
   }
-  if(opt.io_buffers_on_gpu){
-    u_argv_push(argv, "--allocateBufferOnGPU");
-  }  
+  if(opt.allocateBufferDevice){
+    u_argv_push_printf(argv, "--allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
+  }
   u_argv_push(argv, "--process-reports");
   u_argv_push_default_if_set_api_options(argv, "-a", d->api, d->api);
   u_argv_push_printf(argv, "-o=%s/mdworkbench", opt.datadir);
@@ -77,7 +80,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
 
     char file[PATH_MAX];
     sprintf(file, "%s/mdworkbench-size", opt.resdir);
-    if (is_create && opt.rank == 0){
+    if (is_create && rank == 0){
       // store the actual processed size, allows easy deletion
       FILE * f = fopen(file, "w");
       if(! f){
@@ -89,7 +92,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
     }
     if(! is_create && mdtest->rate <= 0.0){
       // read the size back as this is a deletion run
-      if(opt.rank == 0){
+      if(rank == 0){
         FILE * f = fopen(file, "r");
         if(! f){
           WARNING("Couldn't open mdworkbench-file: %s\n", file);
@@ -101,7 +104,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
       MPI_Bcast(& mdtest->rate, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
     if( mdtest->rate <= 0.0 ){
-      if(opt.rank == 0){
+      if(rank == 0){
         WARNING("MDWorkbench uses the MDTest rates to determine suitable options but MDTest didn't run, will use a low (and sane) default instead\n");
       }
       mdtest->rate = 10.0;

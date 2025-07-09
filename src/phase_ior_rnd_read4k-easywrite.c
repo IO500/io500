@@ -41,9 +41,7 @@ static double run(void){
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd4K-easy-read.csv", opt.resdir);
   u_argv_push(argv, "-t=4096");
   u_argv_push(argv, "-b=4096");
-  u_argv_push(argv, "-s=10000000");
-  u_argv_push(argv, "-O");
-  u_argv_push(argv, "stoneWallingWearOut=1");
+  u_argv_push(argv, "-s=1000000");
   
   o.command = u_flatten_argv(argv);
 
@@ -52,8 +50,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd4K_read_easywrite.name);
-  return ior_process_read(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_ior_rnd4K_read.name, opt.rank);
+  return ior_process_read(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 
@@ -64,5 +62,5 @@ u_phase_t p_ior_rnd4K_read_easywrite = {
   validate,
   run,
   0,
-  .group = IO500_NO_SCORE,
+  .group = IO500_SCORE_BW,
 };

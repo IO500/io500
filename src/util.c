@@ -158,10 +158,11 @@ static void push_api_args(u_argv_t * argv, char const * var){
       if(! t){
         break;
       }
-      if(strncasecmp(buff, t, len) != 0){
-        WARNING("Provided API option %s starts with a different prefix and might be not supported - don't worry if you checked!\n", t);
+      if(strncasecmp(buff, t, len) == 0){
+        u_argv_push(argv, t);
+      }else{
+        FATAL("Provided API option %s appears to be no API supported version\n", t);
       }
-      u_argv_push(argv, t);
     }
   }
   free(str);
@@ -235,9 +236,9 @@ void u_print_timestamp(FILE * out){
   fprintf(out, "%s", buffer);
 }
 
-FILE * u_res_file_prep(char const * name){
+FILE * u_res_file_prep(char const * name, int rank){
   FILE * out = stdout;
-  if(opt.rank == 0){
+  if(rank == 0){
     char fname[PATH_MAX];
     sprintf(fname, "%s/%s.txt", opt.resdir, name);
     INFO_PAIR("result-file", "%s\n", fname);
@@ -250,7 +251,7 @@ FILE * u_res_file_prep(char const * name){
 }
 
 void u_res_file_close(FILE * out){
-  if(opt.rank == 0){
+  if(out != stdout){
     fclose(out);
     out_logfile = stdout;
   }

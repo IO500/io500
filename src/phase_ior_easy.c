@@ -21,7 +21,7 @@ static void validate(void){
 }
 
 static void cleanup(void){
-  if (opt.dry_run) return;
+  if (opt.dry_run || ! ior_easy_o.run) return;
   
   if(opt.rank == 0){
     char filename[PATH_MAX];
@@ -42,7 +42,7 @@ static void cleanup(void){
   }
 }
 
-void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
+void ior_easy_add_params(u_argv_t * argv, int useStatusFile){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
@@ -50,9 +50,12 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
   for(int i=0; i < ior_easy_o.verbosity; i++){
     u_argv_push(argv, "-v");	/* verbose */
   }
-  if(opt.io_buffers_on_gpu){
+  if(opt.allocateBufferDevice){
     u_argv_push(argv, "-O");
-    u_argv_push(argv, "allocateBufferOnGPU=1");
+    u_argv_push_printf(argv, "allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
   }
   u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
   u_argv_push(argv, "-Q");	/* task per node offset */
@@ -66,14 +69,14 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
   u_argv_push(argv, "-e");	/* fsync upon write close */
   u_argv_push(argv, "-o");	/* filename for output file */
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
-  if(addStdFlags){
+  if(useStatusFile){
     u_argv_push(argv, "-O");	/* additional IOR options */
     u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
-    u_argv_push(argv, "-t");	/* transfer size */
-    u_argv_push(argv, d.transferSize);
-    u_argv_push(argv, "-b");	/* blocksize in bytes */
-    u_argv_push(argv, d.blockSize);
   }
+  u_argv_push(argv, "-t");	/* transfer size */
+  u_argv_push(argv, d.transferSize);
+  u_argv_push(argv, "-b");	/* blocksize in bytes */
+  u_argv_push(argv, d.blockSize);
 
   if(ior_easy_o.uniqueDir){
     u_argv_push(argv, "-u");	/* unique directory for each output file */

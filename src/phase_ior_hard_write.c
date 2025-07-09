@@ -52,8 +52,8 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_hard_write.name);
-  return ior_process_write(argv, out, & o.res);
+  FILE * out = u_res_file_prep(p_ior_hard_write.name, opt.rank);
+  return ior_process_write(argv, out, & o.res, MPI_COMM_WORLD);
 }
 
 u_phase_t p_ior_hard_write = {

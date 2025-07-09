@@ -9,6 +9,10 @@
 # When you are done pring 'x/y' where x is matched files and y is total files searched.
 # There is a parallel version also install in bin that might be better
 
+# The script should support the following extra options
+# -e for deletion of found files 
+# -E for deletion of directories
+
 function parse_rates {
   #find -D rates gives a weird thing like this:
   #Predicate success rates after completion
@@ -18,7 +22,20 @@ function parse_rates {
   echo $rates | tr " " "\n" | grep '/' | $1 -1 | cut -d \/ -f 2 | cut -d = -f 1
 }
 
-rates=`find -D rates $* 2>&1 | grep -A1 Predicate | tail -1` 
+IN=""
+for var in "$@"
+do
+    if [[ $var == "-e" ]] ; then 
+      continue
+    fi
+    if [[ $var == "-E" ]] ; then 
+      IN="$IN -exec rm -f {} ;"
+      continue
+    fi
+    IN="$IN $var"
+done
+
+rates=$(find -D rates $IN 2>&1 | grep -A1 Predicate | tail -1)
 total_files=$(parse_rates 'head')
 match_files=$(parse_rates 'tail')
 echo "MATCHED $match_files/$total_files"

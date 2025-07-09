@@ -2,8 +2,8 @@
 #include <assert.h>
 
 
-double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
-  IOR_test_t * test = ior_run(argv->size, argv->vector, MPI_COMM_WORLD, out);
+double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out, MPI_Comm com){
+  IOR_test_t * test = ior_run(argv->size, argv->vector, com, out);
   assert(test);
   IOR_results_t * res = test->results;
   assert(res);
@@ -31,8 +31,8 @@ double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
   return tp;
 }
 
-double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out){
-  IOR_results_t * res = ior_run(argv->size, argv->vector, MPI_COMM_WORLD, out)->results;
+double ior_process_read(u_argv_t * argv, FILE * out, IOR_point_t ** res_out, MPI_Comm com){
+  IOR_results_t * res = ior_run(argv->size, argv->vector, com, out)->results;
   u_res_file_close(out);
   u_argv_free(argv);
 

@@ -12,7 +12,7 @@ static opt_find of;
 
 static double run(void){
   if(of.run == 0) return 0.0;
-  return run_find("find-hard", & of);;
+  return run_find("find-hard", & of);
 }
 
 static ini_option_t option[] = {
@@ -28,30 +28,18 @@ static ini_option_t option[] = {
 
 static void validate(void){
   if(of.run == 0) return;
-  if(of.ext_find){
-    char args[1024];
-    sprintf(args, "%s/mdtest-hard/ -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
+  if(of.ext_find){ // runs with one process anyway
+    char args[PATH_MAX];
+    sprintf(args, "%s/mdtest-easy/ -newer %s/timestampfile -size 0c", opt.datadir, opt.resdir);
     external_find_prepare_arguments(args, & of);
   }else{
     u_argv_t * argv = u_argv_create();
     u_argv_push(argv, "./pfind");
-    u_argv_push_printf(argv, "%s/mdtest-hard/", opt.datadir);
-    u_argv_push(argv, "-newer");
-    u_argv_push_printf(argv, "%s/timestampfile", opt.resdir);
+    u_argv_push_printf(argv, "%s/mdtest-easy/", opt.datadir);
     u_argv_push(argv, "-size");
-    u_argv_push(argv, "3901c");
-    u_argv_push(argv, "-name");
-    u_argv_push(argv, "*01*");
-    u_argv_push(argv, "-C");
-    if(of.pfind_steal_from_next){
-      u_argv_push(argv, "-N");
-    }
-    if(of.pfind_par_single_dir_access_hash){
-      u_argv_push(argv, "-H");
-      u_argv_push(argv, "1");
-    }
-    u_argv_push(argv, "-q");
-    u_argv_push_printf(argv, "%d", of.pfind_queue_length);
+    u_argv_push(argv, "0c");
+    u_argv_push(argv, "-r");
+    u_argv_push_printf(argv, "%s", opt.datadir);
 
     pfind_prepare_arguments(argv, & of);
   }

@@ -35,9 +35,13 @@ void mdtest_hard_add_params(u_argv_t * argv){
 
   u_argv_push(argv, "./mdtest");
   u_argv_push_printf(argv, "--dataPacketType=%s", opt.dataPacketType);
-  if(opt.io_buffers_on_gpu){
-    u_argv_push(argv, "--allocateBufferOnGPU");
+  if(opt.allocateBufferDevice){
+    u_argv_push_printf(argv, "--allocateBufferOnGPU=%d", opt.allocateBufferDevice);
+    if(opt.gpuDirect){
+      u_argv_push(argv, "--gpuDirect");
+    }
   }
+
   u_argv_push(argv, "-n");	/* number of files per process */
   u_argv_push_printf(argv, "%"PRIu64, d.g.files_per_proc);
 

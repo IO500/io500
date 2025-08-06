@@ -15,22 +15,19 @@
 
 #define INVALID_RUN(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s:%d) ", __FILE__, __LINE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_run = 0; } }while(0);
 
-#define RUN_PHASE(phase) ( ! (phase->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD) )
 
 FILE* file_out = NULL;
 
 static char const * io500_phase_str[IO500_SCORE_LAST] = {
   "NO SCORE",
   "MD",
-  "BW", 
-  "CONCURRENT"
+  "BW"
   };
 
 static char const * io500_unit_str[IO500_SCORE_LAST] = {
   "     ",
   "kIOPS",
-  "GiB/s",
-  "score"
+  "GiB/s"
 };
 
 extern int rank;
@@ -134,12 +131,9 @@ static void print_cfg_hash(FILE * out, ini_section_t ** cfg){
 
 #define dupprintf(...) do{ if(opt.rank == 0) { fprintf(res_summary, __VA_ARGS__); printf(__VA_ARGS__); } }while(0);
 
-static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t * hash){
+static double calc_score(double scores[IO500_SCORE_LAST], uint32_t * hash){
   double overall_score = 1;
   int groups = IO500_SCORE_BW;
-  if(extended){
-    groups = IO500_SCORE_CONCURRENT;
-  }
   memset(scores, 0, sizeof(double) * IO500_SCORE_LAST);
   for(io500_phase_score_group g=1; g <= groups; g++){
     char score_string[2048];
@@ -148,7 +142,7 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
     int numbers = 0;
     p += sprintf(p, " %s = (1.0", io500_phase_str[g]);
     for(int i=0; i < IO500_PHASES; i++){
-      if( phases[i]->group == g && (extended || ! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) ){
+      if( phases[i]->group == g ){
         double t = phases[i]->score;
         if(t <= 0){
           continue;
@@ -174,15 +168,6 @@ static double calc_score(double scores[IO500_SCORE_LAST], int extended, uint32_t
   return pow(overall_score, 1.0 / groups);
 }
 
-static const char * io500_mode_str(io500_mode mode){
-  switch(mode){
-    case (IO500_MODE_STANDARD): return "standard";
-    case (IO500_MODE_EXTENDED): return "extended";
-    default:
-      return "unknown";
-  }
-}
-
 typedef struct {
   int run;
   int valid;
@@ -199,10 +184,19 @@ typedef struct{
 static io500_phase_result_t io500_results[IO500_PHASES];
 static io500_overall_results_t io500_overall_results;
 
-static void dump_io500_phase(FILE * o, int i){
-  io500_phase_result_t * r = & io500_results[i];
-  if(! r->run) return;
-  u_phase_t * phase = phases[i];
+static void dump_io500_phase(FILE * o, char * name){
+  int i;
+  u_phase_t * phase = NULL;
+  io500_phase_result_t * r;
+  for(i=0; i < IO500_PHASES; i++){
+    if (strcmp(phases[i]->name, name) == 0) {
+      phase = phases[i];
+      r = & io500_results[i];
+      if(! r->run) return;
+      break;
+    }
+  }
+  
   char score_str[40];
   sprintf(score_str, "%f", r->score);
   fprintf(o, "%25s\t%15s\t%s\t%.3fs\t%s\n", phase->name, score_str, io500_unit_str[phase->group], r->time, r->valid ? "" : "INVALID");
@@ -233,38 +227,22 @@ static void dump_io500_results(void){
     }
     
     // ior easy
-    dump_io500_phase(res, 3);
-    dump_io500_phase(res, 24);
+    dump_io500_phase(res, "ior-easy-write");
+    dump_io500_phase(res, "ior-easy-read");
     // ior hard
-    dump_io500_phase(res, 15);
-    dump_io500_phase(res, 26);
-    // rand4k
-    dump_io500_phase(res, 5);
-    dump_io500_phase(res, 19);
-    // rand1M
-    dump_io500_phase(res, 8);
-    dump_io500_phase(res, 20);
-    // concurrent
-    dump_io500_phase(res, 23);
-    
+    dump_io500_phase(res, "ior-hard-write");
+    dump_io500_phase(res, "ior-hard-read");  
     // MD easy
-    dump_io500_phase(res, 7);
-    dump_io500_phase(res, 25);
-    dump_io500_phase(res, 29);
+    dump_io500_phase(res, "mdtest-easy-write");
+    dump_io500_phase(res, "mdtest-easy-stat");
+    dump_io500_phase(res, "mdtest-easy-delete");
     // MD hard
-    dump_io500_phase(res, 17);
-    dump_io500_phase(res, 27);
-    dump_io500_phase(res, 30);
-    dump_io500_phase(res, 31);
-    // MDW
-    dump_io500_phase(res, 22);
-    dump_io500_phase(res, 28);
+    dump_io500_phase(res, "mdtest-hard-write");
+    dump_io500_phase(res, "mdtest-hard-stat");
+    dump_io500_phase(res, "mdtest-hard-read");
+    dump_io500_phase(res, "mdtest-hard-delete");
     // find
-    dump_io500_phase(res, 18);
-    // find easy
-    dump_io500_phase(res, 13);    
-    // find hard
-    dump_io500_phase(res, 21);
+    dump_io500_phase(res, "find");
     
     fclose(res);
 }
@@ -429,7 +407,6 @@ int main(int argc, char ** argv){
   PRINT_PAIR("version", "%s\n", VERSION);
   print_cfg_hash(file_out, cfg);
   PRINT_PAIR("result-dir", "%s\n", opt.resdir);
-  PRINT_PAIR("mode", "%s\n", io500_mode_str(opt.mode));
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved
@@ -459,13 +436,12 @@ int main(int argc, char ** argv){
 
   // manage a hash for the scores
   uint32_t score_hash = 0;
-  uint32_t score_extended_hash = 0;
   u_hash_update_key_val(& score_hash, "version", VERSION);
 
-  dupprintf("IO500 version %s (%s)\n", VERSION, io500_mode_str(opt.mode));
+  dupprintf("IO500 version %s\n", VERSION);
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(RUN_PHASE(phases[i]) && phases[i]->validate){
+    if((phases[i]) && phases[i]->validate){
       phases[i]->validate();
     }
   }
@@ -477,7 +453,7 @@ int main(int argc, char ** argv){
     u_phase_t * phase = phases[i];
     if(! phase->run) continue;        
     if( cleanup_only && ! (phase->type & IO500_PHASE_REMOVE) ) continue;
-    if(! RUN_PHASE(phase)){
+    if(! (phase)){
       continue;
     }
     io500_results[i].run = 1;
@@ -548,9 +524,6 @@ int main(int argc, char ** argv){
       }
       if(! opt.is_valid_phase){
         opt.is_valid_extended_run = 0;
-        if(! (phase->type & IO500_PHASE_FLAG_OPTIONAL)){
-          opt.is_valid_run = 0;
-        }
       }
     
       io500_results[i].score = score;
@@ -576,11 +549,7 @@ int main(int argc, char ** argv){
       fprintf(file_out, "\n");
     }
     if(phase->group > IO500_NO_SCORE){
-      if(phase->type & IO500_PHASE_FLAG_OPTIONAL){
-        u_hash_update_key_val_dbl(& score_extended_hash, phase->name, score);
-      }else{
-        u_hash_update_key_val_dbl(& score_hash, phase->name, score);
-      }
+      u_hash_update_key_val_dbl(& score_hash, phase->name, score);
     }
     phases[i]->score = score;
   }
@@ -591,7 +560,7 @@ int main(int argc, char ** argv){
     // compute the overall score
     fprintf(file_out, "\n[SCORE]\n");
     double scores[IO500_SCORE_LAST];
-    double overall_score = calc_score(scores, 0, & score_hash);
+    double overall_score = calc_score(scores, & score_hash);
     PRINT_PAIR("SCORE", "%f%s\n", overall_score, valid_str);
     u_hash_update_key_val_dbl(& score_hash, "SCORE", overall_score);
     if( ! opt.is_valid_run ){
@@ -604,30 +573,13 @@ int main(int argc, char ** argv){
     scores[IO500_NO_SCORE] = overall_score;
     memcpy(io500_overall_results.score, scores, sizeof(scores));
     
-    // extended run
-    if(opt.mode == IO500_MODE_EXTENDED){
-      valid_str = opt.is_valid_extended_run ? "" : " [INVALID]";
-      fprintf(file_out, "\n[SCOREX]\n");
-      double overall_extended_score = calc_score(scores, 1, & score_extended_hash);
-      u_hash_update_key_val_dbl(& score_extended_hash, "SCORE", overall_extended_score);
-      if( ! opt.is_valid_extended_run ){
-        u_hash_update_key_val(& score_extended_hash, "valid", "NO");
-      }
-      PRINT_PAIR("SCORE", "%f%s\n", overall_extended_score, valid_str);
-      PRINT_PAIR("hash", "%X\n", (int) score_extended_hash);
-      dupprintf("[SCOREX] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f%s\n", scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_extended_score, valid_str);
-      
-      scores[IO500_NO_SCORE] = overall_score;
-      memcpy(io500_overall_results.scoreX, scores, sizeof(scores));
-    }
-    
     io500_overall_results.runtime = GetTimeStamp() - t_io500_start;
     dump_io500_results();
     printf("\nThe result files are stored in the directory: %s\n", opt.resdir);
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    if(RUN_PHASE(phases[i]) && phases[i]->cleanup){
+    if((phases[i]) && phases[i]->cleanup){
       phases[i]->cleanup();
     }
   }

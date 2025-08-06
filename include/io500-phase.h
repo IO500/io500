@@ -11,7 +11,6 @@ typedef enum {
   IO500_NO_SCORE = 0,
   IO500_SCORE_MD,
   IO500_SCORE_BW,
-  IO500_SCORE_CONCURRENT,
   IO500_SCORE_LAST
 } io500_phase_score_group;
 
@@ -21,8 +20,7 @@ typedef enum {
   IO500_PHASE_WRITE = 2,
   IO500_PHASE_READ = 4,
   IO500_PHASE_UPDATE = 8,
-  IO500_PHASE_REMOVE = 16,
-  IO500_PHASE_FLAG_OPTIONAL = 32
+  IO500_PHASE_REMOVE = 16
 } io500_phase_type;
 
 typedef struct{
@@ -38,7 +36,7 @@ typedef struct{
   io500_phase_score_group group;
 } u_phase_t;
 
-#define IO500_PHASES (2 + 1 + 2*3 + 3 + 3 + 4 + 5 + 3 + 4 + 1 + 1)
+#define IO500_PHASES (2 + 1 + 1 + 3 + 4 + 4 + 5)
 
 extern u_phase_t p_opt;
 extern u_phase_t p_debug;
@@ -46,27 +44,10 @@ extern u_phase_t p_debug;
 extern u_phase_t p_timestamp;
 
 extern u_phase_t p_find;
-extern u_phase_t p_find_easy;
-extern u_phase_t p_find_hard;
 
 extern u_phase_t p_ior_hard;
 extern u_phase_t p_ior_hard_write;
 extern u_phase_t p_ior_hard_read;
-
-extern u_phase_t p_ior_rnd4K;
-extern u_phase_t p_ior_rnd4K_write;
-extern u_phase_t p_ior_rnd4K_read;
-
-extern u_phase_t p_ior_rnd1MB;
-extern u_phase_t p_ior_rnd1MB_write;
-extern u_phase_t p_ior_rnd1MB_read;
-
-extern u_phase_t p_mdworkbench;
-extern u_phase_t p_mdworkbench_create;
-extern u_phase_t p_mdworkbench_bench;
-extern u_phase_t p_mdworkbench_delete;
-
-extern u_phase_t p_concurrent;
 
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;

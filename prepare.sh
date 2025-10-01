@@ -6,8 +6,7 @@ echo This script downloads the code for the benchmarks
 echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
-
-IOR_HASH=348572ccfe8963
+IOR_HASH=8ab8f69b32b919
 PFIND_HASH=aaba722a178
 
 INSTALL_DIR=$PWD

@@ -16,7 +16,7 @@ static ini_option_t option[] = {
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.g.run},
   {NULL} };
 
-mdtest_generic_res * mdtest_easy_write_get_result(){
+mdtest_generic_res * mdtest_easy_write_get_result(void){
   return & o.res;
 }
 

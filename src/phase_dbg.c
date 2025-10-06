@@ -12,7 +12,7 @@ static ini_option_t option[] = {
 
 static void validate(void){
   if(opt.stonewall != opt.minwrite && opt.rank == 0){
-    INVALID("stonewall-time < %us\n", opt.minwrite);
+    INVALID("stonewall-time %us != %us\n", opt.stonewall, opt.minwrite);
   }
 }
 

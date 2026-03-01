@@ -13,6 +13,7 @@ typedef struct{
   char * transferSize;
   char * blockSize;
   int verbosity;
+  int direct;
 } opt_ior_easy;
 
 extern opt_ior_easy ior_easy_o;
@@ -41,7 +42,7 @@ extern opt_ior_rnd ior_rnd4K_o;
 extern opt_ior_rnd ior_rnd1MB_o;
 
 
-void ior_easy_add_params(u_argv_t * argv, int addStdFlags);
+void ior_easy_add_params(u_argv_t * argv, int addStdFlags, int direct);
 void ior_hard_add_params(u_argv_t * argv);
 void ior_rnd4K_add_params(u_argv_t * argv);
 void ior_rnd1MB_add_params(u_argv_t * argv);

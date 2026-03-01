@@ -14,6 +14,7 @@ static ini_option_t option[] = {
   {"uniqueDir", "Use unique directory per file per process", 0, INI_BOOL, "FALSE", & ior_easy_o.uniqueDir},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & ior_easy_o.run},
   {"verbosity", "The verbosity level", 0, INI_INT, 0, & ior_easy_o.verbosity},
+  {"direct", "Use direct IO (posix.odirect)", 0, INI_BOOL, "TRUE", & ior_easy_o.direct},
   {NULL} };
 
 static void validate(void){
@@ -42,7 +43,7 @@ static void cleanup(void){
   }
 }
 
-void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
+void ior_easy_add_params(u_argv_t * argv, int addStdFlags, int direct){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
@@ -81,6 +82,10 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
 
   if(ior_easy_o.filePerProc){
     u_argv_push(argv, "-F");	/* write a separate file per process */
+  }
+
+  if(direct){
+    u_argv_push(argv, "--posix.odirect");	/* read&write file with direct IO */
   }
 }
 

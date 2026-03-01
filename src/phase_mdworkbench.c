@@ -94,7 +94,9 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
         if(! f){
           WARNING("Couldn't open mdworkbench-file: %s\n", file);
         }else{
-          fread(& mdtest->rate, sizeof(mdtest->rate), 1, f);
+          if (fread(& mdtest->rate, sizeof(mdtest->rate), 1, f) != 1) {
+            WARNING("Failed to read mdworkbench-file: %s\n", file);
+          }
         }
         fclose(f);
       }

@@ -8,6 +8,7 @@
 typedef struct{
   int run;
   char * api;
+  int direct;
 
   char * command;
   IOR_point_t * res;
@@ -18,6 +19,7 @@ static opt_ior_rnd_read o;
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.run},  
+  {"direct", "Use direct IO (posix.odirect)", 0, INI_BOOL, NULL, & o.direct},
   {NULL} };
 
 
@@ -30,7 +32,8 @@ static double run(void){
   opt_ior_rnd_read d = o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv, 0);
+  int direct = (o.direct != INI_UNSET_BOOL) ? o.direct : ior_easy_o.direct;
+  ior_easy_add_params(argv, 0, direct);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);

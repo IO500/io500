@@ -169,6 +169,17 @@ static const char * io500_mode_str(io500_mode mode){
   }
 }
 
+static int should_run_phase(u_phase_t * phase){
+  if(phase->options){
+    for(ini_option_t * o = phase->options; o->name != NULL; o++){
+      if(o->type == INI_BOOL && o->var != NULL && strcmp(o->name, "run") == 0){
+        return *(int*) o->var;
+      }
+    }
+  }
+  return 1;
+}
+
 int main(int argc, char ** argv){
   int mpi_init = 0;
   file_out = stdout;
@@ -375,6 +386,10 @@ int main(int argc, char ** argv){
     if(! phase->run) continue;
     if( cleanup_only && ! (phase->type & IO500_PHASE_REMOVE) ) continue;
     if(! RUN_PHASE(phase)){
+      continue;
+    }
+
+    if(! should_run_phase(phase)){
       continue;
     }
 

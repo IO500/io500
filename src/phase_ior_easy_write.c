@@ -9,6 +9,7 @@
 typedef struct{
   int run;
   char * api;
+  int direct;
 
   char * command;
   IOR_point_t * res;
@@ -19,6 +20,7 @@ static opt_ior_easy_write o;
 static ini_option_t option[] = {
   {"API", "The API to be used", 0, INI_STRING, NULL, & o.api},
   {"run", "Run this phase", 0, INI_BOOL, "TRUE", & o.run},  
+  {"direct", "Use direct IO (posix.odirect)", 0, INI_BOOL, NULL, & o.direct},
   {NULL} };
 
 static void validate(void){
@@ -29,7 +31,8 @@ static double run(void){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv, 1);
+  int direct = (o.direct != INI_UNSET_BOOL) ? o.direct : d.direct;
+  ior_easy_add_params(argv, 1, direct);
   u_argv_push(argv, "-w");	/* write file */
   u_argv_push(argv, "-D");	/* deadline for stonewall in seconds */
   u_argv_push_printf(argv, "%d", opt.stonewall);
@@ -40,9 +43,6 @@ static double run(void){
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-easy-write.csv", opt.resdir);
 //  u_argv_push_default_if_set(argv, "-U",		/* use hints file */
 //			     d.hintsFileName, o.hintsFileName);
-//  u_argv_push_default_if_set_api_options(argv, "-a",	/* backend API */
-//					 d.api, o.api);
-//  u_argv_push_default_if_set_bool(argv, "--posix.odirect", d.odirect, o.odirect);
 
   o.command = u_flatten_argv(argv);
 

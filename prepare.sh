@@ -87,8 +87,8 @@ function get_schema_tools {
 function build_ior {
   pushd "$BUILD"/ior
   ./bootstrap
-  # Add here extra flags
-  ./configure --prefix="$INSTALL_DIR"
+  # Add here extra flags (e.g., --with-aio for asynchronous I/O support)
+  ./configure --prefix="$INSTALL_DIR" --with-aio
   cd src
   $MAKE clean
   $MAKE install
@@ -99,7 +99,7 @@ function build_ior {
 
 function build_pfind {
   pushd "$BUILD"/pfind
-  ./prepare.sh
+  CFLAGS="-fPIC" ./prepare.sh
   ./compile.sh
   ln -sf "$BUILD"/pfind/pfind "$BIN"/pfind
   echo "Pfind: OK"

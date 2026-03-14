@@ -27,7 +27,7 @@ static void validate(void){
 
 
 static double run(void){
-  opt_ior_rnd_read d = o;
+  opt_ior_easy d = ior_easy_o;
 
   u_argv_t * argv = u_argv_create();
   ior_easy_add_params(argv, 0);
@@ -44,6 +44,12 @@ static double run(void){
   u_argv_push(argv, "-s=10000000");
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
+
+  if (d.filePerProc){
+    u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
+    u_argv_push(argv, "-Q");	/* task per node offset */
+    u_argv_push(argv, "1");
+  }
   
   o.command = u_flatten_argv(argv);
 

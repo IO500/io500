@@ -54,9 +54,6 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
     u_argv_push(argv, "-O");
     u_argv_push(argv, "allocateBufferOnGPU=1");
   }
-  u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
-  u_argv_push(argv, "-Q");	/* task per node offset */
-  u_argv_push(argv, "1");
   u_argv_push(argv, "-g");	/* barriers between open, read, write, close */
   u_argv_push(argv, "-G");	/* use fixed timestamp signature */
   int hash = u_phase_unique_random_number("ior-easy");
@@ -67,6 +64,9 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
   u_argv_push(argv, "-o");	/* filename for output file */
   u_argv_push_printf(argv, "%s/ior-easy/ior_file_easy", opt.datadir);
   if(addStdFlags){
+    u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
+    u_argv_push(argv, "-Q");	/* task per node offset */
+    u_argv_push(argv, "1");
     u_argv_push(argv, "-O");	/* additional IOR options */
     u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
     u_argv_push(argv, "-t");	/* transfer size */

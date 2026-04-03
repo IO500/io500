@@ -47,9 +47,8 @@ static double run(void){
 
   if (d.filePerProc){
     u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
-    u_argv_push(argv, "-C");	/* shift one more node away */
     u_argv_push(argv, "-Q");	/* task per node offset */
-    u_argv_push(argv, "1");
+    u_argv_push(argv, "2");
   }
   
   o.command = u_flatten_argv(argv);

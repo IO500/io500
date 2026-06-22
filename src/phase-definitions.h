@@ -50,7 +50,7 @@ static u_phase_t * phases[IO500_PHASES] = {
   & p_ior_rnd4K_easy_read
 };
 
-static ini_section_t ** u_options(void){
+static inline ini_section_t ** u_options(void){
   ini_section_t ** ini_section = u_malloc(sizeof(ini_section_t*) * (IO500_PHASES + 1));
   for(int i=0; i < IO500_PHASES; i++){
     ini_section[i] = u_malloc(sizeof(ini_section_t));
@@ -60,3 +60,14 @@ static ini_section_t ** u_options(void){
   ini_section[IO500_PHASES] = NULL;
   return ini_section;
 }
+
+static inline bool u_should_hash_phase(char const * name) {
+  for (int i = 0; i < IO500_PHASES; i++) {
+    if (strcmp(phases[i]->name, name) == 0) {
+      return phases[i]->group > IO500_NO_SCORE &&
+             (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL) == 0;
+    }
+  }
+  return true;
+}
+

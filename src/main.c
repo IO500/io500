@@ -13,6 +13,10 @@
 
 #include <phase-definitions.h>
 
+bool should_hash_phase(char const * name) {
+  return u_should_hash_phase(name);
+}
+
 #define INVALID_RUN(...) do{ if (opt.rank == 0){fprintf(file_out, "; ERROR INVALID "__VA_ARGS__); printf("ERROR INVALID (%s:%d) ", __FILE__, __LINE__); printf(__VA_ARGS__); fflush(file_out); opt.is_valid_run = 0; } }while(0);
 
 #define RUN_PHASE(phase) ( ! (phase->type & IO500_PHASE_FLAG_OPTIONAL && opt.mode == IO500_MODE_STANDARD) )

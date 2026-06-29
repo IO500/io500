@@ -60,7 +60,7 @@ void ior_rnd4K_add_params(u_argv_t * argv){
 
 u_phase_t p_ior_rnd4K = {
   "ior-rnd4K",
-  IO500_PHASE_DUMMY,
+  IO500_PHASE_DUMMY | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,
   NULL,

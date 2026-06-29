@@ -182,15 +182,46 @@ int main(int argc, char ** argv){
 
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
     help:
-    r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash] [--timestamp <timestamp>]\n\n", argv[0]);
-    r0printf("--config-hash Compute the configuration hash\n");
-    r0printf("--cleanup will run the delete phases of the benchmark useful to get rid of a partially executed benchmark\n");
-    r0printf("--dry-run will show the executed IO benchmark arguments but not run them (It will run drop caches, though, if enabled)\n");
-    r0printf("--list list available options for the .ini file\n");
-    r0printf("--mode=standard|extended define the mode to run the benchmark\n");
-    r0printf("--timestamp use <timestamp> for the output directory\n");
-    r0printf("--verify to verify that the output hasn't been modified accidentially; call like: io500 test.ini --verify test.out\n\n");
+    r0printf("Synopsis:\n");
+    r0printf("  %s <INI file> [options]                     Run the benchmark\n", argv[0]);
+    r0printf("  %s --list | -l                              List all configuration options\n", argv[0]);
+    r0printf("  %s --list-mandatory | -lm                   List only mandatory configuration options\n", argv[0]);
+    r0printf("  %s <INI file> --verify <output file>        Verify that the output matches the configuration\n", argv[0]);
+    r0printf("  %s --help | -h                              Show this help message\n\n", argv[0]);
+    
+    r0printf("Options:\n");
+    r0printf("  --config-hash          Compute the configuration hash\n");
+    r0printf("  --cleanup              Run only the delete phases (useful to clean up failed runs)\n");
+    r0printf("  --dry-run              Show executed IO benchmark arguments but do not run them\n");
+    r0printf("  --mode=standard|extended\n");
+    r0printf("                         Define the mode to run the benchmark (default: standard)\n");
+    r0printf("  -v=<verbosity level>   Set the verbosity level (1-10)\n");
+    r0printf("  --timestamp=<string>   Use <string> for the output directory name\n\n");
 
+    goto out;
+  }
+  if (argc >= 2 && (strcmp(argv[1], "--list-mandatory") == 0 || strcmp(argv[1], "-lm") == 0)) {
+    if (opt.rank == 0) {
+      /* print this as a comment, in case it is saved into the .ini file */
+      r0printf("# Supported and current values of the ini file (Mandatory Phases Only):\n");
+      int mandatory_count = 0;
+      for(int i=0; i < IO500_PHASES; i++){
+        if (! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) {
+          mandatory_count++;
+        }
+      }
+      ini_section_t ** filtered_cfg = malloc(sizeof(ini_section_t*) * (mandatory_count + 1));
+      int idx = 0;
+      for(int i=0; i < IO500_PHASES; i++){
+        if (! (phases[i]->type & IO500_PHASE_FLAG_OPTIONAL)) {
+          filtered_cfg[idx] = cfg[i];
+          idx++;
+        }
+      }
+      filtered_cfg[mandatory_count] = NULL;
+      u_ini_print_values(stdout, filtered_cfg, TRUE);
+      free(filtered_cfg);
+    }
     goto out;
   }
   if (argc < 2 || strcmp(argv[1], "-l") == 0 || strcmp(argv[1], "--list") == 0){

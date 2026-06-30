@@ -58,12 +58,12 @@ static double run(void){
     u_argv_free(argv);
     return 0;
   }
-  FILE * out = u_res_file_prep(p_ior_rnd4K_read_easywrite.name);
+  FILE * out = u_res_file_prep(p_ior_rnd4K_easy_read.name);
   return ior_process_read(argv, out, & o.res);
 }
 
 
-u_phase_t p_ior_rnd4K_read_easywrite = {
+u_phase_t p_ior_rnd4K_easy_read = {
   "ior-rnd4K-easy-read",
   IO500_PHASE_READ,
   option,

@@ -201,7 +201,8 @@ int main(int argc, char ** argv){
     r0printf("  --mode=standard|extended\n");
     r0printf("                         Define the mode to run the benchmark (default: standard)\n");
     r0printf("  --timestamp=<string>   Use <string> for the output directory name\n\n");
-    r0printf("  --verbose=<level>      Set the verbosity level (1-10)\n");
+    r0printf("  -v                     Increase the verbosity level (can be repeated, e.g., -v -v).\n");
+    r0printf("  --verbose=<level>      Set the verbosity level (1-10).\n");
 
     goto out;
   }
@@ -256,6 +257,12 @@ int main(int argc, char ** argv){
         print_help = 1;
       }else if(strncmp(argv[i], "--verbose=", 10) == 0){
         verbosity_override = atoi(argv[i]+10);
+        opt.verbosity = verbosity_override;
+      }else if(strcmp(argv[i], "-v") == 0){
+        if(verbosity_override == -1){
+          verbosity_override = 0;
+        }
+        verbosity_override++;
         opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--mode=standard") == 0){
         opt.mode = IO500_MODE_STANDARD;

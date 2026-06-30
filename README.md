@@ -4,13 +4,17 @@ This is the C version of the IO500 benchmark.
 
 ## Install and Build Packages
 
-Download and compile all required packages (e.g., IOR/mdtest/pfind).
+Before compiling, you should review and edit the `prepare.sh` file to customize the build configuration for your system. 
+
+* **Custom Build Flags**: You can edit the variables at the top of `prepare.sh` (or set them as environment variables) to pass custom flags:
+  * `IOR_EXTRA_CONFIGURE_FLAGS`: Extra arguments to pass to IOR's `./configure` (e.g., `--with-aio`).
+  * `IO500_EXTRA_CFLAGS` / `IO500_EXTRA_LDFLAGS`: Custom compiler/linker flags for `io500` (e.g., for custom storage libraries like DAOS).
+
+Once you have configured the script, run it to download and compile all required packages (IOR, mdtest, pfind):
 
     $ ./prepare.sh
 
-Note that prepare.sh installs the packages in the IO500
-directory even if they are already installed on your system to ensure
-that the right versions are utilized for the benchmark.
+Note that `prepare.sh` installs these packages locally in the `io500` directory to ensure the correct versions are utilized for the benchmark, even if they are already installed globally on your system.
 
 ## Customize configuration
 Be advised that any modifications to IO500 MUST be made according to the [IO500 rules](https://io500.org/rules/submission) if the results are intended for official submission.
@@ -52,7 +56,8 @@ Options:
                          Define the mode to run the benchmark (default: standard)
   --timestamp=<string>   Use <string> for the output directory name
 
-  --verbose=<level>      Set the verbosity level (1-10)
+  -v                     Increase the verbosity level (can be repeated, e.g., -v -v).
+  --verbose=<level>      Set the verbosity level (1-10).
 ```
 
 For most users, it is best to generate an .ini file of the mandatory phases required

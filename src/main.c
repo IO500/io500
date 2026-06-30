@@ -184,19 +184,24 @@ int main(int argc, char ** argv){
     help:
     r0printf("Synopsis:\n");
     r0printf("  %s <INI file> [options]                     Run the benchmark\n", argv[0]);
-    r0printf("  %s --list | -l                              List all configuration options\n", argv[0]);
-    r0printf("  %s --list-mandatory | -lm                   List only mandatory configuration options\n", argv[0]);
+    r0printf("  or\n");
     r0printf("  %s <INI file> --verify <output file>        Verify that the output matches the configuration\n", argv[0]);
-    r0printf("  %s --help | -h                              Show this help message\n\n", argv[0]);
-    
+    r0printf("  or\n");
+    r0printf("  %s --help | -h                              Show this help message\n", argv[0]);
+    r0printf("  or\n");
+    r0printf("  %s --list | -l                              List all configuration options for INI file\n", argv[0]);
+    r0printf("  or\n");
+    r0printf("  %s --list-mandatory | -lm                   List only mandatory configuration options for INI file\n\n", argv[0]);
+
     r0printf("Options:\n");
     r0printf("  --config-hash          Compute the configuration hash\n");
     r0printf("  --cleanup              Run only the delete phases (useful to clean up failed runs)\n");
     r0printf("  --dry-run              Show executed IO benchmark arguments but do not run them\n");
+
     r0printf("  --mode=standard|extended\n");
     r0printf("                         Define the mode to run the benchmark (default: standard)\n");
-    r0printf("  -v=<verbosity level>   Set the verbosity level (1-10)\n");
     r0printf("  --timestamp=<string>   Use <string> for the output directory name\n\n");
+    r0printf("  --verbose=<level>      Set the verbosity level (1-10)\n");
 
     goto out;
   }
@@ -249,8 +254,8 @@ int main(int argc, char ** argv){
     for(int i = 2; i < argc; i++){
       if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0 ){
         print_help = 1;
-      }else if(strncmp(argv[i], "-v=", 3) == 0){
-        verbosity_override = atoi(argv[i]+3);
+      }else if(strncmp(argv[i], "--verbose=", 10) == 0){
+        verbosity_override = atoi(argv[i]+10);
         opt.verbosity = verbosity_override;
       }else if(strcmp(argv[i], "--mode=standard") == 0){
         opt.mode = IO500_MODE_STANDARD;

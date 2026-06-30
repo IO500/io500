@@ -126,7 +126,7 @@ void mdworkbench_add_params(u_argv_t * argv, int is_create){
 
 u_phase_t p_mdworkbench = {
   "mdworkbench",
-  IO500_PHASE_DUMMY,
+  IO500_PHASE_DUMMY | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,
   NULL,

@@ -7,6 +7,7 @@ vgcore.*
 io500
 io500-verify
 system-information.txt
+local.mk
 
 # Temporary files
 *.orig

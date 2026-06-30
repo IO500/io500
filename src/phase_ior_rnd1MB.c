@@ -60,7 +60,7 @@ void ior_rnd1MB_add_params(u_argv_t * argv){
 
 u_phase_t p_ior_rnd1MB = {
   "ior-rnd1MB",
-  IO500_PHASE_DUMMY,
+  IO500_PHASE_DUMMY | IO500_PHASE_FLAG_OPTIONAL,
   option,
   validate,
   NULL,

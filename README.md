@@ -35,10 +35,14 @@ Detailed help for the available options is provided when running:
 $ ./io500 -h
 Synopsis:
   ./io500 <INI file> [options]                     Run the benchmark
-  ./io500 --list | -l                              List all configuration options
-  ./io500 --list-mandatory | -lm                   List only mandatory configuration options
+  or
   ./io500 <INI file> --verify <output file>        Verify that the output matches the configuration
+  or
   ./io500 --help | -h                              Show this help message
+  or
+  ./io500 --list | -l                              List all configuration options for INI file
+  or
+  ./io500 --list-mandatory | -lm                   List only mandatory configuration options for INI file
 
 Options:
   --config-hash          Compute the configuration hash
@@ -46,8 +50,9 @@ Options:
   --dry-run              Show executed IO benchmark arguments but do not run them
   --mode=standard|extended
                          Define the mode to run the benchmark (default: standard)
-  -v=<verbosity level>   Set the verbosity level (1-10)
   --timestamp=<string>   Use <string> for the output directory name
+
+  --verbose=<level>      Set the verbosity level (1-10)
 ```
 
 For most users, it is best to generate an .ini file of the mandatory phases required

@@ -6,8 +6,6 @@ echo This script downloads the code for the benchmarks
 echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
-IOR_HASH=5fcf0ba995f
-PFIND_HASH=2742734
 
 # Extra arguments to pass to IOR's ./configure command.
 # Example: IOR_EXTRA_CONFIGURE_FLAGS="--with-aio" ./prepare.sh
@@ -21,6 +19,10 @@ INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
 BUILD=$PWD/build
 MAKE="make -j${NPROC:-$(nproc 2> /dev/null || echo 4)}"	# handle missing nproc
+
+# *****  YOU SHOULD NOT EDIT ANYTHING BELOW THIS LINE  *****
+IOR_HASH=5fcf0ba995f
+PFIND_HASH=2742734
 
 function main {
   # listed here, easier to spot and run if something fails

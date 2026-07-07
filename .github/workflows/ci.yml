@@ -23,10 +23,9 @@ jobs:
         run: |
           apt-get update
           apt-get install -y \
-            build-essential autoconf automake libtool git ca-certificates electric-fence
+            build-essential autoconf automake libtool pkg-config git ca-certificates electric-fence
           if [ "${{ matrix.mpi }}" = "mpich" ]; then
             apt-get install -y mpich
-            update-alternatives --install /usr/bin/mpiexec mpiexec /usr/bin/mpirun.mpich 100
           else
             apt-get install -y libopenmpi-dev openmpi-bin
           fi

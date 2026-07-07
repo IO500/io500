@@ -29,6 +29,7 @@ jobs:
           else
             apt-get install -y libopenmpi-dev openmpi-bin
           fi
+          git config --global --add safe.directory '*'
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,6 +49,14 @@ jobs:
 
       - name: Build
         run: make
+
+      - name: MPI sanity check
+        run: |
+          echo "mpiexec: $(command -v mpiexec) -> $(readlink -f "$(command -v mpiexec)")"
+          mpiexec --version | head -2
+          echo "--- ldd io500 ---"; ldd ./io500 | grep -iE 'mpi|pmi' || true
+          echo "--- PMI/OMPI env seen by each rank ---"
+          mpiexec -np 2 sh -c 'echo "rank PMI=${PMI_RANK:-unset}/${PMI_SIZE:-unset} OMPI=${OMPI_COMM_WORLD_RANK:-unset}/${OMPI_COMM_WORLD_SIZE:-unset}"'
 
       - name: Run benchmark (debug config)
         run: ./io500.sh config-debug-run.ini

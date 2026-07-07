@@ -28,7 +28,7 @@ jobs:
           else
             sudo apt-get install -y libopenmpi-dev openmpi-bin
           fi
-          mpicc --version
+          sudo ln -sf "$(command -v mpirun)" /usr/local/bin/mpiexec
 
       - name: Restore build cache
         uses: actions/cache@v4

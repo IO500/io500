@@ -9,11 +9,15 @@ jobs:
   build-and-test:
     name: build-and-test (${{ matrix.mpi }})
     runs-on: ubuntu-latest
-    container: ubuntu:24.04
+    container: ${{ matrix.image }}
     strategy:
       fail-fast: false
       matrix:
-        mpi: [mpich, openmpi]
+        include:
+          - mpi: mpich
+            image: ubuntu:22.04
+          - mpi: openmpi
+            image: ubuntu:24.04
     env:
       OMPI_ALLOW_RUN_AS_ROOT: 1
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1

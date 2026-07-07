@@ -8,6 +8,10 @@
 
 #include <phase-definitions.h>
 
+bool should_hash_phase(char const * name) {
+  return u_should_hash_phase(name);
+}
+
 // Dummy prototypes to satisfy need for depending modules
 // TODO use ifdefs to strip dependency
 void pfind_find(void){}

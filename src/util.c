@@ -265,6 +265,10 @@ typedef struct{
 
 static res_file_data_t res_data;
 
+__attribute__((weak)) bool should_hash_phase(char const * name) {
+  return true;
+}
+
 static void hash_func(bool is_section, char const * key, char const * val){
   static char const * last_section = NULL;
   if(is_section){
@@ -299,6 +303,9 @@ static void hash_func(bool is_section, char const * key, char const * val){
     return;
   }
   if(strcmp(key, "score") == 0){
+    if (!should_hash_phase(last_section)) {
+      return;
+    }
     u_hash_update_key_val(& res_data.score_hash, last_section, val);
     return;
   }

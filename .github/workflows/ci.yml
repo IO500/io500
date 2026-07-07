@@ -64,3 +64,10 @@ jobs:
 
       - name: Run benchmark (debug config)
         run: ./io500.sh config-debug-run.ini
+
+      - name: Verify result
+        run: |
+          result=$(find . -name result.txt | head -n1)
+          echo "Verifying: $result"
+          ./io500 config-debug-run.ini --verify "$result" | tee verify.out
+          grep -qF '[OK]' verify.out && ! grep -qF 'ERROR' verify.out

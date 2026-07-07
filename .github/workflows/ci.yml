@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: build-and-test (${{ matrix.mpi }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi: [mpich, openmpi]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential autoconf automake libtool git electric-fence
+          if [ "${{ matrix.mpi }}" = "mpich" ]; then
+            sudo apt-get install -y mpich
+          else
+            sudo apt-get install -y libopenmpi-dev openmpi-bin
+          fi
+          mpicc --version
+
+      - name: Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            schema-tools
+          key: ${{ runner.os }}-${{ matrix.mpi }}-deps-${{ hashFiles('prepare.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.mpi }}-deps-
+
+      - name: Prepare dependencies (IOR, pfind, schema-tools)
+        run: ./prepare.sh
+
+      - name: Build
+        run: make
+
+      - name: Run benchmark (debug config)
+        run: ./io500.sh config-debug-run.ini

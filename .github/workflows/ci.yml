@@ -28,7 +28,9 @@ jobs:
           else
             sudo apt-get install -y libopenmpi-dev openmpi-bin
           fi
-          sudo ln -sf "$(command -v mpirun)" /usr/local/bin/mpiexec
+          launcher=$(readlink -f "$(command -v mpirun)")
+          sudo ln -sf "$launcher" "$(dirname "$launcher")/mpiexec"
+          dirname "$launcher" >> "$GITHUB_PATH"
 
       - name: Restore build cache
         uses: actions/cache@v4

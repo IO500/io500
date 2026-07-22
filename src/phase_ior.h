@@ -28,23 +28,8 @@ typedef struct{
 
 extern opt_ior_hard ior_hard_o;
 
-typedef struct{
-  int run;
-  char * api;
-
-  int random_prefill_bytes;
-  uint64_t block_size;
-  int verbosity;
-} opt_ior_rnd;
-
-extern opt_ior_rnd ior_rnd4K_o;
-extern opt_ior_rnd ior_rnd1MB_o;
-
-
 void ior_easy_add_params(u_argv_t * argv, int addStdFlags);
 void ior_hard_add_params(u_argv_t * argv);
-void ior_rnd4K_add_params(u_argv_t * argv);
-void ior_rnd1MB_add_params(u_argv_t * argv);
 
 // Generic helpers
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);

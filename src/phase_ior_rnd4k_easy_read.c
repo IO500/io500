@@ -36,12 +36,13 @@ static double run(void){
   u_argv_push_printf(argv, "%d", opt.stonewall);
   u_argv_push(argv, "-z");
   u_argv_push(argv, "-z");
+  u_argv_push(argv, "-z");  
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);
   u_argv_push(argv, "-O");
   u_argv_push_printf(argv, "saveRankPerformanceDetailsCSV=%s/ior-rnd4K-easy-read.csv", opt.resdir);
   u_argv_push(argv, "-t=4096");
   u_argv_push(argv, "-b=4096");
-  u_argv_push(argv, "-s=10000000");
+  u_argv_push(argv, "-s=-1");
   u_argv_push(argv, "-O");
   u_argv_push(argv, "stoneWallingWearOut=1");
 

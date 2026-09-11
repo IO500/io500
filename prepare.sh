@@ -21,7 +21,7 @@ BUILD=$PWD/build
 MAKE="make -j${NPROC:-$(nproc 2> /dev/null || echo 4)}"	# handle missing nproc
 
 # *****  YOU SHOULD NOT EDIT ANYTHING BELOW THIS LINE  *****
-IOR_HASH=5fcf0ba995f
+IOR_HASH=93c085cdd6370c1d
 PFIND_HASH=2742734
 
 function main {

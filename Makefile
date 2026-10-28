@@ -9,7 +9,7 @@ LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS) # -lgpfs # may need some additional flags
 # Allow local user overrides without editing this Makefile
 -include local.mk
 
-VERSION_GIT=$(shell git describe --always --abbrev=12)
+VERSION_GIT=$(shell git describe --always --abbrev=12 --match 'io500-*_v[0-9]*')
 VERSION_TREE=$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")
 VERSION=$(VERSION_GIT)$(VERSION_TREE)
 CFLAGS += -DVERSION="\"$(VERSION)\""

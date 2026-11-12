@@ -28,8 +28,8 @@ typedef struct{
 
 extern opt_ior_hard ior_hard_o;
 
-void ior_easy_add_params(u_argv_t * argv, int addStdFlags);
-void ior_hard_add_params(u_argv_t * argv);
+void ior_easy_add_params(u_argv_t * argv, int addStdFlags, int rank_offset);
+void ior_hard_add_params(u_argv_t * argv, int rank_offset);
 
 // Generic helpers
 double ior_process_write(u_argv_t * argv, FILE * out, IOR_point_t ** res_out);

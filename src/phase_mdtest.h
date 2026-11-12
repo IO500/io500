@@ -37,8 +37,10 @@ extern opt_mdtest_hard mdtest_hard_o;
 
 void mdtest_add_generic_params(u_argv_t * argv, opt_mdtest_generic * dflt, opt_mdtest_generic * generic);
 
-void mdtest_easy_add_params(u_argv_t * argv);
-void mdtest_hard_add_params(u_argv_t * argv);
+void mdtest_easy_add_params(u_argv_t * argv, int rank_offset);
+void mdtest_hard_add_params(u_argv_t * argv, int rank_offset);
+/* the -N value of mdtest-easy, which fixes its directory layout at write time */
+int mdtest_easy_rank_offset(int draw);
 
 void p_mdtest_run(u_argv_t * argv, FILE * out, mdtest_generic_res * d, mdtest_test_num_t test);
 

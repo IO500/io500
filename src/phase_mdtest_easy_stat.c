@@ -3,6 +3,7 @@
 
 #include <io500-phase.h>
 #include <phase_mdtest.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   opt_mdtest_generic g;
@@ -22,8 +23,11 @@ static void validate(void){
 }
 
 static double run(void){
+  /* mdtest stats the files of rank + 1 * stride */
+  int rank_offset = mdtest_easy_rank_offset(0);
+  u_rank_offset_check("mdtest-easy", IO500_OFFSET_MDTEST, rank_offset, 1);
   u_argv_t * argv = u_argv_create();
-  mdtest_easy_add_params(argv);
+  mdtest_easy_add_params(argv, rank_offset);
   u_argv_push(argv, "-T");	/* only stat files */
   u_argv_push_printf(argv, "--saveRankPerformanceDetails=%s/mdtest-easy-stat.csv", opt.resdir);
 

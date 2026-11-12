@@ -4,6 +4,7 @@
 
 #include <io500-phase.h>
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   int run;
@@ -31,8 +32,10 @@ static void validate(void){
 static double run(void){
   opt_ior_hard d = ior_hard_o;
 
+  int k = 1;
+  int rank_offset = u_rank_offset_phase("ior-hard", IO500_OFFSET_IOR, & k, 1, 1);
   u_argv_t * argv = u_argv_create();
-  ior_hard_add_params(argv);
+  ior_hard_add_params(argv, rank_offset);
   u_argv_push(argv, "-r");	/* read file */
   u_argv_push(argv, "-R");	/* verify data read */
   u_argv_push_default_if_set_bool(argv, "-c", d.collective, o.collective);

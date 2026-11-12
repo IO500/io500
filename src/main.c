@@ -10,6 +10,7 @@
 
 #include <io500-util.h>
 #include <io500-phase.h>
+#include <io500-rank-offset.h>
 
 #include <phase-definitions.h>
 
@@ -248,6 +249,7 @@ int main(int argc, char ** argv){
   MPI_Comm_rank(MPI_COMM_WORLD, & opt.rank);
   MPI_Comm_size(MPI_COMM_WORLD, & opt.mpi_size);
   rank = opt.rank;
+  u_node_table_init(MPI_COMM_WORLD);
 
   int verbosity_override = -1;
   int print_help = 0;
@@ -374,6 +376,7 @@ int main(int argc, char ** argv){
   print_cfg_hash(file_out, cfg);
   PRINT_PAIR("result-dir", "%s\n", opt.resdir);
   PRINT_PAIR("mode", "%s\n", io500_mode_str(opt.mode));
+  u_node_table_print();
 
   if(opt.rank == 0){
     // create configuration in result directory to ensure it is preserved

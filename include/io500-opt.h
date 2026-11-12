@@ -38,6 +38,7 @@ typedef struct{
 
   int scc;
   int minwrite;
+  int rank_offset;       /* debug: force the read-back rank offset */
   io500_mode mode;
 
   aiori_xfer_hint_t backend_hints;

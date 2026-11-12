@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 #include <io500-phase.h>
 
 opt_ior_hard ior_hard_o;
@@ -27,12 +28,13 @@ static void cleanup(void){
     char filename[PATH_MAX];
     sprintf(filename, "%s/ior-hard.stonewall", opt.resdir);
     unlink(filename);
+    u_rank_offset_cleanup("ior-hard");
     u_purge_file("ior-hard/file");
     u_purge_datadir("ior-hard");
   }
 }
 
-void ior_hard_add_params(u_argv_t * argv){
+void ior_hard_add_params(u_argv_t * argv, int rank_offset){
   opt_ior_hard d = ior_hard_o;
 
   u_argv_push(argv, "./ior");
@@ -46,7 +48,7 @@ void ior_hard_add_params(u_argv_t * argv){
   }
   u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
   u_argv_push(argv, "-Q");	/* task per node offset */
-  u_argv_push(argv, "1");
+  u_argv_push_printf(argv, "%d", rank_offset);
   u_argv_push(argv, "-g");	/* barriers between open, read, write, close */
   int hash = u_phase_unique_random_number("ior-hard");
   u_argv_push_printf(argv, "-G=%d", hash);

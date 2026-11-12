@@ -3,6 +3,7 @@
 
 #include <io500-phase.h>
 #include <phase_mdtest.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   opt_mdtest_generic g;
@@ -22,8 +23,9 @@ static void validate(void){
 }
 
 static double run(void){
+  u_rank_offset_written("mdtest-hard");
   u_argv_t * argv = u_argv_create();
-  mdtest_hard_add_params(argv);
+  mdtest_hard_add_params(argv, 1);	/* -N is unused by create */
   u_argv_push(argv, "-C"); /* only create files */
   u_argv_push(argv, "-Y"); /* call sync command after each phase */
   

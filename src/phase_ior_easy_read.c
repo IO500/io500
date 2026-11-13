@@ -4,6 +4,7 @@
 
 #include <io500-phase.h>
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   int run;
@@ -29,8 +30,11 @@ static void validate(void){
 static double run(void){
   opt_ior_easy d = ior_easy_o;
 
+  /* ior-rnd4K-easy-read reads the files again with its own shift */
+  int mult[] = {1, 1};
+  int rank_offset = u_rank_offset_phase("ior-easy", IO500_OFFSET_IOR, mult, d.filePerProc ? 2 : 1, 1);
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv, 1);
+  ior_easy_add_params(argv, 1, rank_offset);
   u_argv_push(argv, "-r");	/* read existing file */
   u_argv_push(argv, "-R");	/* verify data read */
   u_argv_push_default_if_set_api_options(argv, "-a", d.api, o.api);

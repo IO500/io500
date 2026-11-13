@@ -26,8 +26,9 @@ static void validate(void){
 }
 
 static double run(void){
+  int rank_offset = mdtest_easy_rank_offset(1);
   u_argv_t * argv = u_argv_create();
-  mdtest_easy_add_params(argv);
+  mdtest_easy_add_params(argv, rank_offset);
   u_argv_push(argv, "-C");	/* only create files */
   u_argv_push(argv, "-Y");	/* call sync command after each phase */
   u_argv_push(argv, "-W");	/* deadline for stonewall in seconds */

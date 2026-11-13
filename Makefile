@@ -22,8 +22,9 @@ vpath %.c $(SEARCHPATH)
 vpath %.h $(SEARCHPATH)
 .SUFFIXES:
 
-DEPS += io500-util.h io500-debug.h io500-opt.h
+DEPS += io500-util.h io500-debug.h io500-opt.h io500-rank-offset.h
 OBJSO += util.o
+OBJSO += rank_offset.o
 OBJSO += ini-parse.o
 OBJSO += phase_dbg.o
 OBJSO += phase_opt.o
@@ -57,6 +58,7 @@ OBJSO += phase_ior_rnd4k_easy_read.o
 OBJS = $(patsubst %,./build/%,$(OBJSO))
 
 TESTS += ini-test
+TESTS += rank-offset-test
 TESTSEXE = $(patsubst %,./build/%.exe,$(TESTS))
 
 all: $(VERIFIER) $(PROGRAM) $(TESTSEXE)

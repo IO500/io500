@@ -5,6 +5,7 @@
 #include <io500-phase.h>
 
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   int run;
@@ -30,8 +31,9 @@ static void validate(void){
 static double run(void){
   opt_ior_hard d = ior_hard_o;
 
+  u_rank_offset_written("ior-hard");
   u_argv_t * argv = u_argv_create();
-  ior_hard_add_params(argv);
+  ior_hard_add_params(argv, 1);
   u_argv_push(argv, "-w");	/* write file */
   u_argv_push_default_if_set_bool(argv, "-c", d.collective, o.collective);
   u_argv_push(argv, "-D");	/* deadline for stonewall in seconds */

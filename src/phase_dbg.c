@@ -5,6 +5,7 @@
 
 static ini_option_t option[] = {
   {"stonewall-time", "For a valid result, the stonewall timer must be set to the value according to the rules. If smaller "DEBUG_OPTION, 0, INI_INT, "300", & opt.stonewall},
+  {"rank-offset", "Use this IOR -Q / mdtest -N value for all read, stat and delete phases instead of a random one "DEBUG_OPTION, 0, INI_INT, NULL, & opt.rank_offset},
   {"pause-dir", "Pause between phases while in this directory lies a file with the phase name, e.g., easy-create. This can be useful for performance testing, e.g., of tiered storage. At the moment it "DEBUG_OPTION, 0, INI_STRING, NULL, & opt.pause_dir},
   
   {NULL} };

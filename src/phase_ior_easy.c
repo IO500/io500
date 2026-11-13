@@ -3,6 +3,7 @@
 
 #include <io500-phase.h>
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 
 opt_ior_easy ior_easy_o;
 
@@ -27,6 +28,7 @@ static void cleanup(void){
     char filename[PATH_MAX];
     sprintf(filename, "%s/ior-easy.stonewall", opt.resdir);
     unlink(filename);
+    u_rank_offset_cleanup("ior-easy");
 
     if(! ior_easy_o.filePerProc){
       u_purge_file("ior-easy/ior_file_easy");
@@ -42,7 +44,7 @@ static void cleanup(void){
   }
 }
 
-void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
+void ior_easy_add_params(u_argv_t * argv, int addStdFlags, int rank_offset){
   opt_ior_easy d = ior_easy_o;
 
   u_argv_push(argv, "./ior");
@@ -66,7 +68,7 @@ void ior_easy_add_params(u_argv_t * argv, int addStdFlags){
   if(addStdFlags){
     u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
     u_argv_push(argv, "-Q");	/* task per node offset */
-    u_argv_push(argv, "1");
+    u_argv_push_printf(argv, "%d", rank_offset);
     u_argv_push(argv, "-O");	/* additional IOR options */
     u_argv_push_printf(argv, "stoneWallingStatusFile=%s/ior-easy.stonewall", opt.resdir);
     u_argv_push(argv, "-t");	/* transfer size */

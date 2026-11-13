@@ -5,6 +5,7 @@
 
 #include <io500-phase.h>
 #include <phase_mdtest.h>
+#include <io500-rank-offset.h>
 
 opt_mdtest_hard mdtest_hard_o;
 
@@ -26,11 +27,12 @@ static void cleanup(void){
     char filename[PATH_MAX];
     sprintf(filename, "%s/mdtest-hard.stonewall", opt.resdir);
     unlink(filename);
+    u_rank_offset_cleanup("mdtest-hard");
     u_purge_datadir("mdtest-hard");
   }
 }
 
-void mdtest_hard_add_params(u_argv_t * argv){
+void mdtest_hard_add_params(u_argv_t * argv, int rank_offset){
   opt_mdtest_hard d = mdtest_hard_o;
 
   u_argv_push(argv, "./mdtest");
@@ -54,7 +56,7 @@ void mdtest_hard_add_params(u_argv_t * argv){
   int hash = u_phase_unique_random_number("mdtest-hard");
   u_argv_push_printf(argv, "-G=%d", hash);
   u_argv_push(argv, "-N");	/* number of ranks between neighbours */
-  u_argv_push(argv, "1");
+  u_argv_push_printf(argv, "%d", rank_offset);
   u_argv_push(argv, "-F");	/* create only files, not directories */
   u_argv_push(argv, "-d");	/* output directory */
   u_argv_push_printf(argv, "%s/mdtest-hard", opt.datadir);

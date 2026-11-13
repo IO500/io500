@@ -4,6 +4,7 @@
 
 #include <io500-phase.h>
 #include <phase_ior.h>
+#include <io500-rank-offset.h>
 
 typedef struct{
   int run;
@@ -29,8 +30,14 @@ static void validate(void){
 static double run(void){
   opt_ior_easy d = ior_easy_o;
 
+  /* a shared file is read at random offsets, only file-per-proc is shifted */
+  int rank_offset = 2;
+  if (d.filePerProc){
+    int k = 1;
+    rank_offset = u_rank_offset_phase("ior-easy", IO500_OFFSET_IOR, & k, 1, 2);
+  }
   u_argv_t * argv = u_argv_create();
-  ior_easy_add_params(argv, 0);
+  ior_easy_add_params(argv, 0, 0);
   u_argv_push(argv, "-r");
   u_argv_push(argv, "-D");
   u_argv_push_printf(argv, "%d", opt.stonewall);
@@ -49,7 +56,7 @@ static double run(void){
   if (d.filePerProc){
     u_argv_push(argv, "-C");	/* reorder tasks in constant order for read */
     u_argv_push(argv, "-Q");	/* task per node offset */
-    u_argv_push(argv, "2");
+    u_argv_push_printf(argv, "%d", rank_offset);
   }
   
   o.command = u_flatten_argv(argv);
